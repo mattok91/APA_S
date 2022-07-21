@@ -1,0 +1,127 @@
+﻿FUNCTION_BLOCK "fbGetTimeLocal"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inGetTime { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+   END_VAR
+
+   VAR_OUTPUT 
+      ouDate { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : "typeDateSplit";
+      ouErrorStr : Bool;
+   END_VAR
+
+   VAR 
+      statPositiveEdgeDate {InstructionName := 'R_TRIG'; LibVersion := '1.0'} : R_TRIG;
+      statDate {InstructionName := 'DTL'; LibVersion := '1.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DTL;
+   END_VAR
+
+   VAR_TEMP 
+      tempRDSYST : Int;
+      tempExpDate : UInt;
+      tempFiller : Char;
+      tempStr : String;
+   END_VAR
+
+   VAR CONSTANT 
+      cExpDate : UInt := 5;
+   END_VAR
+
+
+BEGIN
+	
+	#statPositiveEdgeDate(CLK := #inGetTime);
+	
+	#ouErrorStr := FALSE;
+	#tempFiller := '0';
+	
+	IF #statPositiveEdgeDate.Q THEN
+	    
+	    //clear data
+	    "fcFillString"(inFillChar := #tempFiller,
+	                   inLength := 0,
+	                   ouString => #ouDate.Year);
+	    "fcFillString"(inFillChar := #tempFiller,
+	                   inLength := 0,
+	                   ouString => #ouDate.ExpYear);
+	    #ouDate.YearShort := #ouDate.Month := #ouDate.Day := #ouDate.Hour := #ouDate.Minute := #ouDate.Second := '  ';
+	    
+	    #tempRDSYST := RD_LOC_T(#statDate);
+	END_IF;
+	
+	// Convert date and time to strings
+	// 
+	#tempStr := UINT_TO_STRING(#statDate.YEAR);                                 //Convert year to string
+	
+	IF LEN(IN := #tempStr) = 5 THEN                                             //with blank space
+	    #ouDate.Year := MID(IN := #tempStr, L := 4, P := 2);                    //4 digit year
+	    #ouDate.YearShort := MID(IN := #ouDate.Year, L := 2, P := 3);           //2 digit year
+	    
+	    #tempExpDate := #statDate.YEAR + #cExpDate;                             //Exp date
+	    #tempStr := UINT_TO_STRING(#tempExpDate);                               //Convert exp_year to string
+	    #ouDate.ExpYear := MID(IN := #tempStr, L := 4, P := 2);                 //4 digit year
+	ELSE
+	    #ouErrorStr := TRUE;
+	    RETURN;
+	END_IF;
+	
+	#tempStr := UINT_TO_STRING(#statDate.MONTH);
+	#tempStr := DELETE(IN := #tempStr, L := 1, P := 1);
+	CASE LEN(#tempStr) OF
+	    1:
+	        #ouDate.Month := CONCAT(IN1 := #tempFiller, IN2 := #tempStr);
+	    2:
+	        #ouDate.Month := #tempStr;
+	    ELSE
+	        #ouErrorStr := TRUE;
+	        RETURN;
+	END_CASE;
+	
+	#tempStr := UINT_TO_STRING(#statDate.DAY);
+	#tempStr := DELETE(IN := #tempStr, L := 1, P := 1);
+	CASE LEN(#tempStr) OF
+	    1:
+	        #ouDate.Day := CONCAT(IN1 := #tempFiller, IN2 := #tempStr);
+	    2:
+	        #ouDate.Day := #tempStr;
+	    ELSE
+	        #ouErrorStr := TRUE;
+	        RETURN;
+	END_CASE;
+	
+	#tempStr := UINT_TO_STRING(#statDate.HOUR);
+	#tempStr := DELETE(IN := #tempStr, L := 1, P := 1);
+	CASE LEN(#tempStr) OF
+	    1:
+	        #ouDate.Hour := CONCAT(IN1 := #tempFiller, IN2 := #tempStr);
+	    2:
+	        #ouDate.Hour := #tempStr;
+	    ELSE
+	        #ouErrorStr := TRUE;
+	        RETURN;
+	END_CASE;
+	
+	#tempStr := UINT_TO_STRING(#statDate.MINUTE);
+	#tempStr := DELETE(IN := #tempStr, L := 1, P := 1);
+	CASE LEN(#tempStr) OF
+	    1:
+	        #ouDate.Minute := CONCAT(IN1 := #tempFiller, IN2 := #tempStr);
+	    2:
+	        #ouDate.Minute := #tempStr;
+	    ELSE
+	        #ouErrorStr := TRUE;
+	        RETURN;
+	END_CASE;
+	
+	#tempStr := UINT_TO_STRING(#statDate.SECOND);
+	#tempStr := DELETE(IN := #tempStr, L := 1, P := 1);
+	CASE LEN(#tempStr) OF
+	    1:
+	        #ouDate.Second := CONCAT(IN1 := #tempFiller, IN2 := #tempStr);
+	    2:
+	        #ouDate.Second := #tempStr;
+	    ELSE
+	        #ouErrorStr := TRUE;
+	        RETURN;
+	END_CASE;
+END_FUNCTION_BLOCK
+

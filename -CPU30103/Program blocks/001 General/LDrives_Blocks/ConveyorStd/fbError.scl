@@ -1,0 +1,52 @@
+﻿FUNCTION_BLOCK "fbError"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inEnable { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := false;   // Generalne zezwolenie
+      inResetMessage { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;   // Reset błędu
+      inFbSignalOk { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;   // Sygnał OK
+      inTimeDelayError : Time;   // Filtrowanie wystąpienia błędu
+   END_VAR
+
+   VAR_OUTPUT 
+      ouError { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;   // Błąd
+   END_VAR
+
+   VAR 
+      sInternalDelay {InstructionName := 'TON_TIME'; LibVersion := '1.0'; S7_SetPoint := 'False'} : TON_TIME;
+      sTimeReached { S7_SetPoint := 'True'} : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      tInternalEnable : Bool;
+      tSignalNotOK : Bool;
+      tSignalOK : Bool;
+      tTimeOut : Time;
+      tRet : Bool;
+   END_VAR
+
+
+BEGIN
+	//-- Init
+	#tInternalEnable := #inEnable;
+	
+	#tSignalNotOK := NOT #inFbSignalOk AND #tInternalEnable;
+	//-- Opóźnienie błędu
+	#sInternalDelay(IN := #tSignalNotOK,
+	                PT := #inTimeDelayError,
+	                Q  => #tSignalNotOK,
+	                ET => #tTimeOut);
+	
+	IF #tSignalNotOK THEN
+	    #ouError := TRUE;
+	END_IF;
+	
+	//-- Error set reset
+	IF NOT #tSignalNotOK AND #inResetMessage THEN
+	    #ouError := FALSE;
+	END_IF;
+	
+	
+	
+END_FUNCTION_BLOCK
+

@@ -1,0 +1,87 @@
+﻿FUNCTION "fcTrackingOccRange" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inDownstream : UInt;
+      inUpstream : UInt;
+   END_VAR
+
+   VAR_OUTPUT 
+      ouIDNo : UInt;
+      ouIDData : "typeTrackingUserData";
+   END_VAR
+
+   VAR_IN_OUT 
+      ioArray : Array[*] of "typeTrackingStep";
+      ioData : "typeTrackingData";
+   END_VAR
+
+   VAR_TEMP 
+      tQuotientDown : UInt;
+      tReminderDown : UInt;
+      tQuotientUp : UInt;
+      tReminderUp : UInt;
+      tArrayLength : DInt;
+      tFirstIndex : DInt;
+      tInc : Int;
+   END_VAR
+
+
+BEGIN
+	
+	// określenie górny/dolny zakres tablicy
+	#tArrayLength := UPPER_BOUND(ARR := #ioArray, DIM := 1);
+	#tFirstIndex := LOWER_BOUND(ARR := #ioArray, DIM := 1);
+	
+	#tQuotientDown := #inDownstream / #ioData.WindowLength;
+	#tReminderDown := #inDownstream MOD #ioData.WindowLength;
+	
+	#tQuotientUp := #inUpstream / #ioData.WindowLength;
+	#tReminderUp := #inUpstream MOD #ioData.WindowLength;
+	
+	//zerowanie ID
+	// #ouIDNo := 0;
+	// "fcClearData"(io_VAR_Data := #ouIDData);
+	
+	IF #tQuotientDown >= #tFirstIndex AND #tQuotientDown <= #tArrayLength AND
+	    #tQuotientUp >= #tFirstIndex AND #tQuotientUp <= #tArrayLength THEN
+	    
+	    //jeżeli okno down < up
+	    IF #tQuotientDown < #tQuotientUp THEN
+	        
+	        //przeszukiwanie okien z zakresu downtream - upstream
+	        FOR #tInc := UINT_TO_INT(#tQuotientDown) TO UINT_TO_INT(#tQuotientUp) DO
+	            
+	            //jeżeli wartość ID w oknach różna od 0
+	            IF #ioArray[#tInc].ID > 0 THEN
+	                //jeżeli pierwsze okno :
+	                IF #tInc = #tQuotientDown THEN
+	                    IF #ioArray[#tInc].Window >= #tReminderDown THEN
+	                        #ouIDNo := #ioArray[#tInc].ID;
+	                    END_IF;
+	                //jezeli ostatnie okno :
+	                ELSIF #tInc = #tQuotientUp THEN
+	                    IF #ioArray[#tInc].Window <= #tReminderUp THEN
+	                        #ouIDNo := #ioArray[#tInc].ID;
+	                    END_IF;
+	                //jeżeli pomiedzy oknami
+	                ELSE
+	                    #ouIDNo := #ioArray[#tInc].ID;
+	                END_IF;
+	            END_IF;
+	        END_FOR;
+	        
+	    //jeżeli okno down=up (offsety w granicahc jednego okna)
+	    ELSIF #tQuotientDown = #tQuotientUp THEN
+	        IF #ioArray[#tQuotientDown].Window <= #tReminderUp AND #ioArray[#tQuotientDown].Window >= #tReminderDown THEN
+	            #ouIDNo := #ioArray[#tQuotientDown].ID;
+	        END_IF;
+	    END_IF;
+	 
+	END_IF;
+	
+	IF #ouIDNo > 0 AND #ouIDNo <= #ioData.MaxID THEN
+	    #ouIDData := #ioData.UserData[#ouIDNo];
+	END_IF;
+END_FUNCTION
+

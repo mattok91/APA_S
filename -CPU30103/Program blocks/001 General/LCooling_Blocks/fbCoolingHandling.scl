@@ -1,0 +1,599 @@
+﻿FUNCTION_BLOCK "fbCoolingHandling"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inNewFilterIN : Bool;   // Nowy filtr do suszarki z TT2
+      inNewFilterOUT : Bool;   // Nowy filtr z suszarki na TT3
+      inEmptyingLineRequest : Bool;   // Żądanie opróżniania linii
+      inSlotSensors : "typeCoolingSensorSlot";   // Czujniki powiazane z suszarką
+      inGateClose : Bool;   // Czujnik zamkniecia drzwi rewizyjnych
+      inGroup : "typeGroup";   // Struktura grupy
+   END_VAR
+
+   VAR_OUTPUT 
+      ouCoolingEmpty : Bool;   // Status : suszarka pusta
+      ouFillingActive : Bool;   // Status : napełnianie aktywne. Brak filtrów OUT
+      ouEmptyingActive : Bool;   // Status : opróżnianie linii
+      ouCountOccupiedSlots : Int;   // Ilość zajętych slotów
+      ouCountBlockedSlots : Int;   // Ilość zablokowanych slotów z poziomu HMI
+      ouEnableEntranceForRobot : Bool;   // Sygnał dla robota o możliwości pracy w obszarze suszarki
+      ouLevelForRobot : Int;   // Sygnał dla robota o poziomie pracy suszarki
+      ouTypeProgram : Int;   // Sygnał dla robota o typie programu (do ustawienia numeru programu)
+      ouMoveTTPermitt : Bool;   // Sygnał dla stołu o możliwości ruchu (dla interloków)
+      ouError : Bool;   // Błąd
+      ouStatus : Word;   // Numer błędu
+   END_VAR
+
+   VAR_IN_OUT RETAIN
+      ioPlus1Pos : Bool;
+      ioPlus2Pos : Bool;
+   END_VAR
+   VAR_IN_OUT 
+      ioData : "typeCoolingTracking";
+      ioSensors : Array[*] of Bool;
+      ioDrive : "typeRotaryDrive";   // Struktura stołu obrotowego
+   END_VAR
+
+   VAR 
+      sError : Word;
+      sTriggerIN {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      sTriggerOUT {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+   END_VAR
+   VAR RETAIN
+      sAvaLevelTab : Array[1.."Cooling_Max_Level"] of Bool := [5(TRUE)];
+      sAvaLevelNo : Int;
+      sAvaLevelStart : Int;
+   END_VAR
+   VAR 
+      sGetTime { S7_SetPoint := 'False'} : "fbGetTimeStruct";
+      sDate { S7_SetPoint := 'False'} : "typeDateSplit";
+      sDateArray : Array[0..2] of String[4];
+      sCharArray : Array[0..20] of Char;
+      sStr : String;
+      sDaTLastEntrance : Date_And_Time;
+   END_VAR
+   VAR RETAIN
+      sStoreSlotNo : Int;
+      sAvaStoreSlotNo : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      tInc1 : Int;
+      tInc2 : Int;
+      tCounterEmptySlots : Int;
+      tCounterBlockedSlots : Int;
+      tCoolingMaxLevel_minus1 : Int;
+      tCoolingMaxRotaryOnLevel_minus1 : Int;
+      tCountRotary : Int;
+      tRetVal : Int;
+      tNumberSlots : Int;
+      tCoolingEmpty : Bool;
+      tCoolingEmptyLevel : Bool;
+      tCompleteCycle : Bool;
+      tSlotNo : Int;
+      tSeparator : Char;
+      tPosition : UDInt;
+      tDaT : Date_And_Time;
+      tSensorIN : Bool;
+      tSensorOUT : Bool;
+   END_VAR
+
+
+BEGIN
+	
+	(*
+	Gdy start procesu to stół musi wykonać ruch aby znalazł się na jakiejkolwiek pozycji.
+	Inkrementacja pomiedzy poziomami w górę = 2 obroty stołu
+	Inkrementacja pomiędzu poziomami w dół = 1 obrót stołu
+	Inkrementacja pomiedzy slotami = 1 obrót stołu
+	Inkrementacja pomiedzy poziomami gdy tylko jeden poziom aktywny = 1 obrót stołu
+	
+	Jeżeli poziom nieaktywny, musi zostać opróżniony
+	
+	Błędy :
+	1 - puste sloty podczas zwykłej pracy nie tworzą jednej kolumny
+	2 - po informacji z robota o zakończeniu operacji w obszarze suszarki (odłożenie detalu), czujnik nie wykrywa obecności detalu
+	4 - po informacji z robota o zakończeniu operacji w obszarze suszarki (pobranie detalu), czujnik obecności nadal wykrywa detal
+	8 - pozycja zerowa z kodowania stołu po osiagnieciu pozycji
+	
+	Ważne !
+	Po zakończonym ruchu stołu obrotowego należy zresetowac ioPlus2Pos oraz ioPlus1Pos
+	*)
+	
+	REGION Inicjalizacje
+	    
+	    //odzyskiwanie danych na wypadek inicjalizacji instancji
+	    //
+	    //1. przepisanie informacji o zablokowanym slocie na potrzeby "wspólnej" kolumny.
+	//    #sStoreSlotNo := #ioData.StartSlotNumber;
+	    
+	    
+	    #tCoolingMaxLevel_minus1 := "Cooling_Max_Level" - 1;
+	    #tCoolingMaxRotaryOnLevel_minus1 := "Cooling_Max_RotaryOnLevel" - 1;
+	    #tNumberSlots := "Cooling_Max_Level" * "Cooling_Max_RotaryOnLevel";
+	    
+	    //jeżeli brak warunku na ruch i informacja z stołu o osiągnięciu pozycji, przepisanie numeru pozycji
+	    IF NOT #ioDrive.sts.inOperation AND #ioDrive.sts.inPosition THEN
+	        #ioData.ActualDrivePosition := #ioDrive.sts.position;  //pozycja stołu <=> numer slotu
+	    END_IF;
+	    
+	    #tCountRotary := 0; //informacja ile obrotów ma zrobić suszarka
+	    #tCompleteCycle := FALSE; //informacja o zakonczeniu zapełniania suszarki z dołu do góry
+	    
+	    #sGetTime(inGetTime := FALSE);
+	    
+	    CASE "CoolingData".Data.ActualLevel OF
+	        1:
+	            #tSensorIN := #inSlotSensors."Slot L level 1 occupied";
+	            #tSensorOUT := #inSlotSensors."Slot P level 1 occupied";
+	        2:
+	            #tSensorIN := #inSlotSensors."Slot L level 2 occupied";
+	            #tSensorOUT := #inSlotSensors."Slot P level 2 occupied";
+	        3:
+	            #tSensorIN := #inSlotSensors."Slot L level 3 occupied";
+	            #tSensorOUT := #inSlotSensors."Slot P level 3 occupied";
+	        4:
+	            #tSensorIN := #inSlotSensors."Slot L level 4 occupied";
+	            #tSensorOUT := #inSlotSensors."Slot P level 4 occupied";
+	        5:
+	            #tSensorIN := #inSlotSensors."Slot L level 5 occupied";
+	            #tSensorOUT := #inSlotSensors."Slot P level 5 occupied";
+	    END_CASE;
+	    
+	    IF (#inGroup.sts.auto OR #inGroup.sts.step) AND #ioData.ActualDrivePosition = 0 THEN
+	        #sError.%X3 := TRUE;
+	        RETURN;
+	    END_IF;
+	    
+	    // możliwość zapamietania pierwszego włożonego filtra na pierwszy dostępny poziom  
+	    IF #ioData.ActualLevel <> #sAvaLevelStart THEN
+	        #sAvaStoreSlotNo := TRUE;
+	    END_IF;
+	    
+	END_REGION
+	
+	REGION Sprawdzanie ilości pustych pul / aktywny poziom : WYKONYWANE W KAŻDYM CYKLU
+	    #tCounterEmptySlots := 0;
+	    
+	    FOR #tInc2 := 1 TO "Cooling_Max_RotaryOnLevel" DO
+	        
+	        IF #ioData.ActualLevel = 0 THEN
+	            EXIT;
+	        END_IF;
+	        
+	        IF NOT #ioData.Slots[#ioData.ActualLevel, #tInc2].Occupied THEN
+	            #tCounterEmptySlots += 1;
+	        END_IF;
+	    END_FOR;
+	    
+	    #tCoolingEmptyLevel := #tCounterEmptySlots = "Cooling_Max_RotaryOnLevel";
+	    
+	END_REGION
+	
+	REGION Sprawdzanie ilości pustych pul/określenie warunków startowych : WYKONYWANE W KAŻDYM CYKLU
+	    #tCounterEmptySlots := 0;
+	    #tCounterBlockedSlots := 0;
+	    
+	    FOR #tInc1 := 1 TO "Cooling_Max_Level" DO
+	        FOR #tInc2 := 1 TO "Cooling_Max_RotaryOnLevel" DO
+	            IF NOT #ioData.Slots[#tInc1, #tInc2].Occupied THEN
+	                #tCounterEmptySlots += 1;
+	            END_IF;
+	            
+	            IF #ioData.Slots[#tInc1, #tInc2].Blocked THEN
+	                #tCounterBlockedSlots += 1;
+	            END_IF;
+	        END_FOR;
+	        
+	    END_FOR;
+	    
+	    //sprawdzenie czy suszarka jest pusta
+	    #ouCoolingEmpty := #tCoolingEmpty := #tCounterEmptySlots = #tNumberSlots;
+	    #ouCountOccupiedSlots := #tNumberSlots - #tCounterEmptySlots;
+	    #ouCountBlockedSlots := #tCounterBlockedSlots + ("Cooling_Max_Level" - #sAvaLevelNo) * "Cooling_Max_RotaryOnLevel";
+	    
+	END_REGION
+	
+	REGION Warunki startowe obroty / poziom : WYKONYWANE TYLKO PRZY PUSTEJ SUSZARCE   
+	    //warunki sprawdzane tylko przy opróżnionej suszarce
+	    IF #tCoolingEmpty THEN
+	        //wyzerowanie wartości
+	        #sAvaLevelNo := #ioData.ActualLevel := #ioData.AmountRotaryOnLevel := 0;
+	        
+	        //***przepisanie tablicy dostępnych poziomów
+	        #sAvaLevelTab := #ioData.AvaLevel;
+	        
+	        //ustalenie startowego poziomu dla zapełniania (liczac od poziomu 1)
+	        FOR #tInc1 := 1 TO "Cooling_Max_Level" DO
+	            
+	            IF #sAvaLevelTab[#tInc1] THEN
+	                //LOGIKA DLA AKTYWNYCH POZIOMÓW
+	                IF #sAvaLevelNo = 0 THEN
+	                    //***poziom inicjalizacyjny
+	                    #sAvaLevelStart := #ioData.ActualLevel := #tInc1;
+	                END_IF;
+	                
+	                //***ilość aktywnych poziomów
+	                #sAvaLevelNo += 1;
+	            END_IF;
+	        END_FOR;
+	    END_IF;
+	    
+	    //na każdym z aktywnych poziomów max. 1 pole puste. W przeciwnym razie proces napełniania suszarki
+	    
+	    //pomniejszenie ilości wolnych pól o nieaktywne poziomy
+	    #tCounterEmptySlots := #tCounterEmptySlots - ("Cooling_Max_Level" - #sAvaLevelNo) * "Cooling_Max_RotaryOnLevel" - #tCounterBlockedSlots;
+	    #ouFillingActive := #tCounterEmptySlots > #sAvaLevelNo AND NOT #inEmptyingLineRequest;
+	    
+	END_REGION
+	
+	REGION Operacje bez trackingu danych : ustawianie occupied,time,etc.
+	    REGION Napełnianie suszarki : WYKONYWANE GDY ROBOT ZAKONCZYŁ SEKWENCJE W SUSZARCE  
+	        
+	        #sTriggerIN(CLK := #inNewFilterIN);
+	        //Nowy wpis gdy brak opróżniania linii : napełnianie linii lub praca normalna <-> not #inEmptyingLineRequest
+	        IF #sTriggerIN.Q THEN
+	            
+	            // Czas pomiedzy kolejnymi nowymi detalami w suszarce
+	            #tRetVal := RD_LOC_T(#tDaT);
+	            
+	            "fcTimeDiffString"(Time1 := #sDaTLastEntrance,
+	                               Time2 := #tDaT,
+	                               TimeDiff => #ioData.Timers.TimeBetweenEntrance);
+	            
+	            //zapamietanie czasu do obliczania czasu pomiedzy kolejnymi wjazdami robota
+	            #sDaTLastEntrance := #tDaT;
+	            
+	            "fcClearData"(io_VAR_Data := #sCharArray);
+	            #sGetTime(inGetTime := TRUE,
+	                      ouDate => #sDate);
+	            
+	            #sDateArray[0] := #sDate.Year;
+	            #sDateArray[1] := #sDate.Month;
+	            #sDateArray[2] := #sDate.Day;
+	            
+	            #tSeparator := '-';
+	            #tPosition := 0;
+	            
+	            #tRetVal := JOIN(Mode := 0,
+	                             RecSeparator := #tSeparator,
+	                             EndSeparator := #tSeparator,
+	                             SrcStruct := #sDateArray,
+	                             Count := 3,
+	                             DstArray := #sCharArray,
+	                             Position := #tPosition);
+	            
+	            #sDateArray[0] := #sDate.Hour;
+	            #sDateArray[1] := #sDate.Minute;
+	            #sDateArray[2] := #sDate.Second;
+	            #tSeparator := ':';
+	            #sCharArray[#tPosition] := '-';
+	            #tPosition += 1;
+	            
+	            #tRetVal := JOIN(Mode := 0, //no end separator
+	                             RecSeparator := #tSeparator,
+	                             EndSeparator := #tSeparator,
+	                             SrcStruct := #sDateArray,
+	                             Count := 3,
+	                             DstArray := #sCharArray,
+	                             Position := #tPosition);
+	            
+	            Chars_TO_Strg(Chars := #sCharArray,
+	                          pChars := 0,
+	                          Cnt := 0,
+	                          Strg => #sStr);
+	            
+	            IF #tSensorIN THEN
+	                #ioData.Slots[#ioData.ActualLevel, #ioData.ActualDrivePosition].Occupied := TRUE;
+	                #tRetVal := RD_LOC_T(#ioData.Slots[#ioData.ActualLevel, #ioData.ActualDrivePosition].EntryTime.formatTime);
+	                #ioData.Slots[#ioData.ActualLevel, #ioData.ActualDrivePosition].EntryTime.formatString := #sStr;
+	                #ioData.Slots[#ioData.ActualLevel, #ioData.ActualDrivePosition].ElapsedTime.formatString := '';
+	                
+	                //Aktualizacja sygnału "FillingActive" po dodaniu nowego filtra do suszarki !!!
+	                #tCounterEmptySlots := #tCounterEmptySlots - 1;
+	                #ouFillingActive := #tCounterEmptySlots > #sAvaLevelNo AND NOT #inEmptyingLineRequest;
+	                
+	                //Zapamietanie numeru slotu dla pierwszego włożonego elementu
+	                IF #sAvaStoreSlotNo AND #ioData.ActualLevel = #sAvaLevelStart THEN
+	                    
+	                    #sAvaStoreSlotNo := FALSE; //<--- Pierwsze zapamietanie pozycji
+	                    
+	                    #sStoreSlotNo := #ioData.ActualDrivePosition - 1;
+	                    IF #sStoreSlotNo <= 0 THEN
+	                        #sStoreSlotNo := "Cooling_Max_RotaryOnLevel"; //<--- #ioData.ActualDrivePosition = 1
+	                    END_IF;
+	                    
+	                END_IF;
+	                
+	            ELSIF #ioData.Slots[#ioData.ActualLevel, #ioData.ActualDrivePosition].Blocked THEN
+	                ; //gdy slot jest zablokowany nie rób nic  
+	            ELSE
+	                #sError.%X1 := TRUE;
+	            END_IF;
+	            
+	        END_IF;
+	        
+	    END_REGION
+	    
+	    REGION Opróżnianie suszarki : WYKONYWANE GDY ROBOT ZAKONCZYŁ SEKWENCJE W SUSZARCE  
+	        
+	        #sTriggerOUT(CLK := #inNewFilterOUT);
+	        //Usunięcie wpisu gdy brak napełniania linii : opróżnianie linii lub praca normalna <-> not #tFillingActive
+	        IF #sTriggerOUT.Q THEN
+	            
+	            IF #ioData.ActualDrivePosition < "Cooling_Max_RotaryOnLevel" THEN
+	                #tSlotNo := #ioData.ActualDrivePosition + 1;
+	            ELSE
+	                #tSlotNo := 1;
+	            END_IF;
+	            
+	            #tRetVal := RD_LOC_T(#tDaT);
+	            
+	            "fcTimeDiffString"(Time1 := #ioData.Slots[#ioData.ActualLevel, #tSlotNo].EntryTime.formatTime,
+	                               Time2 := #tDaT,
+	                               TimeDiff => #sStr);
+	            
+	            // slot pusty i nie zablokowany z HMI
+	            IF NOT #tSensorOUT AND NOT #ioData.Slots[#ioData.ActualLevel, #tSlotNo].Blocked THEN
+	                #ioData.Slots[#ioData.ActualLevel, #tSlotNo].Occupied := FALSE;
+	                #ioData.Slots[#ioData.ActualLevel, #tSlotNo].ElapsedTime.formatString := #ioData.Timers.ElapsedTimePrevFilter := #sStr;
+	                // slot zajęty i nie zablokowany z HMI    
+	            ELSIF #tSensorOUT AND NOT #ioData.Slots[#ioData.ActualLevel, #tSlotNo].Blocked THEN
+	                #sError.%X2 := TRUE;
+	            END_IF;
+	        END_IF;
+	        
+	    END_REGION
+	END_REGION
+	
+	REGION Operacje z trackingiem danych : zmiana poziomów, obrót/poziom
+	    REGION Obrót suszarki : WYKONYWANE GDY ROBOT ZAKONCZYŁ SEKWENCJE W SUSZARCE  
+	        
+	        //#tFillingActive -> oczekujemy tylko sTriggerIN
+	        //#inEmptyingLineRequest -> oczekujemy tylko sTriggerOUT
+	        
+	        IF #sTriggerIN.Q OR (#sTriggerOUT.Q AND #inEmptyingLineRequest) THEN
+	            
+	            #ioData.AmountRotaryOnLevel += 1;
+	            #tCountRotary += 1;     //+1 obrót stołu
+	            
+	            //sprawdzenie czy należy przejść pomiedzy poziomami
+	            IF #ioData.AmountRotaryOnLevel >= #tCoolingMaxRotaryOnLevel_minus1 THEN
+	                
+	                // możliwość przejścia gdy : poziom pusty przy aktywnym opróżnianiu lub brak opróżniania <------------------------------- !!!
+	//                IF #tCoolingEmptyLevel OR NOT #inEmptyingLineRequest THEN
+	                    #ioData.AmountRotaryOnLevel := 0;
+	                    
+	                    //ustalenie kolejnego poziomu (góra czy dół)
+	                    FOR #tInc1 := #ioData.ActualLevel TO "Cooling_Max_Level" DO
+	                        #ioData.ActualLevel += 1; //inkrementacja poziomu
+	                        
+	                        IF #ioData.ActualLevel <= "Cooling_Max_Level" THEN
+	                            IF #sAvaLevelTab[#ioData.ActualLevel] THEN
+	                                #tCountRotary += 1;     //+1 obrót stołu
+	                                EXIT;
+	                            END_IF;
+	                        ELSE
+	                            #ioData.ActualLevel := #sAvaLevelStart;
+	                            #tCompleteCycle := TRUE;
+	                        END_IF;
+	                    END_FOR;
+	//                END_IF;
+	                
+	            END_IF;
+	        END_IF;
+	        
+	    END_REGION
+	    
+	    REGION Obrót suszarki : WYKONYWANE PRZY OSIAGNIECIU PRZEZ SUSZARKĘ POZYCJI 
+	        IF (NOT #ioDrive.sts.inOperation AND #ioDrive.sts.inPosition AND //stół w pozycji
+	            NOT #ioPlus1Pos AND NOT #ioPlus2Pos AND #tCountRotary = 0) AND
+	            (#inGroup.sts.auto OR #inGroup.sts.step)
+	        THEN
+	            
+	            // jeżeli opróżnianie linii sprawdzanie slotu kolejnego
+	            IF #inEmptyingLineRequest THEN
+	                IF #ioData.ActualDrivePosition < "Cooling_Max_RotaryOnLevel" THEN
+	                    #tSlotNo := #ioData.ActualDrivePosition + 1;
+	                ELSE
+	                    #tSlotNo := 1;
+	                END_IF;
+	            ELSE
+	                #tSlotNo := #ioData.ActualDrivePosition; // jeżeli brak opróżnianie linii sprawdzanie aktualnego slotu
+	            END_IF;
+	            
+	            //poszukiwanie zajetego gniazda gdy :
+	            // - aktywowane oproznianie
+	            // - zablokowany slot
+	            IF #inEmptyingLineRequest AND //proces opróżniania linii
+	                ((NOT "CoolingData".Data.Slots[#ioData.ActualLevel, #tSlotNo].Occupied AND NOT #tCoolingEmptyLevel) OR  //wolne gniazdo, poziom nie pusty
+	                (#tCoolingEmptyLevel AND NOT #tCoolingEmpty)) OR //pusty poziom i suszarka nie pusta
+	                "CoolingData".Data.Slots[#ioData.ActualLevel, #tSlotNo].Blocked THEN //zapełnianie/opróżnianie/praca ciągła
+	                
+	                #ioData.AmountRotaryOnLevel += 1;
+	                #tCountRotary += 1;     //+1 obrót stołu
+	                
+	                //sprawdzenie czy należy przejść pomiedzy poziomami
+	                IF #ioData.AmountRotaryOnLevel >= #tCoolingMaxRotaryOnLevel_minus1 THEN
+	                    
+	                    // możliwość przejścia gdy : poziom pusty przy aktywnym opróżnianiu lub brak opróżniania <------------------------------- !!!
+	//                    IF #tCoolingEmptyLevel OR NOT #inEmptyingLineRequest THEN
+	                        #ioData.AmountRotaryOnLevel := 0;
+	                        
+	                        //ustalenie kolejnego poziomu (góra czy dół)
+	                        FOR #tInc1 := #ioData.ActualLevel TO "Cooling_Max_Level" DO
+	                            #ioData.ActualLevel += 1; //inkrementacja poziomu
+	                            
+	                            IF #ioData.ActualLevel <= "Cooling_Max_Level" THEN
+	                                IF #sAvaLevelTab[#ioData.ActualLevel] THEN
+	                                    #tCountRotary += 1;     //+1 obrót stołu
+	                                    EXIT;
+	                                END_IF;
+	                            ELSE
+	                                #ioData.ActualLevel := #sAvaLevelStart;
+	                                #tCompleteCycle := TRUE;
+	                            END_IF;
+	                        END_FOR;
+	                   END_IF;
+	                    
+	//                END_IF;
+	            END_IF;
+	        END_IF;
+	        
+	    END_REGION
+	END_REGION
+	
+	REGION Weryfikacja poprawności zapełniania linii : WYKONYWANE GDY PRZEJSCIE Z GÓRNEGO POZIOMU NA DOLNY
+	    (*
+	    po zapełnieniu suszarki w kierunku góra, sprawdzenie czy puste pola tworzą jedną kolumnę
+	    *)
+	    IF #tCompleteCycle AND #sAvaLevelStart < "Cooling_Max_Level" AND NOT #inEmptyingLineRequest THEN
+	        
+	        //1. jeżeli błąd w indeksie [poziom,kolumna] to generuj błąd/ostrzeżenie
+	        IF #sAvaLevelStart <= 0 OR #sStoreSlotNo <= 0 THEN
+	            #sError.%X0 := TRUE;
+	        ELSE
+	            //2. jezeli zajętość w polach tworzących kolumnę to generuj błąd/ostrzeżenie
+	            FOR #tInc2 := #sAvaLevelStart + 1 TO "Cooling_Max_Level" DO
+	                
+	                IF #ioData.Slots[#tInc2, #sStoreSlotNo].Occupied THEN
+	                    #sError.%X0 := TRUE;
+	                END_IF;
+	            END_FOR;
+	        END_IF;
+	        
+	    END_IF;
+	END_REGION
+	
+	REGION Ustawienie wyjść
+	    #ouLevelForRobot := #ioData.ActualLevel;
+	    
+	    IF #tCountRotary <> 0 THEN
+	        CASE #tCountRotary OF
+	            1:
+	                #ioPlus1Pos := TRUE;
+	                #ioPlus2Pos := FALSE;
+	            2:
+	                #ioPlus1Pos := FALSE;
+	                #ioPlus2Pos := TRUE;
+	            ELSE
+	                #ioPlus1Pos := FALSE;
+	                #ioPlus2Pos := FALSE;
+	        END_CASE;
+	    END_IF;
+	    
+	    //zakończono obrót, możliwy wjazd robota
+	    #ouError := #sError <> 0;
+	    #ouStatus := #sError;
+	    #ioDrive.sts.alm.%X12 := #ouStatus.%X0; //puste sloty podczas zwykłej pracy nie tworzą jednej kolumny
+	    #ioDrive.sts.alm.%X13 := #ouStatus.%X1; //po informacji z robota o zakończeniu operacji w obszarze suszarki (odłożenie detalu), czujnik nie wykrywa obecności detalu
+	    #ioDrive.sts.alm.%X14 := #ouStatus.%X2; //po informacji z robota o zakończeniu operacji w obszarze suszarki (pobranie detalu), czujnik obecności nadal wykrywa detal
+	    #ioDrive.sts.alm.%X15 := #ouStatus.%X3; //pozycja zerowa z kodowania stołu po osiagnieciu pozycji
+	    
+	    #ouMoveTTPermitt := (#ioPlus1Pos OR #ioPlus2Pos) AND NOT #ouError;
+	    #ouEnableEntranceForRobot := #ioData.ActualDrivePosition <> 0 AND #ioDrive.sts.inPosition AND
+	    NOT #ioPlus2Pos AND NOT #ioPlus1Pos AND NOT #ouError AND #inGateClose AND NOT #inNewFilterIN AND NOT #inNewFilterOUT;
+	    #ouEmptyingActive := #inEmptyingLineRequest;
+	    
+	END_REGION
+	
+	REGION Typy programów do robota
+	    IF #ouFillingActive THEN
+	        #ouTypeProgram := 1; //IN
+	    ELSIF #ouEmptyingActive THEN
+	        #ouTypeProgram := 2; //OUT
+	    ELSE
+	        
+	        IF #ioData.ActualDrivePosition < "Cooling_Max_RotaryOnLevel" THEN
+	            #tSlotNo := #ioData.ActualDrivePosition + 1;
+	        ELSE
+	            #tSlotNo := 1;
+	        END_IF;
+	        
+	        IF NOT #ioData.Slots[#ioData.ActualLevel, #tSlotNo].Blocked THEN
+	            #ouTypeProgram := 3; //standard program IN/OUT
+	        ELSE
+	            #ouTypeProgram := 4; //emergency program
+	        END_IF;
+	    END_IF;
+	    
+	END_REGION
+	
+	REGION Reset błędu z trackingu danych
+	    IF #ioDrive.rq.reset THEN
+	        
+	        //### Reset błędu "wspolnej kolumny"
+	        // 1. Sprawdzenie czy poziom startowy > 0
+	        IF #sError.%X0 AND #sAvaLevelStart > 0 THEN
+	            //2. znalezienie pierwszego wolnego slotu na poziomie "#sAvaLevelStart"
+	            FOR #tInc1 := 1 TO "Cooling_Max_RotaryOnLevel" DO
+	                IF NOT #ioData.Slots[#sAvaLevelStart, #tInc1].Occupied THEN
+	                    EXIT;
+	                END_IF;
+	            END_FOR;
+	            
+	            //3. sprawdzenie czy wszystkie poziomy tworza "wspolna wolną kolumne" 
+	            IF #sAvaLevelStart < "Cooling_Max_Level" THEN
+	                
+	                #sError.%X0 := FALSE; //<--- Ponowne ustawienie w pętli for jeżeli błąd
+	                FOR #tInc2 := #sAvaLevelStart + 1 TO "Cooling_Max_Level" DO
+	                    
+	                    IF #ioData.Slots[#tInc2, #tInc1].Occupied THEN
+	                        #sError.%X0 := TRUE; //<--- Ponowne ustawienie w pętli for jeżeli błąd
+	                    END_IF;
+	                END_FOR;
+	                
+	            ELSE
+	                //tylko jeden poziom dostępny : ostatni (w praktyce nie powinien zostać wygenerowany błąd dla takiej konfiguracji)
+	                #sError.%X0 := FALSE;
+	            END_IF;
+	        END_IF;
+	        
+	        //### Jeżeli błąd braku zajętości, najpierw ustawienie zajetości na HMI
+	        IF #sError.%X1 THEN
+	            IF #ioData.Slots[#ioData.ActualLevel, #ioData.ActualDrivePosition].Occupied THEN
+	                #sError.%X1 := FALSE;
+	            END_IF;
+	        END_IF;
+	        
+	        //### Jeżeli błąd zajętości, najpierw resetu zajetość na HMI
+	        IF #sError.%X2 THEN
+	            
+	            //ustalenie numeru slotu
+	            IF #ioData.ActualDrivePosition < "Cooling_Max_RotaryOnLevel" THEN
+	                #tSlotNo := #ioData.ActualDrivePosition + 1;
+	            ELSE
+	                #tSlotNo := 1;
+	            END_IF;
+	            
+	            IF NOT #ioData.Slots[#ioData.ActualLevel, #tSlotNo].Occupied THEN
+	                #sError.%X2 := FALSE;
+	            END_IF;
+	        END_IF;
+	        
+	        //### Jeżeli kod suszarki dostępny oznacza to że stół obrotowy zwraca pozycje i bezwarunkowy reset błędu
+	        #sError.%X3 := FALSE;
+	    END_IF;
+	    
+	END_REGION
+	
+	#ioSensors[36] := #inSlotSensors."Slot L level 1 occupied";
+	#ioSensors[37] := #inSlotSensors."Slot P level 1 occupied";
+	#ioSensors[38] := #inSlotSensors."Slot L level 2 occupied";
+	#ioSensors[39] := #inSlotSensors."Slot P level 2 occupied";
+	#ioSensors[40] := #inSlotSensors."Slot L level 3 occupied";
+	#ioSensors[41] := #inSlotSensors."Slot P level 3 occupied";
+	#ioSensors[42] := #inSlotSensors."Slot L level 4 occupied";
+	#ioSensors[43] := #inSlotSensors."Slot P level 4 occupied";
+	#ioSensors[44] := #inSlotSensors."Slot L level 5 occupied";
+	#ioSensors[45] := #inSlotSensors."Slot P level 5 occupied";
+	#ioSensors[46] := #inGateClose;
+	
+	//przepisanie informacji o zablokowanym slocie na potrzeby "wspólnej" kolumny.
+	#ioData.StartSlotNumber := #sStoreSlotNo;
+	
+	//Usunięcie wpisu gdy brak napełniania linii : opróżnianie linii lub praca normalna <-> not #tFillingActive
+	//Nowy wpis gdy brak opróżniania linii : napełnianie linii lub praca normalna <-> not #inEmptyingLineRequest
+	
+END_FUNCTION_BLOCK
+

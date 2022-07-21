@@ -1,0 +1,174 @@
+﻿FUNCTION_BLOCK "fbVibrationSensor"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inEnable : Bool;   // Start testu
+      inThreshold : Real;   // Zakres powyżej którego wynik = OK
+      inCountSample : UInt;   // Liczba próbek 
+      inRangeMin : UInt;   // Zakres próbek do wyliczenia Total
+      inRangeMax : UInt;   // Zakres próbek do wyliczenia Total (0 = zakres maksymalny)
+      inaRMSX : Real;   // X
+      inaRMSY : Real;   // Y
+      inaRMSZ : Real;   // Z
+   END_VAR
+
+   VAR_OUTPUT 
+      ouBusy : Bool;   // W trakcie wykonywania testu
+      ouDone : Bool;   // Wykonano test, wynik dostepny
+      ouOK : Bool;   // OK
+      ouNOK : Bool;   // NOK
+      ouReady : Bool;   // Gotowość na wykonanie testu
+      ouErrorRange : Bool;   // Bład zakresów Min > Max
+      ouTimeCalculate : UInt;   // Czas pomiaru [ms] dla całej procedury
+   END_VAR
+
+   VAR 
+      statInt_SequenceNo : Int;
+      statInt_Index : Int;
+      statReal_aRMSXMeasurement : Array[1..500] of LReal;
+      statReal_aRMSYMeasurement : Array[1..500] of LReal;
+      statReal_aRMSZMeasurement : Array[1..500] of LReal;
+      statLReal_aRMSX : LReal;
+      statLReal_aRMSY : LReal;
+      statLReal_aRMSZ : LReal;
+      statLReal_aRMSX_1 : LReal;
+      statLReal_aRMSY_1 : LReal;
+      statLReal_aRMSZ_1 : LReal;
+      statReal_aRMSTotal : Real;
+      statTimeCounter_Total : UInt;
+      instTRIG_enable {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+   END_VAR
+
+   VAR_TEMP 
+      tempInc : Int;
+      tempCountSample : Int;
+      tempRangeMin : Int;
+      tempRangeMax : Int;
+   END_VAR
+
+
+BEGIN
+	
+	REGION Licznik próbek
+	    IF #inCountSample > 500 THEN
+	        #tempCountSample := 500;
+	    ELSE
+	        #tempCountSample := UINT_TO_INT(#inCountSample);
+	    END_IF;
+	    
+	    //jeżeli zakres Max = 0 => wartości maksymalne
+	    IF #inRangeMax <= 0 THEN
+	        #tempRangeMax := #tempCountSample;
+	    ELSE
+	        #tempRangeMax := UINT_TO_INT(#inRangeMax);
+	    END_IF;
+	    
+	    //sprawdzanie Zakresów
+	    IF #inRangeMin > #inRangeMax THEN
+	        #ouErrorRange := TRUE;
+	        RETURN;
+	    ELSE
+	        #ouErrorRange := FALSE;
+	    END_IF;
+	    
+	END_REGION
+	
+	#instTRIG_enable(CLK := #inEnable);
+	
+	REGION aRMS
+	// Gdy warunek aktywny - wykonuj obliczenia    
+	    IF #instTRIG_enable.Q OR #ouBusy THEN
+	        
+	// Inicjalizacja zmiennych 
+	        IF NOT #ouBusy THEN
+	            #ouReady := FALSE;
+	            #ouDone := FALSE;
+	            #statLReal_aRMSX := 0.0;
+	            #statLReal_aRMSY := 0.0;
+	            #statLReal_aRMSZ := 0.0;
+	            #statLReal_aRMSX_1 := 0.0;
+	            #statLReal_aRMSY_1 := 0.0;
+	            #statLReal_aRMSZ_1 := 0.0;
+	            #statReal_aRMSTotal := 0.0;
+	            #ouNOK := FALSE;
+	            #ouOK := FALSE;
+	            #statInt_Index := 0;
+	            #statInt_SequenceNo := 1;
+	            #ouBusy := TRUE;
+	        END_IF;
+	        
+	// Sekwencja        
+	        CASE #statInt_SequenceNo OF
+	                
+	// Pomiary
+	            1:
+	                #statInt_Index += 1;
+	                #statReal_aRMSXMeasurement[#statInt_Index] := REAL_TO_LREAL(#inaRMSX);
+	                #statReal_aRMSYMeasurement[#statInt_Index] := REAL_TO_LREAL(#inaRMSY);
+	                #statReal_aRMSZMeasurement[#statInt_Index] := REAL_TO_LREAL(#inaRMSZ);
+	                
+	// Koniec pomiarów                
+	                IF #statInt_Index = #tempCountSample THEN
+	                    #statInt_SequenceNo := 2;
+	                END_IF;
+	                
+	// Sumowanie pomiarów                
+	            2:
+	                FOR #tempInc := 1 TO #tempCountSample DO
+	                    
+	                    #statLReal_aRMSX += #statReal_aRMSXMeasurement[#tempInc];
+	                    #statLReal_aRMSY += #statReal_aRMSYMeasurement[#tempInc];
+	                    #statLReal_aRMSZ += #statReal_aRMSZMeasurement[#tempInc];
+	                    
+	                    IF #tempInc >= #inRangeMin AND #tempInc <= #tempRangeMax THEN
+	                        #statLReal_aRMSX_1 += #statReal_aRMSXMeasurement[#tempInc];
+	                        #statLReal_aRMSY_1 += #statReal_aRMSYMeasurement[#tempInc];
+	                        #statLReal_aRMSZ_1 += #statReal_aRMSZMeasurement[#tempInc];
+	                    END_IF;
+	                    
+	                END_FOR;
+	                #statInt_SequenceNo := 3;
+	                
+	 // Obliczanie aRMSTotal i konwersja na Real                
+	            3:
+	                #statReal_aRMSTotal := LREAL_TO_REAL(SQRT(#statLReal_aRMSZ_1 * #statLReal_aRMSZ_1 + SQRT(#statLReal_aRMSX_1 * #statLReal_aRMSX_1 + #statLReal_aRMSY_1 * #statLReal_aRMSY_1)));
+	                
+	                #statLReal_aRMSX := LREAL_TO_REAL(#statLReal_aRMSX);
+	                #statLReal_aRMSY := LREAL_TO_REAL(#statLReal_aRMSY);
+	                #statLReal_aRMSZ := LREAL_TO_REAL(#statLReal_aRMSZ);
+	                
+	                #statLReal_aRMSX_1 := LREAL_TO_REAL(#statLReal_aRMSX_1);
+	                #statLReal_aRMSY_1 := LREAL_TO_REAL(#statLReal_aRMSY_1);
+	                #statLReal_aRMSZ_1 := LREAL_TO_REAL(#statLReal_aRMSZ_1);
+	                
+	// Sprawdzanie czy wynik OK czy NOK                
+	                IF #statReal_aRMSTotal > #inThreshold THEN
+	                    #ouOK := TRUE;
+	                ELSE
+	                    #ouNOK := TRUE;
+	                END_IF;
+	                #statInt_SequenceNo := 4;
+	                
+	// Zakończenie pomiarów
+	            4:
+	                #ouBusy := FALSE;
+	                #ouDone := TRUE;
+	            END_CASE;
+	            
+	// Gdy warunek nieaktywny i wykonano obliczenia - ustaw sygnał Ready
+	        ELSE
+	            #ouReady := TRUE;
+	    END_IF;
+	    
+	END_REGION
+	
+	"fcCounterUInt"(inEnableCount := #ouBusy,
+	                inReset := #instTRIG_enable.Q,
+	                inValue := "CycleTimeData".PrevScanTime.Milliseconds,
+	                ioCounter := #statTimeCounter_Total);
+	
+	#ouTimeCalculate := #statTimeCounter_Total;
+	
+	
+END_FUNCTION_BLOCK
+

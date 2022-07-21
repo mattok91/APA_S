@@ -1,0 +1,61 @@
+﻿FUNCTION "fcConvertStringToDint" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inString : String;   // String
+      inAlignmentReminder : Int;   // Ilość miejsc po przecinku
+   END_VAR
+
+   VAR_OUTPUT 
+      ouDINT : DInt;   // wartość DINT
+   END_VAR
+
+   VAR_TEMP 
+      QuotientString : String;
+      QuotienDInt : DInt;
+      ReminderString : String;
+      ReminderDInt : DInt;
+      Length : Int;
+      L : Int;
+      i : Int;
+      Divider : DInt;
+      Minus : Bool;
+      Str : String;
+   END_VAR
+
+
+BEGIN
+	
+	//ustalenie dzielnika/mnożnika
+	#Divider := 1;
+	FOR #i := 1 TO #inAlignmentReminder DO
+	    #Divider := #Divider * 10;
+	END_FOR;
+	
+	#Length := LEN(IN := #inString);
+	#L := #Length - #inAlignmentReminder - 1; //-1 dla '.'
+	
+	IF LEFT(IN := #inString, L := 1) = '-' THEN
+	    #Minus := TRUE;
+	    #Str := DELETE(IN := #inString, L := 1, P := 1); //usuniecie znaku
+	ELSE
+	    #Minus := FALSE;
+	    #Str := #inString;
+	END_IF;
+	
+	#QuotientString := MID(IN:=#Str, L:=#L, P:=1);
+	#QuotienDInt := STRING_TO_DINT(IN := #QuotientString);
+	#QuotienDInt := #QuotienDInt * #Divider;
+	
+	#ReminderString := RIGHT(IN := #Str, L := #inAlignmentReminder);
+	#ReminderDInt := STRING_TO_DINT(IN := #ReminderString);
+	
+	#ouDINT := #QuotienDInt + #ReminderDInt;
+	
+	IF #Minus THEN
+	    #ouDINT := #ouDINT * -1;
+	END_IF;
+	
+	
+END_FUNCTION
+

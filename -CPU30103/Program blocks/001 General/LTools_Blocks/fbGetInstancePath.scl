@@ -1,0 +1,53 @@
+﻿FUNCTION_BLOCK "fbGetInstancePath"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_OUTPUT 
+      ouInstancePath : String[100];
+   END_VAR
+
+   VAR 
+      tIndex : Int;
+      tLength : Int;
+      tPosition : Int;
+      tInstancePath : WString;
+   END_VAR
+
+
+BEGIN
+	IF #ouInstancePath = '' THEN
+	    
+	    REGION read instance path
+	        #tInstancePath := GetInstancePath(0);
+	    END_REGION
+	    
+	    REGION find last '.'
+	        #tLength := LEN(#tInstancePath);
+	        FOR #tIndex := #tLength TO 1 BY -1 DO
+	            IF MID(IN := #tInstancePath, L := 1, P := #tIndex) = WString#'.' THEN
+	                #tPosition := #tIndex;
+	                EXIT;
+	            END_IF;
+	        END_FOR;
+	    END_REGION
+	    
+	    REGION cut own instance name
+	        // cut at last '.', but only if it has been found
+	        IF #tPosition > 0 THEN
+	            #tInstancePath := LEFT(IN := #tInstancePath,
+	                                   L := #tPosition - 1);
+	        END_IF;
+	    END_REGION
+	    
+	    REGION Output
+	        IF LEN(#tInstancePath) > 100 THEN
+	            #ouInstancePath := CONCAT(IN1 := '...',
+	                                      IN2 := RIGHT(IN := WSTRING_TO_STRING(#tInstancePath),
+	                                                   L := 97));
+	        ELSE
+	            #ouInstancePath := WSTRING_TO_STRING(#tInstancePath);
+	        END_IF;
+	    END_REGION
+	    
+	END_IF;
+END_FUNCTION_BLOCK
+

@@ -1,0 +1,185 @@
+﻿FUNCTION_BLOCK "fbATIDataAcq"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_OUTPUT 
+      tstInProgress : Bool;   // Trwa test
+      tstElapsedTimeTillResultDigital : Time;   // Czas trwania testu
+      tstElapsedTimeTillCompleteData : Time;   // Czas trwania akwizycji danych
+   END_VAR
+
+   VAR_IN_OUT 
+      ATI : "typeTester";   // Tester ATI
+      ATIP2P : "typeATIP2P";   // Blok danych do obsługi połączenia z testerem
+   END_VAR
+
+   VAR 
+      statP2PNDR { S7_SetPoint := 'True'} : Bool;
+      statRecievedData : String;
+      statRecvLength : Int;
+      statDataATI : "typeATIData";
+      instGetTime : "fbGetTimeLocal";
+      statDateString { S7_SetPoint := 'False'} : "typeDateSplit";
+      instStartTest {InstructionName := 'R_TRIG'; LibVersion := '1.0'} : R_TRIG;
+      statElapsedTime { S7_SetPoint := 'True'} : Time;
+   END_VAR
+
+   VAR_TEMP 
+      tempFindFail : Int;
+      tempFindSep : Int;
+      tempFindRES : Int;
+      tempFindPEN : Int;
+      tempFindFLO : Int;
+   END_VAR
+
+
+BEGIN
+	(*
+	Block for acquisition data via RS232
+	*)
+	
+	(* $S,$P,$R,$F,$?
+	1,0.5310,10.7,170.0,F; *)
+	
+	REGION Read data and check buffer
+	    
+	    #statP2PNDR := #ATIP2P.P2PRecv.newMsg;
+	    #statRecievedData := #ATIP2P.P2PRecv.buffer;
+	    #statRecvLength := LEN(#statRecievedData);
+	    
+	END_REGION
+	
+	#instStartTest(CLK :=#ATI.sts.tstInProgress);
+	
+	//Po rozpoczeciu testu reset bitów statusowych
+	IF #instStartTest.Q AND #ATI.sts.IDExists THEN
+	    #ATI.sts.resResultNOK := FALSE;
+	    #ATI.sts.penResultNOK := FALSE;
+	    #ATI.sts.flowResultNOK := FALSE;
+	    
+	    #ATI.sts.newResult := FALSE;
+	    
+	    "fcClearData"(io_VAR_Data := #statDataATI);
+	    #ATI.sts.lastResult := #statDataATI;
+	END_IF;
+	
+	REGION Copy data
+	    
+	    #instGetTime(inGetTime := #statP2PNDR,
+	                 ouDate => #statDateString);
+	    
+	    IF #statP2PNDR THEN
+	        
+	        (* #ATI po zakonczeniu testu wysyła od 1 do 4 ramek.
+	        Po niepowodzeniu testu w pierwszej kolejności wysyłana jest informacja o parametrze przez który test zakończył się niepowodzeniem.
+	        Nastepnie wysyłana jest ramka z danymi. *)
+	        
+	        //Sprawdzanie czy telegram zawiera dane '!FAIL'.
+	        #tempFindFail := FIND(IN1 := #statRecievedData,
+	                              IN2 := '!FAIL');
+	        
+	        #tempFindRES := FIND(IN1 := #statRecievedData,
+	                             IN2 := 'RES');
+	        
+	        #tempFindPEN := FIND(IN1 := #statRecievedData,
+	                             IN2 := 'PEN');
+	        
+	        #tempFindFLO := FIND(IN1 := #statRecievedData,
+	                             IN2 := 'FLO');
+	        
+	        //Sprawdzanie czy telegram zawiera dane (do odróżnienia telegramu z testu filtra od parametrów)
+	        #tempFindSep := FIND(IN1 := #statRecievedData,
+	                             IN2 := ',');
+	        
+	        //dane + błąd
+	        IF #tempFindSep <> 0 AND #tempFindFail <> 0 AND #ATI.sts.IDExists THEN
+	            
+	            IF #tempFindRES <> 0 THEN   //problem z rezystancja
+	                #ATI.sts.resResultNOK := TRUE;
+	            END_IF;
+	            
+	            IF #tempFindPEN <> 0 THEN    //problem z penetracja
+	                #ATI.sts.penResultNOK := TRUE;
+	            END_IF;
+	            
+	            IF #tempFindFLO <> 0 THEN       //problem z przepływem
+	                #ATI.sts.flowResultNOK := TRUE;
+	            END_IF;
+	            
+	        END_IF;
+	        
+	        //dane. 
+	        IF #tempFindSep <> 0 AND #tempFindFail = 0 AND #ATI.sts.IDExists THEN
+	            
+	            //ID testera
+	            #statDataATI.unitID := #ATI.sts.unitID;
+	            
+	            //przepisanie na zmienna tymczasowa telegramu
+	            #statDataATI.testTxt := #statRecievedData;
+	            
+	            //ID filtra
+	            #tempFindFail := FIND(IN1 := #statRecievedData,
+	                                  IN2 := ',');
+	            #statDataATI.sample := MID(IN := #statRecievedData, L := #tempFindFail - 1, P := 1);
+	            #statRecievedData := DELETE(IN := #statRecievedData, L := #tempFindFail, P := 1);
+	            
+	            //Penetracja
+	            #tempFindFail := FIND(IN1 := #statRecievedData,
+	                                  IN2 := ',');
+	            #statDataATI.penVal := MID(IN := #statRecievedData, L := #tempFindFail - 1, P := 1);
+	            #statRecievedData := DELETE(IN := #statRecievedData, L := #tempFindFail, P := 1);
+	            
+	            //Rezystancja
+	            #tempFindFail := FIND(IN1 := #statRecievedData,
+	                                  IN2 := ',');
+	            #statDataATI.resVal := MID(IN := #statRecievedData, L := #tempFindFail - 1, P := 1);
+	            #statRecievedData := DELETE(IN := #statRecievedData, L := #tempFindFail, P := 1);
+	            
+	            //Przepływ
+	            #tempFindFail := FIND(IN1 := #statRecievedData,
+	                                  IN2 := ',');
+	            #statDataATI.flowRate := MID(IN := #statRecievedData, L := #tempFindFail - 1, P := 1);
+	            #statRecievedData := DELETE(IN := #statRecievedData, L := #tempFindFail, P := 1);
+	            
+	            //test OK/NOK
+	            #statDataATI.result := LEFT(IN := #statRecievedData, L := 1);
+	            
+	            //Data
+	            #statDataATI.testDate := CONCAT(IN1 := #statDateString.Year, IN2 := '-');
+	            #statDataATI.testDate := CONCAT(IN1 := #statDataATI.testDate, IN2 := #statDateString.Month);
+	            #statDataATI.testDate := CONCAT(IN1 := #statDataATI.testDate, IN2 := '-');
+	            #statDataATI.testDate := CONCAT(IN1 := #statDataATI.testDate, IN2 := #statDateString.Day);
+	            
+	            //Czas
+	            #statDataATI.testTime := CONCAT(IN1 := #statDateString.Hour, IN2 := ':');
+	            #statDataATI.testTime := CONCAT(IN1 := #statDataATI.testTime, IN2 := #statDateString.Minute);
+	            #statDataATI.testTime := CONCAT(IN1 := #statDataATI.testTime, IN2 := ':');
+	            #statDataATI.testTime := CONCAT(IN1 := #statDataATI.testTime, IN2 := #statDateString.Second);
+	            
+	            //Ustawienie znacznika o pobraniu danych
+	            #ATI.sts.newResult := TRUE;
+	            
+	            #ATI.sts.lastResult := #statDataATI;
+	        END_IF;
+	        
+	    END_IF;
+	
+	END_REGION
+	
+	REGION Aktywny test filtra + czas testu
+	    "fcCounterTime"(inEnableCount := #ATI.sts.tstInProgress OR NOT #ATI.sts.newResult,
+	                    inReset := #instStartTest.Q OR #ATI.sts.fault,
+	                    inValue := "CycleTimeData".PrevScanTime."Time",
+	                    ioCounter := #statElapsedTime);
+	    
+	    #tstInProgress := #ATI.sts.tstInProgress OR NOT #ATI.sts.newResult;
+	    
+	    IF #ATI.sts.tstInProgress THEN
+	        #tstElapsedTimeTillResultDigital := #statElapsedTime;
+	    END_IF;
+	    
+	    #tstElapsedTimeTillCompleteData := #statElapsedTime;
+	END_REGION
+	
+	
+END_FUNCTION_BLOCK
+

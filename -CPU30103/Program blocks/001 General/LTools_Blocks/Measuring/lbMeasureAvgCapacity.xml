@@ -1,0 +1,274 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V16" />
+  <DocumentInfo>
+    <Created>2022-07-21T09:35:27.6988541Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V16 Update 2</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V16 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V16 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V16 Update 5</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V16</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.FB ID="0">
+    <AttributeList>
+      <AutoNumber>true</AutoNumber>
+      <HeaderAuthor />
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v4">
+  <Section Name="Input">
+    <Member Name="inEnable" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="en-GB">General release for this object</MultiLanguageText><MultiLanguageText Lang="de-DE">Generelle Freigabe für das Objekt</MultiLanguageText></Comment></Member>
+    <Member Name="inRENewTU" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="en-GB">[RE] New TU detected, count +1</MultiLanguageText><MultiLanguageText Lang="de-DE">[PF] Neue TE erkannt, zähle +1</MultiLanguageText></Comment></Member>
+    <Member Name="inTimePeriod" Datatype="Time" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="en-GB">Timeperiod for capacity</MultiLanguageText><MultiLanguageText Lang="de-DE">Zeitraum für Leistung</MultiLanguageText></Comment></Member>
+    <Member Name="inTimeBaseIntervall" Datatype="Time" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="en-GB">Timebase for intervall</MultiLanguageText></Comment><StartValue>T#1000ms</StartValue></Member>
+  </Section>
+  <Section Name="Output">
+    <Member Name="ouCapacity" Datatype="UInt" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="en-GB">Capacity in period of time</MultiLanguageText><MultiLanguageText Lang="de-DE">Leistung in Zeitraum</MultiLanguageText></Comment></Member>
+    <Member Name="ouCapacitiyHeadToHead" Datatype="UInt" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="en-GB">Capacity head to head</MultiLanguageText><MultiLanguageText Lang="de-DE">Leistung Vorderkante zu Vorderkante</MultiLanguageText></Comment></Member>
+    <Member Name="ouTimeHeadToHead" Datatype="Time" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="en-GB">Time head to head</MultiLanguageText><MultiLanguageText Lang="de-DE">Zeit Vorderkante zu Vorderkante</MultiLanguageText></Comment></Member>
+  </Section>
+  <Section Name="InOut" />
+  <Section Name="Static">
+    <Member Name="sMeasureAvgCapacityCount" Datatype="&quot;fbMeasureAvgCapacityCount&quot;" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="Input"><Member Name="inEnable" Datatype="Bool" /><Member Name="inRENewTU" Datatype="Bool" /><Member Name="inBaseTimeIntervall" Datatype="Time" /></Section><Section Name="Output"><Member Name="ouCapacitiyHeadToHead" Datatype="UInt" /><Member Name="ouTimeHeadToHead" Datatype="Time" /><Member Name="ouBuffer" Datatype="&quot;typeBufferCountTUs&quot;"><Sections><Section Name="None"><Member Name="TimeHeadToHead" Datatype="Time" /><Member Name="TimeIntervall" Datatype="Time" /><Member Name="BaseTimeIntervall" Datatype="Time" /><Member Name="CurrentIndex" Datatype="DInt" /><Member Name="ValuesInBuffer" Datatype="UDInt" /><Member Name="CurrentValue" Datatype="USInt" /><Member Name="Value" Datatype="Array[0..120] of USInt" /></Section></Sections></Member></Section><Section Name="InOut" /><Section Name="Static"><Member Name="sActivateHeadToHead" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="sMeasureAvgCapacityGet" Datatype="&quot;fbMeasureAvgCapacityGet&quot;" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="Input"><Member Name="inBuffer" Datatype="&quot;typeBufferCountTUs&quot;"><Sections><Section Name="None"><Member Name="TimeHeadToHead" Datatype="Time" /><Member Name="TimeIntervall" Datatype="Time" /><Member Name="BaseTimeIntervall" Datatype="Time" /><Member Name="CurrentIndex" Datatype="DInt" /><Member Name="ValuesInBuffer" Datatype="UDInt" /><Member Name="CurrentValue" Datatype="USInt" /><Member Name="Value" Datatype="Array[0..120] of USInt" /></Section></Sections></Member><Member Name="inTimePeriod" Datatype="Time" /></Section><Section Name="Output"><Member Name="ouCapacity" Datatype="UInt" /></Section><Section Name="InOut" /><Section Name="Static"><Member Name="sSum" Datatype="LInt" /><Member Name="sInitDone" Datatype="Bool" /><Member Name="sCurrentIndxPrevScan" Datatype="DInt" /><Member Name="sTimeSaved" Datatype="Time" /><Member Name="sValuesAdded" Datatype="DInt" /></Section></Sections></Member>
+    <Member Name="sBuffer" Datatype="&quot;typeBufferCountTUs&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="en-GB">Buffer Count TUs</MultiLanguageText><MultiLanguageText Lang="de-DE">Puffer zum TUs zählen</MultiLanguageText></Comment><Sections><Section Name="None"><Member Name="TimeHeadToHead" Datatype="Time" /><Member Name="TimeIntervall" Datatype="Time" /><Member Name="BaseTimeIntervall" Datatype="Time" /><Member Name="CurrentIndex" Datatype="DInt" /><Member Name="ValuesInBuffer" Datatype="UDInt" /><Member Name="CurrentValue" Datatype="USInt" /><Member Name="Value" Datatype="Array[0..120] of USInt" /></Section></Sections></Member>
+  </Section>
+  <Section Name="Temp" />
+  <Section Name="Constant" />
+</Sections></Interface>
+      <IsIECCheckEnabled>true</IsIECCheckEnabled>
+      <IsRetainMemResEnabled>false</IsRetainMemResEnabled>
+      <MemoryLayout>Optimized</MemoryLayout>
+      <MemoryReserve>100</MemoryReserve>
+      <Name>lbMeasureAvgCapacity</Name>
+      <Number>111</Number>
+      <ProgrammingLanguage>LAD</ProgrammingLanguage>
+      <SetENOAutomatically>false</SetENOAutomatically>
+      <UDABlockProperties />
+      <UDAEnableTagReadback>false</UDAEnableTagReadback>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-US</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="3" CompositionName="Items">
+            <AttributeList>
+              <Culture>pl-PL</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <SW.Blocks.CompileUnit ID="4" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="inEnable" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="inRENewTU" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="inTimeBaseIntervall" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="ouCapacitiyHeadToHead" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="ouTimeHeadToHead" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="26">
+      <Symbol>
+        <Component Name="sBuffer" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="27">
+      <Symbol>
+        <Component Name="sBuffer" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="28">
+      <Symbol>
+        <Component Name="inTimePeriod" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="29">
+      <Symbol>
+        <Component Name="ouCapacity" />
+      </Symbol>
+    </Access>
+    <Call UId="30">
+      <CallInfo Name="fbMeasureAvgCapacityCount" BlockType="FB">
+        <Instance Scope="LocalVariable" UId="31">
+          <Component Name="sMeasureAvgCapacityCount" />
+        </Instance>
+        <Parameter Name="inEnable" Section="Input" Type="Bool" />
+        <Parameter Name="inRENewTU" Section="Input" Type="Bool" />
+        <Parameter Name="inBaseTimeIntervall" Section="Input" Type="Time" />
+        <Parameter Name="ouCapacitiyHeadToHead" Section="Output" Type="UInt" />
+        <Parameter Name="ouTimeHeadToHead" Section="Output" Type="Time" />
+        <Parameter Name="ouBuffer" Section="Output" Type="&quot;typeBufferCountTUs&quot;" />
+      </CallInfo>
+    </Call>
+    <Call UId="32">
+      <CallInfo Name="fbMeasureAvgCapacityGet" BlockType="FB">
+        <Instance Scope="LocalVariable" UId="33">
+          <Component Name="sMeasureAvgCapacityGet" />
+        </Instance>
+        <Parameter Name="inBuffer" Section="Input" Type="&quot;typeBufferCountTUs&quot;" />
+        <Parameter Name="inTimePeriod" Section="Input" Type="Time" />
+        <Parameter Name="ouCapacity" Section="Output" Type="UInt" />
+      </CallInfo>
+    </Call>
+  </Parts>
+  <Wires>
+    <Wire UId="34">
+      <Powerrail />
+      <NameCon UId="30" Name="en" />
+      <NameCon UId="32" Name="en" />
+    </Wire>
+    <Wire UId="35">
+      <IdentCon UId="21" />
+      <NameCon UId="30" Name="inEnable" />
+    </Wire>
+    <Wire UId="36">
+      <IdentCon UId="22" />
+      <NameCon UId="30" Name="inRENewTU" />
+    </Wire>
+    <Wire UId="37">
+      <IdentCon UId="23" />
+      <NameCon UId="30" Name="inBaseTimeIntervall" />
+    </Wire>
+    <Wire UId="38">
+      <NameCon UId="30" Name="ouCapacitiyHeadToHead" />
+      <IdentCon UId="24" />
+    </Wire>
+    <Wire UId="39">
+      <NameCon UId="30" Name="ouTimeHeadToHead" />
+      <IdentCon UId="25" />
+    </Wire>
+    <Wire UId="40">
+      <NameCon UId="30" Name="ouBuffer" />
+      <IdentCon UId="26" />
+    </Wire>
+    <Wire UId="41">
+      <IdentCon UId="27" />
+      <NameCon UId="32" Name="inBuffer" />
+    </Wire>
+    <Wire UId="42">
+      <IdentCon UId="28" />
+      <NameCon UId="32" Name="inTimePeriod" />
+    </Wire>
+    <Wire UId="43">
+      <NameCon UId="32" Name="ouCapacity" />
+      <IdentCon UId="29" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="5" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="6" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="7" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="8" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="9" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Call: MeasureAvgCapacity</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="A" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Wywołanie: MeasureAvgCapacity</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <MultilingualText ID="B" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="C" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-US</Culture>
+              <Text>Measure average capacity</Text>
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="D" CompositionName="Items">
+            <AttributeList>
+              <Culture>pl-PL</Culture>
+              <Text>Pomiar średniej wydajności</Text>
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.FB>
+</Document>

@@ -1,0 +1,56 @@
+﻿FUNCTION_BLOCK "fbTrackingData"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inInitData : Bool;
+      inWindowLength : UInt;
+      inDistancePrevScan : UInt;
+   END_VAR
+
+   VAR_IN_OUT 
+      ioArray : Array[*] of "typeTrackingStep";
+      inDataArray : Array[*] of "typeTrackingUserData";
+      ioData : "typeTrackingData";
+   END_VAR
+
+   VAR_TEMP 
+      tempArrayLength : DInt;
+      tempFirstIndex : DInt;
+      tempInc : Int;
+   END_VAR
+
+
+BEGIN
+	
+	// określenie górny/dolny zakres tablicy
+	#tempArrayLength := UPPER_BOUND(ARR := #ioArray, DIM := 1);
+	#tempFirstIndex := LOWER_BOUND(ARR := #ioArray, DIM := 1);
+	
+	IF #ioData.WindowLength = 0 OR #inInitData THEN
+	    #ioData.ActualID := 0;
+	    #ioData.MaxID := DINT_TO_UINT(UPPER_BOUND(ARR := #inDataArray, DIM := 1));
+	    #ioData.WindowLength := #inWindowLength;
+	END_IF;
+	
+	IF #tempArrayLength > 1 AND #inDistancePrevScan > 0 THEN
+	    FOR #tempInc := #tempArrayLength TO #tempFirstIndex + 1 BY -1 DO
+	        
+	        IF #ioArray[#tempInc - 1].ID > 0 THEN
+	            #ioArray[#tempInc - 1].Window += #inDistancePrevScan;
+	        END_IF;
+	        
+	        IF #ioArray[#tempInc-1].Window >= #ioData.WindowLength THEN
+	            #ioArray[#tempInc-1].Window := #ioArray[#tempInc-1].Window - #ioData.WindowLength; //zapamietanie różnicy powyzej #inDistanceOnTact
+	            
+	            //przepisanie danych do nowego okna
+	            #ioArray[#tempInc] := #ioArray[#tempInc - 1];
+	            
+	            //zerowanie wartości okna poprzedniego
+	            #ioArray[#tempInc - 1].ID := 0;
+	            #ioArray[#tempInc - 1].Window := 0;
+	        END_IF;
+	        
+	    END_FOR;
+	END_IF;
+END_FUNCTION_BLOCK
+

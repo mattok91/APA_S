@@ -1,0 +1,60 @@
+﻿FUNCTION_BLOCK "LAxisCtrl_GetExtEncoderStatusWord"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : AxisCtrl
+VERSION : 1.0
+   VAR_INPUT 
+      axis {InstructionName := 'TO_ExternalEncoder'; LibVersion := '5.0'} : TO_ExternalEncoder;
+   END_VAR
+
+   VAR_OUTPUT 
+      enable { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      error { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      restartActive { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      onlineStartValuesChanged { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      homingDone { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      done { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      homingCommand { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      tempStatusWord : DWord;
+   END_VAR
+
+
+BEGIN
+	//==========================================================================================
+	// SIEMENS AG
+	// (c)Copyright 2017 All Rights Reserved
+	//------------------------------------------------------------------------------------------
+	// Library: LAxisCtrl
+	// Tested with: S7-1515T-2 PN
+	// Engineering: TIA Portal V15
+	// Restrictions: ---
+	// Requirements: S7-1500/S7-1500T FW 2.5
+	// Functionality: The FB is splitting the status word of an external encoder into bits.
+	// Support: tech.team.motioncontrol@siemens.com
+	// Note: Parameter comments are only available in language 'English (United States)'
+	//------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.04   04.10.2016    RS                  First released version
+	//===========================================================================================
+	
+	//----------------------------------------------------------------------------------------------
+	// Read statusword
+	//----------------------------------------------------------------------------------------------
+	#tempStatusWord := #axis.StatusWord;
+	
+	//----------------------------------------------------------------------------------------------
+	// Write outputs
+	//----------------------------------------------------------------------------------------------
+	#enable := #tempStatusWord.%X0;
+	#error := #tempStatusWord.%X1;
+	#restartActive := #tempStatusWord.%X2;
+	#onlineStartValuesChanged := #tempStatusWord.%X3;
+	#homingDone := #tempStatusWord.%X5;
+	#done := #tempStatusWord.%X6;
+	#homingCommand := #tempStatusWord.%X11;
+END_FUNCTION_BLOCK
+

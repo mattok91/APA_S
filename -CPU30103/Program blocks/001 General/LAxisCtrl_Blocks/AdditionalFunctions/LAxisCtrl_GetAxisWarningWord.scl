@@ -1,0 +1,79 @@
+﻿FUNCTION_BLOCK "LAxisCtrl_GetAxisWarningWord"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : AxisCtrl
+VERSION : 1.0
+   VAR_INPUT 
+      axis {InstructionName := 'TO_SpeedAxis'; LibVersion := '5.0'} : TO_SpeedAxis;
+   END_VAR
+
+   VAR_OUTPUT 
+      systemWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      configWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      userWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      commandNotAccepted { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      driveWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      sensorWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      dynamicError { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      communicationWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      swLimitMin { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      swLimitMax { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      homingWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      followingErrorWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      positioningWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      peripheralWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      synchronousWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      adaptionWarning { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      tempWarningWord : DWord;
+   END_VAR
+
+
+BEGIN
+	//==========================================================================================
+	// SIEMENS AG
+	// (c)Copyright 2017 All Rights Reserved
+	//------------------------------------------------------------------------------------------
+	// Library: LAxisCtrl
+	// Tested with: S7-1515T-2 PN
+	// Engineering: TIA Portal V15
+	// Restrictions: ---
+	// Requirements: S7-1500/S7-1500T FW 2.5
+	// Functionality: The FB is splitting the warning word of an axis into bits.
+	// Support: tech.team.motioncontrol@siemens.com
+	// Note: Parameter comments are only available in language 'English (United States)'
+	//------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.01   04.10.2016    AL                  First released version
+	// 01.00.02   29.03.2017    AL                  Added support information
+	//===========================================================================================
+	
+	//----------------------------------------------------------------------------------------------
+	// Read warningword
+	//----------------------------------------------------------------------------------------------
+	#tempWarningWord := #axis.WarningWord;
+	
+	//----------------------------------------------------------------------------------------------
+	// Write outputs
+	//----------------------------------------------------------------------------------------------
+	#systemWarning := #tempWarningWord.%X0;
+	#configWarning := #tempWarningWord.%X1;
+	#userWarning := #tempWarningWord.%X2;
+	#commandNotAccepted := #tempWarningWord.%X3;
+	#driveWarning := #tempWarningWord.%X4;
+	#sensorWarning := #tempWarningWord.%X5;
+	#dynamicError := #tempWarningWord.%X6;
+	#communicationWarning := #tempWarningWord.%X7;
+	#swLimitMin := #tempWarningWord.%X8;
+	#swLimitMax := #tempWarningWord.%X9;
+	#homingWarning := #tempWarningWord.%X10;
+	#followingErrorWarning := #tempWarningWord.%X11;
+	#positioningWarning := #tempWarningWord.%X12;
+	#peripheralWarning := #tempWarningWord.%X13;
+	#synchronousWarning := #tempWarningWord.%X14;
+	#adaptionWarning := #tempWarningWord.%X15;
+END_FUNCTION_BLOCK
+

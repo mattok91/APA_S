@@ -1,0 +1,30 @@
+﻿FUNCTION "fcClearData" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_IN_OUT 
+      io_VAR_Data : Variant;   // Dane do wyczyszczenia
+   END_VAR
+
+   VAR_TEMP 
+      temp_Buffer : Array[1..512] of Byte;
+      temp_PosBuffer : DInt;
+      temp_Internal_error : Int;
+   END_VAR
+
+
+BEGIN
+	
+	//wyczyszczenie struktury danych
+	//przerzucenie z struktury na tablice
+	#temp_PosBuffer := 0;
+	#temp_Internal_error := Serialize(SRC_VARIABLE := #io_VAR_Data, DEST_ARRAY => #temp_Buffer, POS := #temp_PosBuffer);
+	//wyzerowanie
+	FILL_BLK(IN := 0,
+	         COUNT := DINT_TO_UDINT(#temp_PosBuffer),
+	         OUT => #temp_Buffer[1]);
+	//przerzucenie spowrotem z tablicy do struktury
+	#temp_PosBuffer := 0;
+	#temp_Internal_error := Deserialize(SRC_ARRAY := #temp_Buffer, DEST_VARIABLE => #io_VAR_Data, POS := #temp_PosBuffer);
+	
+END_FUNCTION
+

@@ -1,0 +1,42 @@
+﻿FUNCTION "fcCompareData" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      in_VAR_Data_1 : Variant;   // Dane do wyczyszczenia
+      in_VAR_Data_2 : Variant;   // Dane do wyczyszczenia
+   END_VAR
+
+   VAR_OUTPUT 
+      ou_Equal : Bool;   // Dane są sobie równe
+   END_VAR
+
+   VAR_TEMP 
+      temp_Buffer_1 : Array[1..512] of Byte;
+      temp_Buffer_2 : Array[1..512] of Byte;
+      temp_PosBuffer : DInt;
+      temp_Internal_error : Int;
+      i : Int;
+   END_VAR
+
+
+BEGIN
+	
+	//wyczyszczenie struktury danych
+	//przerzucenie z struktury na tablice
+	#temp_PosBuffer := 0;
+	#temp_Internal_error := Serialize(SRC_VARIABLE := #in_VAR_Data_1, DEST_ARRAY => #temp_Buffer_1, POS := #temp_PosBuffer);
+	#temp_PosBuffer := 0;
+	#temp_Internal_error := Serialize(SRC_VARIABLE := #in_VAR_Data_2, DEST_ARRAY => #temp_Buffer_2, POS := #temp_PosBuffer);
+	
+	#ou_Equal := FALSE;
+	
+	FOR #i := 1 TO #temp_PosBuffer DO
+	    IF #temp_Buffer_1[#i] <> #temp_Buffer_2[#i] THEN
+	        RETURN;
+	    END_IF;
+	END_FOR;
+	
+	#ou_Equal := TRUE;
+	
+END_FUNCTION
+

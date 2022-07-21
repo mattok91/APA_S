@@ -1,0 +1,586 @@
+﻿FUNCTION_BLOCK "fbATIParameters"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      noDB : DB_ANY;   // DB z danymi
+      adflo : Bool;   // typ Adflo aktywny
+      tr300 : Bool;   // typ TR300 aktywny
+   END_VAR
+
+   VAR_IN_OUT 
+      ATI : "typeTester";   // Dane HMI
+      ATIP2P : "typeATIP2P";   // Blok danych do obsługi połączenia z testerem
+   END_VAR
+
+   VAR 
+      statParam { S7_SetPoint := 'False'} : "typeATIParam";
+      statReadActive { S7_SetPoint := 'True'} : Bool;
+      statSetActive : Bool;
+      statRecvData : String;
+      statRecvNDR { S7_SetPoint := 'True'} : Bool;
+      statRecvError : Bool;
+      statRecvStatus : Word;
+      statRecvLength : Int;
+      statSendData : String;
+      statSendTrigger : Bool;
+      statSendLength : UInt;
+      statSendDone : Bool;
+      statSendError : Bool;
+      statSendStatus : Word;
+      statCounterTGSend { S7_SetPoint := 'True'} : Int;
+      statCounterTGReceive : Int;
+      statSetParamTRIG {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      statReadParamTRIG {InstructionName := 'R_TRIG'; LibVersion := '1.0'} : R_TRIG;
+      statSendRqTRIG {InstructionName := 'R_TRIG'; LibVersion := '1.0'} : R_TRIG;
+      statGET_MsgSend {InstructionName := 'R_TRIG'; LibVersion := '1.0'} : R_TRIG;
+      statSET_MsgSend {InstructionName := 'R_TRIG'; LibVersion := '1.0'} : R_TRIG;
+      statStr { S7_SetPoint := 'True'} : String;
+   END_VAR
+
+   VAR_TEMP 
+      tempVariant : Variant;
+      tempRetVal : Int;
+      temp_cRL : Char;
+      temp_sRL : String;
+      tempStr : String;
+      tempLen : Int;
+      tempTime : Time;
+      tempTGRead : Int;
+      temp_i : Int;
+      tempClearData : Bool;
+   END_VAR
+
+
+BEGIN
+	
+	REGION Przepisanie struktury z DB na stat
+	    // skopiowanie struktury z DB
+	    #tempVariant := DB_ANY_TO_VARIANT(in := #noDB, err => #tempRetVal);
+	    
+	    IF NOT #statSetActive AND NOT #statReadActive THEN
+	        IF #adflo THEN
+	            #tempRetVal := MOVE_BLK_VARIANT(SRC := #tempVariant, COUNT := 1, SRC_INDEX := 0, DEST_INDEX := 0, DEST => #statParam);
+	        ELSIF #tr300 THEN
+	            #tempRetVal := MOVE_BLK_VARIANT(SRC := #tempVariant, COUNT := 1, SRC_INDEX := 1, DEST_INDEX := 0, DEST => #statParam);
+	        END_IF;
+	    END_IF;
+	END_REGION
+	
+	REGION czyszczenie struktury danych odebranych, gdy pierwszy telegram zostanie wysłany do ATI 
+	    #statGET_MsgSend(CLK := #ATI.rq.readConfig AND FIND(IN1 := #ATIP2P.LastSendMsg, IN2 := 'GET') <> 0);
+	    #statSET_MsgSend(CLK := #ATI.rq.readConfig AND FIND(IN1 := #ATIP2P.LastSendMsg, IN2 := 'SET') <> 0);
+	    
+	    IF #statGET_MsgSend.Q THEN
+	        "fcClearData"(io_VAR_Data := #statParam.read);
+	    END_IF;
+	END_REGION
+	
+	REGION Wyzerowanie licznika telegramów   
+	    #statSetParamTRIG(CLK := #ATI.rq.setConfig);
+	    #statReadParamTRIG(CLK := #ATI.rq.readConfig);
+	    
+	    //#statSetActive - sygnał informujący o wrzucaniu do bufora kolejnych telegramów z zakresu SET
+	    //#statReadActive - sygnał informujący o wrzucaniu do bufora kolejnych telegramów z zakresu READ
+	    
+	    IF #statSetParamTRIG.Q AND NOT #statSetActive THEN
+	        #statCounterTGSend := 1; //ustawienie licznika na 1
+	    ELSIF #statReadParamTRIG.Q AND NOT #statReadActive THEN
+	        #statCounterTGReceive := 1; //ustawienie licznika na 1
+	    END_IF;
+	END_REGION
+	
+	REGION Wybór SET/READ z HMI
+	    
+	    #tempClearData := FALSE;
+	    
+	    // tylko jedna aktywność wymuszona z HMI
+	    IF #statSetParamTRIG.Q THEN
+	        IF NOT #statReadActive THEN
+	            #statSetActive := TRUE;
+	            #ATI.sts.rqSetConfig := FALSE; //ustawiane przy zmiane typu produkowanego filtra 
+	            #ATI.sts.rqReadConfig := TRUE; //ustawianie żadania oczytu parametrow po ich zapisie do ATI
+	        ELSE
+	            #ATI.rq.setConfig := FALSE; //reset przycisku gdy brak możliwosci ustwienia aktywności i co za tym idzie wkładania TG do bufora nadawczego
+	        END_IF;
+	    END_IF;
+	    
+	    IF #statReadParamTRIG.Q THEN
+	        IF NOT #statSetActive THEN
+	            #statReadActive := TRUE;
+	            #ATI.sts.rqReadConfig := FALSE; //ustawiane przy zmiane typu produkowanego filtra 
+	            #tempClearData := TRUE;
+	            
+	            "fcClearData"(io_VAR_Data := #statParam.read);
+	        ELSE
+	            #ATI.rq.readConfig := FALSE; //reset przycisku gdy brak możliwosci ustwienia aktywności i co za tym idzie wkładania TG do bufora nadawczego
+	        END_IF;
+	    END_IF;
+	    
+	END_REGION
+	
+	REGION Znak konca telegramu   
+	    #temp_cRL := BYTE_TO_CHAR(16#D);
+	    #temp_sRL := CHAR_TO_STRING(IN := #temp_cRL);
+	END_REGION
+	
+	REGION Obsługa telegramów dla komunikacji
+	    IF #statSetActive THEN
+	        
+	        CASE #statCounterTGSend OF
+	            1:
+	                "fcConvertDintToString"(inDINT := #statParam.set.flowRate,
+	                                        inAlignmentReminder := 6,
+	                                        ouString => #statStr);
+	                
+	                #statSendData := CONCAT(IN1 := 'SET FLOW=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            2:
+	                "fcConvertDintToString"(inDINT := #statParam.set.flowTol,
+	                                        inAlignmentReminder := 6,
+	                                        ouString => #statStr);
+	                
+	                #statSendData := CONCAT(IN1 := 'SET FLOW_TOL=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            3:
+	                IF #statParam.set.flowTol_On THEN
+	                    #statStr := 'Y';
+	                ELSE
+	                    #statStr := 'N';
+	                END_IF;
+	                
+	                #statSendData := CONCAT(IN1 := 'SET FLOW_TOL_ON=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            4:
+	                "fcConvertDintToString"(inDINT := #statParam.set.penMax,
+	                                        inAlignmentReminder := 6,
+	                                        ouString => #statStr);
+	                
+	                #statSendData := CONCAT(IN1 := 'SET PENMAX=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            5:
+	                "fcConvertDintToString"(inDINT := #statParam.set.penMin,
+	                                        inAlignmentReminder := 6,
+	                                        ouString => #statStr);
+	                
+	                #statSendData := CONCAT(IN1 := 'SET PENMIN=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	                
+	            6:
+	                IF #statParam.set.penMax_On THEN
+	                    #statStr := 'Y';
+	                ELSE
+	                    #statStr := 'N';
+	                END_IF;
+	                
+	                #statSendData := CONCAT(IN1 := 'SET PENMAX_ON=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            7:
+	                IF #statParam.set.penMin_On THEN
+	                    #statStr := 'Y';
+	                ELSE
+	                    #statStr := 'N';
+	                END_IF;
+	                
+	                #statSendData := CONCAT(IN1 := 'SET PEN_LO_ON=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            8:
+	                "fcConvertDintToString"(inDINT := #statParam.set.resMax,
+	                                        inAlignmentReminder := 6,
+	                                        ouString => #statStr);
+	                
+	                #statSendData := CONCAT(IN1 := 'SET RESMAX=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            9:
+	                "fcConvertDintToString"(inDINT := #statParam.set.resMin,
+	                                        inAlignmentReminder := 6,
+	                                        ouString => #statStr);
+	                
+	                #statSendData := CONCAT(IN1 := 'SET RESMIN=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            10:
+	                IF #statParam.set.resMax_On THEN
+	                    #statStr := 'Y';
+	                ELSE
+	                    #statStr := 'N';
+	                END_IF;
+	                
+	                #statSendData := CONCAT(IN1 := 'SET RESMAX_ON=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            11:
+	                IF #statParam.set.resMin_On THEN
+	                    #statStr := 'Y';
+	                ELSE
+	                    #statStr := 'N';
+	                END_IF;
+	                
+	                #statSendData := CONCAT(IN1 := 'SET RESMIN_ON=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            12:
+	                "fcConvertDintToString"(inDINT := #statParam.set.loadTime,
+	                                        inAlignmentReminder := 6,
+	                                        ouString => #statStr);
+	                
+	                #statSendData := CONCAT(IN1 := 'SET LOAD_TIME=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            13:
+	                IF #statParam.set.loadTime_On THEN
+	                    #statStr := 'Y';
+	                ELSE
+	                    #statStr := 'N';
+	                END_IF;
+	                
+	                #statSendData := CONCAT(IN1 := 'SET LOAD_TIME_ON=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            14:
+	                "fcConvertDintToString"(inDINT := #statParam.set.sampTime,
+	                                        inAlignmentReminder := 6,
+	                                        ouString => #statStr);
+	                
+	                #statSendData := CONCAT(IN1 := 'SET SAMP_TIME=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            15:
+	                IF #statParam.set.sampTime_On THEN
+	                    #statStr := 'Y';
+	                ELSE
+	                    #statStr := 'N';
+	                END_IF;
+	                
+	                #statSendData := CONCAT(IN1 := 'SET SAMP_TIME_ON=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            16:
+	                "fcConvertDintToString"(inDINT := #statParam.set.openTime,
+	                                        inAlignmentReminder := 6,
+	                                        ouString => #statStr);
+	                
+	                #statSendData := CONCAT(IN1 := 'SET OPEN_TIME=', IN2 := #statStr); //nazwa TG + wartość z HMI
+	                #statSendData := CONCAT(IN1 := #statSendData, IN2 := #temp_sRL); //+koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData)); //długość TG
+	                #statSendTrigger := TRUE; //trigger
+	            ELSE
+	                #statSetActive := FALSE;
+	                #statCounterTGSend := 0;
+	        END_CASE;
+	        
+	    ELSIF #statReadActive THEN
+	        
+	        CASE #statCounterTGReceive OF
+	            1:
+	                #statSendData := CONCAT(IN1 := 'GET FLOW', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            2:
+	                #statSendData := CONCAT(IN1 := 'GET FLOW_TOL', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            3:
+	                #statSendData := CONCAT(IN1 := 'GET FLOW_TOL_ON', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            4:
+	                #statSendData := CONCAT(IN1 := 'GET PENMAX', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            5:
+	                #statSendData := CONCAT(IN1 := 'GET PENMIN', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            6:
+	                #statSendData := CONCAT(IN1 := 'GET PENMAX_ON', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            7:
+	                #statSendData := CONCAT(IN1 := 'GET PEN_LO_ON', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            8:
+	                #statSendData := CONCAT(IN1 := 'GET RESMAX', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            9:
+	                #statSendData := CONCAT(IN1 := 'GET RESMIN', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            10:
+	                #statSendData := CONCAT(IN1 := 'GET RESMAX_ON', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            11:
+	                #statSendData := CONCAT(IN1 := 'GET RESMIN_ON', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            12:
+	                #statSendData := CONCAT(IN1 := 'GET LOAD_TIME', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            13:
+	                #statSendData := CONCAT(IN1 := 'GET LOAD_TIME_ON', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            14:
+	                #statSendData := CONCAT(IN1 := 'GET SAMP_TIME', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            15:
+	                #statSendData := CONCAT(IN1 := 'GET SAMP_TIME_ON', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            16:
+	                #statSendData := CONCAT(IN1 := 'GET OPEN_TIME', IN2 := #temp_sRL); //nazwa TG + koniec TG
+	                #statSendLength := INT_TO_UINT(LEN(#statSendData));
+	                #statSendTrigger := TRUE;
+	            ELSE
+	                #statReadActive := FALSE;
+	                #statCounterTGReceive := 0;
+	        END_CASE;
+	    END_IF;
+	END_REGION
+	
+	REGION Nowy telegram do wysyłki
+	    
+	    IF #statSendTrigger AND NOT #ATIP2P.BufferFull THEN
+	        #ATIP2P.CounterMsg += 1;
+	        #ATIP2P.P2PSend[#ATIP2P.CounterMsg].buffer := #statSendData; //dane do wysyłki
+	        
+	        IF #statReadActive THEN
+	            #ATIP2P.P2PSend[#ATIP2P.CounterMsg].ReqRcvMsg := TRUE;       //zadanie odpowiedzi
+	        ELSIF #statSetActive THEN
+	            #ATIP2P.P2PSend[#ATIP2P.CounterMsg].ReqRcvMsg := FALSE;       //brak zadania odpowiedzi
+	        END_IF;
+	        
+	        //po wstawieniu nowego telegramu do wysyłki sprawdzenie zapełnienia bufora
+	        IF #ATIP2P.CounterMsg >= "ATI_MaxMsg" THEN
+	            #ATIP2P.BufferFull := TRUE;
+	        END_IF;
+	        
+	        IF #statSetActive THEN
+	            #statCounterTGSend += 1;
+	        ELSIF #statReadActive THEN
+	            #statCounterTGReceive += 1;
+	        END_IF;
+	        
+	        #statSendTrigger := FALSE;
+	    END_IF;
+	    
+	    #statRecvNDR := #ATIP2P.P2PRecv.newMsg;
+	    #statRecvData := #ATIP2P.P2PRecv.buffer;
+	    #statRecvLength := LEN(#statRecvData);
+	    
+	END_REGION
+	
+	REGION Po otrzymaniu TG...
+	    
+	    IF #statRecvNDR THEN
+	        
+	        IF FIND(IN1 := #statRecvData, IN2 := 'FLOW=') <> 0 THEN
+	            //FLOW=...$R
+	            #tempLen := #statRecvLength - 5 - 1;
+	            #tempStr := MID(IN := #statRecvData, L := #tempLen, P := 6);
+	            "fcConvertStringToDint"(inString := #tempStr,
+	                                    inAlignmentReminder := 6,
+	                                    ouDINT => #statParam.read.flowRate);
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'FLOW_TOL=') <> 0 THEN
+	            //FLOW_TOL=...$R
+	            #tempLen := #statRecvLength - 9 - 1;
+	            #tempStr := MID(IN := #statRecvData, L := #tempLen, P := 10);
+	            "fcConvertStringToDint"(inString := #tempStr,
+	                                    inAlignmentReminder := 6,
+	                                    ouDINT => #statParam.read.flowTol);
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'FLOW_TOL_ON=') <> 0 THEN
+	            //FLOW_TOL_ON=...$R
+	            #tempLen := #statRecvLength - 12 - 1;
+	            #temp_sRL := MID(IN := #statRecvData, L := #tempLen, P := 13);
+	            
+	            IF #temp_sRL = 'Y' THEN
+	                #statParam.read.flowTol_On := TRUE;
+	            ELSIF #temp_sRL = 'N' THEN
+	                #statParam.read.flowTol_On := FALSE;
+	            END_IF;
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'PENMAX=') <> 0 THEN
+	            //PENMAX=...$R
+	            #tempLen := #statRecvLength - 7 - 1;
+	            #tempStr := MID(IN := #statRecvData, L := #tempLen, P := 8);
+	            "fcConvertStringToDint"(inString := #tempStr,
+	                                    inAlignmentReminder := 6,
+	                                    ouDINT => #statParam.read.penMax);
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'PENMIN=') <> 0 THEN
+	            //PENMIN=...$R
+	            #tempLen := #statRecvLength - 7 - 1;
+	            #tempStr := MID(IN := #statRecvData, L := #tempLen, P := 8);
+	            "fcConvertStringToDint"(inString := #tempStr,
+	                                    inAlignmentReminder := 6,
+	                                    ouDINT => #statParam.read.penMin);
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'PENMAX_ON=') <> 0 THEN
+	            //PENMAX_ON=...$R
+	            #tempLen := #statRecvLength - 10 - 1;
+	            #temp_sRL := MID(IN := #statRecvData, L := #tempLen, P := 11);
+	            
+	            IF #temp_sRL = 'Y' THEN
+	                #statParam.read.penMax_On := TRUE;
+	            ELSIF #temp_sRL = 'N' THEN
+	                #statParam.read.penMax_On := FALSE;
+	            END_IF;
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'PEN_LO_ON=') <> 0 THEN
+	            //PEN_LO_ON=...$R
+	            #tempLen := #statRecvLength - 10 - 1;
+	            #temp_sRL := MID(IN := #statRecvData, L := #tempLen, P := 11);
+	            
+	            IF #temp_sRL = 'Y' THEN
+	                #statParam.read.penMin_On := TRUE;
+	            ELSIF #temp_sRL = 'N' THEN
+	                #statParam.read.penMin_On := FALSE;
+	            END_IF;
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'RESMAX=') <> 0 THEN
+	            //RESMAX=...$R
+	            #tempLen := #statRecvLength - 7 - 1;
+	            #tempStr := MID(IN := #statRecvData, L := #tempLen, P := 8);
+	            "fcConvertStringToDint"(inString := #tempStr,
+	                                    inAlignmentReminder := 6,
+	                                    ouDINT => #statParam.read.resMax);
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'RESMIN=') <> 0 THEN
+	            //RESMIN=...$R
+	            #tempLen := #statRecvLength - 7 - 1;
+	            #tempStr := MID(IN := #statRecvData, L := #tempLen, P := 8);
+	            "fcConvertStringToDint"(inString := #tempStr,
+	                                    inAlignmentReminder := 6,
+	                                    ouDINT => #statParam.read.resMin);
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'RESMAX_ON=') <> 0 THEN
+	            //RESMAX_ON=...$R
+	            #tempLen := #statRecvLength - 10 - 1;
+	            #temp_sRL := MID(IN := #statRecvData, L := #tempLen, P := 11);
+	            
+	            IF #temp_sRL = 'Y' THEN
+	                #statParam.read.resMax_On := TRUE;
+	            ELSIF #temp_sRL = 'N' THEN
+	                #statParam.read.resMax_On := FALSE;
+	            END_IF;
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'RESMIN_ON=') <> 0 THEN
+	            //RESMIN_ON=...$R
+	            #tempLen := #statRecvLength - 10 - 1;
+	            #temp_sRL := MID(IN := #statRecvData, L := #tempLen, P := 11);
+	            
+	            IF #temp_sRL = 'Y' THEN
+	                #statParam.read.resMin_On := TRUE;
+	            ELSIF #temp_sRL = 'N' THEN
+	                #statParam.read.resMin_On := FALSE;
+	            END_IF;
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'LOAD_TIME=') <> 0 THEN
+	            //LOAD_TIME=...$R
+	            #tempLen := #statRecvLength - 10 - 1;
+	            #tempStr := MID(IN := #statRecvData, L := #tempLen, P := 11);
+	            "fcConvertStringToDint"(inString := #tempStr,
+	                                    inAlignmentReminder := 6,
+	                                    ouDINT => #statParam.read.loadTime);
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'LOAD_TIME_ON=') <> 0 THEN
+	            //LOAD_TIME_ON=...$R
+	            #tempLen := #statRecvLength - 13 - 1;
+	            #temp_sRL := MID(IN := #statRecvData, L := #tempLen, P := 14);
+	            
+	            IF #temp_sRL = 'Y' THEN
+	                #statParam.read.loadTime_On := TRUE;
+	            ELSIF #temp_sRL = 'N' THEN
+	                #statParam.read.loadTime_On := FALSE;
+	            END_IF;
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'SAMP_TIME=') <> 0 THEN
+	            //SAMP_TIME=...$R
+	            #tempLen := #statRecvLength - 10 - 1;
+	            #tempStr := MID(IN := #statRecvData, L := #tempLen, P := 11);
+	            "fcConvertStringToDint"(inString := #tempStr,
+	                                    inAlignmentReminder := 6,
+	                                    ouDINT => #statParam.read.sampTime);
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'SAMP_TIME_ON=') <> 0 THEN
+	            //SAMP_TIME_ON=...$R
+	            #tempLen := #statRecvLength - 13 - 1;
+	            #temp_sRL := MID(IN := #statRecvData, L := #tempLen, P := 14);
+	            
+	            IF #temp_sRL = 'Y' THEN
+	                #statParam.read.sampTime_On := TRUE;
+	            ELSIF #temp_sRL = 'N' THEN
+	                #statParam.read.sampTime_On := FALSE;
+	            END_IF;
+	            
+	        ELSIF FIND(IN1 := #statRecvData, IN2 := 'OPEN_TIME=') <> 0 THEN
+	            //OPEN_TIME=...$R
+	            #tempLen := #statRecvLength - 10 - 1;
+	            #tempStr := MID(IN := #statRecvData, L := #tempLen, P := 11);
+	            "fcConvertStringToDint"(inString := #tempStr,
+	                                    inAlignmentReminder := 6,
+	                                    ouDINT => #statParam.read.openTime);
+	        ELSE
+	            ;
+	        END_IF;
+	        
+	    END_IF;
+	    
+	END_REGION
+	
+	// błąd komunikacji lub po dodaniu wszystkich telegramów do bufora nadawczego i wysłaniu telegramów, reset "setConfig" oraz #statSetActive
+	IF #ATIP2P.CommError OR (#ATI.rq.setConfig AND NOT #statSetActive AND #ATIP2P.CounterMsg = 0) THEN
+	    #statSetActive := FALSE; //dot.#ATIP2P.CommError
+	    #ATI.rq.setConfig := FALSE;
+	   
+	END_IF;
+	
+	// błąd komunikacji lub po dodaniu wszystkich telegramów do bufora nadawczego i wysłaniu telegramów, reset "readConfig" oraz #statReadActive
+	IF #ATIP2P.CommError OR (#ATI.rq.readConfig AND NOT #statReadActive AND #ATIP2P.CounterMsg = 0) THEN
+	    #statReadActive := FALSE; //dot.#ATIP2P.CommError
+	    #ATI.rq.readConfig := FALSE;
+	    
+	END_IF;
+	
+	REGION Przepisanie struktury z stat do DB wejściowego
+	    IF #statRecvNDR OR #tempClearData THEN
+	        IF #adflo THEN
+	            #tempRetVal := MOVE_BLK_VARIANT(SRC := #statParam, COUNT := 1, SRC_INDEX := 0, DEST_INDEX := 0, DEST => #tempVariant);
+	        ELSIF #tr300 THEN
+	            #tempRetVal := MOVE_BLK_VARIANT(SRC := #statParam, COUNT := 1, SRC_INDEX := 0, DEST_INDEX := 1, DEST => #tempVariant);
+	        END_IF;
+	    END_IF;
+	END_REGION
+	
+	#ATI.sts.settingInProgress := #ATI.rq.setConfig;
+	#ATI.sts.readingInProgress := #ATI.rq.readConfig;
+	
+END_FUNCTION_BLOCK
+

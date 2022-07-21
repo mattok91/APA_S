@@ -1,0 +1,110 @@
+﻿FUNCTION_BLOCK "fbMeasureAvgCapacityGet"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inBuffer { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : "typeBufferCountTUs";
+      inTimePeriod { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Time;
+   END_VAR
+
+   VAR_OUTPUT 
+      ouCapacity { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : UInt;
+   END_VAR
+
+   VAR 
+      sSum { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LInt;
+      sInitDone { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      sCurrentIndxPrevScan { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt;
+      sTimeSaved { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Time;
+      sValuesAdded { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt;
+   END_VAR
+
+   VAR_TEMP 
+      tValuesNeeded : DInt;
+      tUpperBound : DInt;
+      tLowerBound : DInt;
+      tIndex : DInt;
+      tBufferIndexValid : Bool;
+   END_VAR
+
+
+BEGIN
+	REGION Init
+	  "fcGetBoundariesUSIntArray"(inArray         := #inBuffer.Value,
+	                              ouUpperBoundary => #tUpperBound,
+	                              ouLowerBoundary => #tLowerBound);
+	  // Check if index is valid
+	  #tBufferIndexValid :=
+	  #inBuffer.CurrentIndex >= #tLowerBound
+	  AND #inBuffer.CurrentIndex <= #tUpperBound;
+	  // Calc values needed
+	  #tValuesNeeded := MIN(IN1 := TIME_TO_DINT(#inTimePeriod) / TIME_TO_DINT(#inBuffer.BaseTimeIntervall),
+	                        IN2 := ABS(#tUpperBound - #tLowerBound));
+	  
+	END_REGION
+	
+	REGION Validation
+	  IF NOT #sInitDone // Instance upload
+	    OR NOT #tBufferIndexValid // No value in buffer
+	    OR #inTimePeriod <> #sTimeSaved // Settings changed
+	    OR #inBuffer.ValuesInBuffer <= 0 // No values in buffer
+	  THEN
+	    #sInitDone :=
+	    #tBufferIndexValid
+	    AND #inBuffer.ValuesInBuffer > 0;
+	    #sTimeSaved := #inTimePeriod;
+	    // Init values for sum building
+	    #sCurrentIndxPrevScan := #inBuffer.CurrentIndex - 1;
+	    #sSum := 0;
+	    #sValuesAdded := 0;
+	  END_IF;
+	END_REGION
+	
+	//every one second (#cTimeIntervall = 1 sec)
+	IF #sCurrentIndxPrevScan <> #inBuffer.CurrentIndex
+	  AND #sInitDone
+	THEN
+	  #sCurrentIndxPrevScan := #inBuffer.CurrentIndex;
+	  REGION Add value
+	    #sSum += #inBuffer.Value[#inBuffer.CurrentIndex];
+	    #sValuesAdded += 1;
+	  END_REGION
+	  IF #sValuesAdded > #tValuesNeeded THEN
+	    REGION Subtract value
+	      // Get index of value to subtract
+	      #tIndex := #inBuffer.CurrentIndex - #tValuesNeeded;
+	      IF #tIndex < #tLowerBound THEN
+	        #tIndex += #tUpperBound - #tLowerBound + 1;
+	      END_IF;
+	      #sSum -= #inBuffer.Value[#tIndex];
+	      #sValuesAdded -= 1;
+	    END_REGION
+	  END_IF;
+	END_IF;
+	
+	//case if : 
+	//function MeasureAvgCapacityCount was running all time and getting values in buffer.
+	//in this function we changed input (for expample inTimePeriod).
+	//after validation sSum, sValuesAdded are 0 (init proces because change input value)
+	//because in buffer we have values we can start calculate sSum for capacity (get sum fast procedure)
+	//
+	REGION Get sum fast
+	  // Add one value per scan after validation error
+	  // and enough values in buffer
+	  IF #sValuesAdded > 0
+	    AND #sValuesAdded < #tValuesNeeded
+	    AND #inBuffer.ValuesInBuffer >= #tValuesNeeded
+	  THEN
+	    #tIndex := #inBuffer.CurrentIndex - #sValuesAdded;
+	    IF #tIndex < #tLowerBound THEN
+	      #tIndex += #tUpperBound - #tLowerBound + 1;
+	    END_IF;
+	    #sSum += #inBuffer.Value[#tIndex];
+	    #sValuesAdded += 1;
+	  END_IF;
+	END_REGION
+	
+	REGION Calc capacity
+	    #ouCapacity := LINT_TO_UINT(3_600_000 * #sSum / DINT_TO_LINT(#sValuesAdded * TIME_TO_DINT(#inBuffer.BaseTimeIntervall)));
+	END_REGION
+END_FUNCTION_BLOCK
+

@@ -1,0 +1,74 @@
+﻿FUNCTION_BLOCK "fbCompareDInt"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : a32thzz
+VERSION : 0.1
+   VAR_INPUT 
+      actual : DInt;
+      setpoint : DInt;
+      hysteresis : DInt;
+      deadband : DInt;
+   END_VAR
+
+   VAR_OUTPUT 
+      greater : Bool;
+      equal : Bool;
+      less : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      error : DInt;
+   END_VAR
+
+
+BEGIN
+	(*  Description
+	
+	    This block compares two values.  Depending on whether "actual" is greater, equal to or smaller than "setpoint", 
+	    the appropriate output "greater", "equal" or "less" is set to 1.  Deadband or hysteresis is also taken into account.
+	
+	    The "deadband" parameter enables a dead zone to be specified, within which deviation between "actual" and "setpoint" 
+	    will be regarded as zero. If the deviation "actual" - "setpoint" remains within this zone, the "equal" output is set to 1.
+	
+	    The "hysteresis" parameter enables a hysteresis effect to be generated, if the deviation between "actual" and "setpoint" decreases, 
+	    starting from a situation where either the "greater" or "less" is set, the "equal" output will only be set when the 
+	    deviation "actual" – "setpoint" is less than "deadband" – "hysteresis".
+	
+	    IF "deadband" and "hysteresis" are zero, then the block behaves as a classic comparison function.  If "actual" is greater than "setpoint", 
+	    then "greater" = 1.  When "actual" is equal to "setpoint", then "equal" = 1.  If "actual" is less than "setpoint", then "less" = 1.
+	        
+	*)
+	
+	#error := #actual - #setpoint;
+	
+	IF #error > #deadband THEN
+	    #greater := 1;
+	    #less := 0;
+	    #equal := 0;
+	END_IF;
+	
+	IF #error <= #deadband - #hysteresis THEN
+	    #greater := 0;
+	END_IF;
+	
+	IF #error < - #deadband THEN
+	    #greater := 0;
+	    #less := 1;
+	    #equal := 0;
+	END_IF;
+	
+	IF #error >= #hysteresis - #deadband THEN
+	    #less := 0;
+	END_IF;
+	
+	IF #error <= #deadband AND #error >= - #deadband AND NOT #greater AND NOT #less THEN
+	    #greater := 0;
+	    #less := 0;
+	    #equal := 1;
+	END_IF;
+	
+	IF #error < - #deadband - #hysteresis OR #error > #deadband + #hysteresis THEN
+	    #equal := 0;
+	END_IF;
+	
+END_FUNCTION_BLOCK
+

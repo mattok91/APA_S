@@ -1,0 +1,44 @@
+﻿FUNCTION_BLOCK "fbDistanceTact_Real"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inEnable : Bool;
+      inDistancePrevScan : Real;
+      inDistanceOnTact : Real;
+   END_VAR
+
+   VAR_OUTPUT 
+      ouTact : Bool;
+      ouError : Bool;
+   END_VAR
+
+   VAR 
+      Reminder : Real;
+      Distance : Real;
+   END_VAR
+
+
+BEGIN
+	
+	// w przypadku dystansu/cykl większego aniżeli oczekiwany tact/dystans, zgubienie taktów. 
+	IF #inDistancePrevScan > #inDistanceOnTact THEN
+	    #ouError := TRUE;
+	ELSE
+	    #ouError := FALSE;
+	END_IF;
+	
+	IF #inEnable THEN
+	    #Distance += #inDistancePrevScan;
+	ELSE
+	    #Distance := 0;
+	END_IF;
+	
+	IF #Distance >= #inDistanceOnTact THEN
+	    #Distance := #Distance - #inDistanceOnTact; //zapamietanie różnicy powyzej #inDistanceOnTact
+	    #ouTact := TRUE;
+	ELSE
+	    #ouTact := FALSE;
+	END_IF;
+	
+END_FUNCTION_BLOCK
+

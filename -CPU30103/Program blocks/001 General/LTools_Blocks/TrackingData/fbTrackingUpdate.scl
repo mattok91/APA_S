@@ -1,0 +1,269 @@
+﻿FUNCTION_BLOCK "fbTrackingUpdate"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inOccupied : Bool;
+      inDistancePrevScan : UInt;
+      inOffset : UInt;
+      inReset : Bool;
+      inResetStatistic : Bool;
+      inErrorUpdate : Int;
+      inUpstream : UInt;
+      inDownstream : UInt;
+   END_VAR
+
+   VAR_OUTPUT 
+      ouIDPosEdge : UInt;
+      ouIDOccupied : UInt;
+      ouIDNegEdge : UInt;
+      ouErrorUpdate : Bool;
+      ouTollerance : DInt;   // Jeżeli "+", należy zmniejszyć inOffset, jeżeli "-" należy zwiększyć inOffset. 9999 - nowe ID
+   END_VAR
+
+   VAR_IN_OUT 
+      ioArray : Array[*] of "typeTrackingStep";
+      ioData : "typeTrackingData";
+   END_VAR
+
+   VAR 
+      pTRIG_Occupied {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      nTRIG_Occupied {InstructionName := 'F_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : F_TRIG;
+      sStoreID { S7_SetPoint := 'True'} : UInt;
+      sPositionStoreID { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt;
+      sDistanceOccupied : UInt;
+      sLengthOccupied : UInt;
+      sMonitoring : Struct
+         TwoIDOneWindow : Int;   // Status 1
+         ObjectWithoutData : Int;   // Status 2
+         DataWithoutObject : Int;   // Status 3
+         CountOccupied : Int;   // CMS
+      END_STRUCT;
+      sErrorUpdate : Int;
+   END_VAR
+
+   VAR_TEMP 
+      tQuotientRangeDown : UInt;
+      tReminderRangeDown : UInt;
+      tQuotientRangeUp : UInt;
+      tReminderRangeUp : UInt;
+      tArrayLength : DInt;
+      tFirstIndex : DInt;
+      tInc : Int;
+      tRangeDownstream : UInt;
+      tRangeUpstream : UInt;
+      tMaxLengthTracking : DInt;
+      tQuotientSensor : UInt;
+      tReminderSensor : UInt;
+      tTwoIDOneWindow : Int;
+      tPositionSensor : DInt;
+      tTollerance : DInt;
+   END_VAR
+
+
+BEGIN
+	
+	// określenie górny/dolny zakres tablicy
+	#tArrayLength := UPPER_BOUND(ARR := #ioArray, DIM := 1);
+	#tFirstIndex := LOWER_BOUND(ARR := #ioArray, DIM := 1);
+	#tMaxLengthTracking := (#tArrayLength-#tFirstIndex) * #ioData.WindowLength;
+	
+	#pTRIG_Occupied(CLK := #inOccupied);
+	#nTRIG_Occupied(CLK := #inOccupied);
+	
+	#ouIDPosEdge := #ouIDNegEdge := 0;
+	
+	REGION Downstream, upstream - poprawność zakresów
+	    //zakresy offset monitorowania
+	    #tRangeDownstream := #inOffset - #inDownstream;
+	    IF #tRangeDownstream < 0 THEN
+	        #tRangeDownstream := 0;
+	    END_IF;
+	    
+	    #tRangeUpstream := #inOffset + #inUpstream; //+ #ioData.ObjectDefaultLength;
+	    IF #tRangeUpstream > #tMaxLengthTracking THEN
+	        #tRangeUpstream := DINT_TO_UINT(#tMaxLengthTracking);
+	    END_IF;
+	END_REGION
+	
+	REGION Parametry okien
+	    //okno i pozycja dla dolnego zakresu
+	    #tQuotientRangeDown := #tRangeDownstream / #ioData.WindowLength;
+	    #tReminderRangeDown := #tRangeDownstream MOD #ioData.WindowLength;
+	    
+	    //okno i pozycja dla górnego zakresu
+	    #tQuotientRangeUp := #tRangeUpstream / #ioData.WindowLength;
+	    #tReminderRangeUp := #tRangeUpstream MOD #ioData.WindowLength;
+	    
+	    //okno i pozycja dla sensora
+	    #tQuotientSensor := #inOffset / #ioData.WindowLength;
+	    #tReminderSensor := #inOffset MOD #ioData.WindowLength;
+	    #tPositionSensor := #inOffset;
+	END_REGION
+	
+	REGION ID dla sensora
+	    //ID z trackingu danych w pozycji inOffset
+	    IF #ioArray[#tQuotientSensor].ID > 0 AND #ioArray[#tQuotientSensor].Window > #tReminderSensor AND #ouIDOccupied = 0 THEN
+	        #ouIDPosEdge := #ioArray[#tQuotientSensor].ID;
+	        #ouIDOccupied := #ioArray[#tQuotientSensor].ID;
+	    END_IF;
+	    
+	    IF #sLengthOccupied > #ioData.ObjectDefaultLength THEN 
+	        #ouIDNegEdge := #ouIDOccupied;
+	        #ouIDOccupied := #sLengthOccupied := 0;
+	    END_IF;
+	END_REGION
+	
+	REGION Zapamietanie nowego ID o statusie 0 w oknie downstream-upstream
+	    IF #ioArray[#tQuotientRangeDown].Window >= #tReminderRangeDown AND #ioArray[#tQuotientRangeDown].ID > 0 THEN
+	        
+	        // wykryto ID w zakresie
+	        IF #sStoreID = 0 (* AND #ioData.UserData[#ioArray[#tQuotientRangeDown].ID].Status = 0 *) THEN
+	            
+	            //zapamietanie pozycji z okna
+	            #sPositionStoreID := #tQuotientRangeDown * #ioData.WindowLength + #ioArray[#tQuotientRangeDown].Window;
+	            //zapamietanie ID z okna
+	            #sStoreID := #ioArray[#tQuotientRangeDown].ID;
+	        END_IF;
+	        
+	    END_IF;
+	END_REGION
+	
+	REGION monitorowanie okna up/down jeżeli store ID <> 0
+	    IF #sStoreID > 0 THEN
+	        
+	        #tTwoIDOneWindow := #sMonitoring.TwoIDOneWindow;
+	        FOR #tInc := UINT_TO_INT(#tQuotientRangeDown) TO UINT_TO_INT(#tQuotientRangeUp) DO
+	            
+	            // Jeżeli wykryto więcej niż jedno ID, usunięcie wszystkich ID z data trackingu, ustawienie statusu 1 
+	            IF #ioArray[#tInc].ID <> #sStoreID AND #ioArray[#tInc].ID > 0 THEN
+	                
+	                //ustawienie statusu
+	                #ioData.UserData[#ioArray[#tInc].ID].Status := 1;
+	                //wyzerowanie danych z trackingu
+	                #ioArray[#tInc].ID := 0;
+	                #ioArray[#tInc].Window := 0;
+	                //statystyka
+	                #sMonitoring.TwoIDOneWindow += 1;
+	            END_IF;
+	        END_FOR;
+	        
+	        // Usunięcie również storeID oraz ID z data trackingu, ustawienie statusu 1
+	        IF #tTwoIDOneWindow <> #sMonitoring.TwoIDOneWindow THEN
+	            #ioData.UserData[#sStoreID].Status := 1;
+	            #ioArray[#sStoreID].ID := 0;
+	            #ioArray[#sStoreID].Window := 0;
+	            #sStoreID := 0;
+	            #sPositionStoreID := 0;
+	            
+	            #sErrorUpdate += 1;  //inkrementacja liczniak błędów
+	        END_IF;
+	        
+	        // Generacja błędu gdy brak fizycznego kartonu
+	        IF #sPositionStoreID > #tRangeUpstream THEN
+	            #ioData.UserData[#sStoreID].Status := 3;
+	            #sMonitoring.DataWithoutObject += 1;
+	            #sErrorUpdate += 1; //inkrementacja liczniak błędów
+	        END_IF;
+	        
+	        // Zbocze opadające ID oraz skasowanie ID
+	        IF #ioArray[#tQuotientRangeUp].ID > 0 AND #ioArray[#tQuotientRangeUp].Window >= #tReminderRangeUp THEN
+	            //usuniecie storeID
+	            #sStoreID := 0;
+	        END_IF;
+	        
+	    END_IF;
+	END_REGION
+	
+	REGION Narastające zbocze sensora
+	    IF #pTRIG_Occupied.Q THEN
+	        
+	        //0. Wyzerowanie dystansu dla zajetości sensora
+	        #sDistanceOccupied := 0;
+	        
+	        //1. usunięcie ID z okien z zakresu Upstream - Downstream
+	        FOR #tInc := UINT_TO_INT(#tQuotientRangeDown) TO UINT_TO_INT(#tQuotientRangeUp) DO
+	            #ioArray[#tInc].ID := 0;
+	            #ioArray[#tInc].Window := 0;
+	        END_FOR;
+	        
+	        //2. ustawienie ID w oknie sensora
+	        IF #sStoreID <> 0 THEN
+	            #ioArray[#tQuotientSensor].ID := #sStoreID;
+	            #ioArray[#tQuotientSensor].Window := #tReminderSensor;
+	            
+	            //określenie tolerancja minus/plus
+	            #ouTollerance := #tPositionSensor - #sPositionStoreID;
+	        ELSE
+	            #ioData.ActualID += 1;
+	            // Aby uniknąć ID = 0 !
+	            IF #ioData.ActualID = #ioData.MaxID THEN
+	                #ioData.ActualID += 1;
+	            END_IF;
+	            #ioData.ActualID := #ioData.ActualID MOD #ioData.MaxID;
+	            #ioArray[#tQuotientSensor].ID := #ioData.ActualID;
+	            #ioArray[#tQuotientSensor].Window := #tReminderSensor;
+	            
+	            //jeżeli nowe ID to status 2
+	            #ioData.UserData[#ioData.ActualID].Status := 2;
+	            #ouTollerance := 9999;
+	            
+	            #sMonitoring.ObjectWithoutData += 1;
+	        END_IF;
+	        
+	        #sPositionStoreID := 0;
+	        #sMonitoring.CountOccupied += 1;
+	    END_IF;
+	END_REGION
+	
+	REGION Opadające zbocze sensora - aktualizacja długosci kartonu
+	    IF #nTRIG_Occupied.Q THEN
+	        
+	        //ID z okna w którym znajduje się sensor
+	        IF #sDistanceOccupied <= #ioData.ObjectDefaultLength THEN
+	            #ioData.UserData[#ioArray[#tQuotientSensor].ID].Length := DINT_TO_UINT(#sDistanceOccupied);
+	        ELSE
+	            #ioData.UserData[#ioArray[#tQuotientSensor].ID].Length := #ioData.ObjectDefaultLength;
+	        END_IF;
+	    END_IF;
+	END_REGION
+	
+	REGION Liczniki
+	    //Inkrementacja licznika dla #PositionStoreID
+	    IF #sPositionStoreID > 0 AND #sPositionStoreID < 32000 THEN
+	        #sPositionStoreID += #inDistancePrevScan;
+	    END_IF;
+	    
+	    //Długość kartonu na fizycznej fotoceli
+	    IF #inOccupied AND #sDistanceOccupied < 32000 THEN
+	        #sDistanceOccupied += #inDistancePrevScan;
+	        #sPositionStoreID := 0; //#sPositionStoreID dla generacji błędu 3 oraz ustalenia wartości tolerancji.
+	    END_IF;
+	    
+	    //Długość kartonu na offset fotoceli
+	    IF #ouIDOccupied > 0 AND #sLengthOccupied < 32000 THEN
+	        #sLengthOccupied += #inDistancePrevScan;
+	    END_IF;
+	END_REGION
+	
+	REGION Błąd update
+	    IF #inErrorUpdate > 0 AND #sErrorUpdate >= #inErrorUpdate THEN
+	        #ouErrorUpdate := TRUE;
+	    END_IF;
+	   
+	END_REGION
+	
+	REGION Reset statystyk
+	    IF #inResetStatistic THEN
+	        #sMonitoring.DataWithoutObject := 0;
+	        #sMonitoring.ObjectWithoutData := 0;
+	        #sMonitoring.TwoIDOneWindow := 0;
+	    END_IF;
+	    
+	    IF #inReset THEN
+	        #sErrorUpdate := 0;
+	    END_IF;
+	END_REGION
+	
+	
+END_FUNCTION_BLOCK
+

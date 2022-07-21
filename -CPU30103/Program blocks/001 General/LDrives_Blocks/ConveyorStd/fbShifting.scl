@@ -1,0 +1,138 @@
+﻿FUNCTION_BLOCK "fbShifting"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inSignal { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;   // Sygnał wejściowy
+      inDistancePrevScan { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : USInt;   // Przeliczony dystans ostaniego cyklu
+      inDistanceShifting { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : UInt;   // Żądany dystans przesunięcia
+      inResetBuffer { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;   // Reset bufora
+   END_VAR
+
+   VAR_OUTPUT 
+      ouSignal { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := true;   // Sygnał wyjściowy, przesunięty
+      ouSignalChangeInput { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;   // Zmiana stanu sygnału wejściowego
+      ouSignalChangeOutput { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;   // Zmiana stanu sygnału wyjściowego
+      ouNumREInBuffer { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : UDInt;   // Ilość flanek pozytywnych w buforze
+      ouNumFEInBuffer { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : UDInt;   // Ilość flanek negatywnych w buforze
+   END_VAR
+
+   VAR_IN_OUT 
+      ioBufferSignal : Array[*] of "typeSignalBuffer";   // Bufor danych
+   END_VAR
+
+   VAR RETAIN
+      sWriteIndex { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt;
+      sReadIndex { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt;
+      sCurrentPosition { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : UInt;
+      sDistanceLastChange { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : UInt;
+      sSignalSaved { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      sMemDistanceShifting { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : UInt;
+   END_VAR
+
+   VAR_TEMP 
+      tUpperBound : DInt;
+      tLowerBound : DInt;
+      tNumEvents : UDInt;
+   END_VAR
+
+
+BEGIN
+	//-- Return, gdy wartość przesunięcia = 0
+	IF #inDistanceShifting = 0 THEN
+	    #ouSignal := #inSignal;
+	    #sMemDistanceShifting := #inDistanceShifting;
+	    RETURN;
+	END_IF;
+	
+	REGION Validation
+	    //-- Granice tablicy
+	    #tUpperBound := UPPER_BOUND(ARR := #ioBufferSignal, DIM := 1);
+	    #tLowerBound := LOWER_BOUND(ARR := #ioBufferSignal, DIM := 1);
+	    IF #sWriteIndex < #tLowerBound
+	        OR #sWriteIndex > #tUpperBound
+	        OR #sReadIndex < #tLowerBound
+	        OR #sReadIndex > #tUpperBound
+	        OR #sMemDistanceShifting <> #inDistanceShifting
+	        OR #inResetBuffer
+	    THEN
+	        GOTO INIT;
+	    END_IF;
+	END_REGION
+	
+	REGION Counters
+	    #sCurrentPosition += #inDistancePrevScan;
+	    #sDistanceLastChange += #inDistancePrevScan;
+	END_REGION
+	
+	REGION Write buffer  
+	    #ouSignalChangeInput := false;
+	    IF #inSignal <> #sSignalSaved
+	        AND #sDistanceLastChange > 0
+	    THEN
+	        #ouSignalChangeInput := true;
+	        #sSignalSaved := #inSignal;
+	        #sDistanceLastChange := 0;
+	        //-- Wejście do listy
+	        #ioBufferSignal[#sWriteIndex].Signal := #inSignal;
+	        #ioBufferSignal[#sWriteIndex].Position := #sCurrentPosition;
+	        // Znajdź następny index
+	        #sWriteIndex += 1;
+	        IF #sWriteIndex > #tUpperBound THEN
+	            #sWriteIndex := #tLowerBound;
+	        END_IF;
+	        IF #sWriteIndex = #sReadIndex THEN
+	            //-- Bufor overflow, idź do INIT
+	            GOTO INIT;
+	        END_IF;
+	    END_IF;
+	END_REGION
+	
+	REGION Read buffer
+	    #ouSignalChangeOutput := false;
+	    IF #sReadIndex <> #sWriteIndex THEN
+	        //-- Sprawdzanie zmiany na pozycji offsetowej
+	        IF #sCurrentPosition - #ioBufferSignal[#sReadIndex].Position >= #inDistanceShifting THEN
+	            #ouSignalChangeOutput := true;
+	            #ouSignal := #ioBufferSignal[#sReadIndex].Signal;
+	            //-- Kolejny index
+	            #sReadIndex += 1;
+	            IF #sReadIndex > #tUpperBound THEN
+	                #sReadIndex := #tLowerBound;
+	            END_IF;
+	        END_IF;
+	    END_IF;
+	END_REGION
+	
+	REGION Count rising and falling edges in buffer
+	    //-- Ogolna liczba eventów
+	    IF #sWriteIndex >= #sReadIndex THEN
+	        #tNumEvents := DINT_TO_UDINT(#sWriteIndex - #sReadIndex);
+	    ELSE
+	        #tNumEvents := DINT_TO_UDINT(#tUpperBound - #sReadIndex + 1 + #sWriteIndex - #tLowerBound);
+	    END_IF;
+	    //-- Obliczanie pozytywnych i negatywnych flanek
+	    #ouNumREInBuffer := #ouNumFEInBuffer := #tNumEvents / 2;
+	    IF #tNumEvents MOD 2 <> 0 THEN // Odd amount of events!
+	        IF #ioBufferSignal[#sReadIndex].Signal THEN
+	            #ouNumREInBuffer += 1;
+	        ELSE
+	            #ouNumFEInBuffer += 1;
+	        END_IF;
+	    END_IF;
+	END_REGION
+	
+	RETURN;
+	REGION Init
+	INIT:
+	    #ouNumREInBuffer := #ouNumFEInBuffer := 0;
+	    #ouSignalChangeInput := #ouSignalChangeOutput := false;
+	    #sMemDistanceShifting := #inDistanceShifting;
+	    #sCurrentPosition := 0;
+	    #sDistanceLastChange := 0;
+	    #sReadIndex := #sWriteIndex := #tLowerBound;
+	    #ouSignal := #sSignalSaved := #inSignal;
+	    #ioBufferSignal[#tLowerBound].Signal := #inSignal;
+	    #ioBufferSignal[#tLowerBound].Position := #sCurrentPosition;
+	END_REGION
+END_FUNCTION_BLOCK
+

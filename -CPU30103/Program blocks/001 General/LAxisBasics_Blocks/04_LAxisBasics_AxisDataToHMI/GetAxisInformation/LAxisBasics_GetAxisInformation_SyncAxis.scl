@@ -1,0 +1,77 @@
+﻿FUNCTION "LAxisBasics_GetAxisInformation_SyncAxis" : Bool
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : ArSc
+FAMILY : LAxisBasics
+VERSION : 1.1
+   VAR_INPUT 
+      axis {InstructionName := 'TO_SynchronousAxis'; LibVersion := '5.0'} : TO_SynchronousAxis;
+      axisName : String;
+      axisDescription : String;
+   END_VAR
+
+   VAR_IN_OUT 
+      axisInformation : "LAxisBasics_typeAxisInformation";
+   END_VAR
+
+   VAR_TEMP 
+      tempAxisName : WString;
+   END_VAR
+
+   VAR CONSTANT 
+      STRING_LENGTH : Int := 50;
+      TYPE_OF_AXIS_NO_AXIS : Int := 0;
+      TYPE_OF_AXIS_SPEED_AXIS : Int := 1;
+      TYPE_OF_AXIS_POSITIONING_AXIS : Int := 2;
+      TYPE_OF_AXIS_SYNCHRONOUS_AXIS : Int := 3;
+      TYPE_OF_AXIS_EXTERNAL_ENCODER : Int := 4;
+   END_VAR
+
+
+BEGIN
+	//=============================================================================
+	//SIEMENS AG
+	//(c)Copyright 2016 All Rights Reserved
+	//-----------------------------------------------------------------------------
+	//Library:       Axis Basics
+	//Tested with:   S7-1500T V2.5
+	//Engineering:   TIA Portal V15
+	//Restrictions:  Motion Control Library V4.0
+	//Requirements:  S7-1500(T)
+	//Functionality: Get axis information of TO_PositioningAxis
+	//-----------------------------------------------------------------------------
+	//Change log table:
+	//Version  Date       Expert in charge Changes applied
+	//01.00.00 01.08.2017 ArSc             First released version
+	//=============================================================================
+	
+	
+	//Reset output
+	#LAxisBasics_GetAxisInformation_SyncAxis := False;
+	
+	IF (#axisInformation.typeOfAxis = #TYPE_OF_AXIS_NO_AXIS)
+	THEN
+	  //Set output
+	  #LAxisBasics_GetAxisInformation_SyncAxis := True;
+	  //Set axis type
+	  #axisInformation.typeOfAxis := #TYPE_OF_AXIS_SYNCHRONOUS_AXIS;
+	  //Set axis name
+	  IF (#axisInformation.axisName = '')
+	  THEN
+	    IF (#axisName <> '')
+	    THEN
+	      #axisInformation.axisName := #axisName;
+	    ELSE
+	      #tempAxisName := GetSymbolName(variable := #axis, size := #STRING_LENGTH);
+	      #axisInformation.axisName := WSTRING_TO_STRING(#tempAxisName);
+	    END_IF;
+	  END_IF;
+	  //Set axis description
+	  IF (#axisDescription <> '')
+	  THEN
+	    #axisInformation.axisDescription := #axisDescription;
+	  END_IF;
+	  
+	END_IF;
+	
+END_FUNCTION
+

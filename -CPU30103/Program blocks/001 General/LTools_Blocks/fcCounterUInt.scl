@@ -1,0 +1,34 @@
+﻿FUNCTION "fcCounterUInt" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inEnableCount : Bool;   // Zezwolenie
+      inValue : UInt;   // Wartość [UInt]
+      inReset : Bool;   // Reset
+   END_VAR
+
+   VAR_IN_OUT 
+      ioCounter : UInt;   // Aktualna wartość 
+   END_VAR
+
+   VAR CONSTANT 
+      cLimitUInt : UInt := 65535;
+   END_VAR
+
+
+BEGIN
+	//-- Licznik
+	IF #inEnableCount AND #ioCounter<#cLimitUInt THEN
+	    #ioCounter += #inValue;
+	END_IF;
+	
+	//-- Reset 
+	IF #inReset THEN
+	    #ioCounter := 0;
+	END_IF;
+	
+	
+	    
+	
+END_FUNCTION
+

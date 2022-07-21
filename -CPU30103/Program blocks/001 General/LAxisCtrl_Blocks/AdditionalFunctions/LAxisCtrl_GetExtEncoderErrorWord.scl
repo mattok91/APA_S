@@ -1,0 +1,62 @@
+﻿FUNCTION_BLOCK "LAxisCtrl_GetExtEncoderErrorWord"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : AxisCtrl
+VERSION : 1.0
+   VAR_INPUT 
+      axis {InstructionName := 'TO_ExternalEncoder'; LibVersion := '5.0'} : TO_ExternalEncoder;
+   END_VAR
+
+   VAR_OUTPUT 
+      systemFault { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      configFault { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      userFault { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      commandNotAccepted { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      sensorFault { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      communicationFault { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      homingError { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+      peripheralError { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      tempErrorWord : DWord;
+   END_VAR
+
+
+BEGIN
+	//==========================================================================================
+	// SIEMENS AG
+	// (c)Copyright 2017 All Rights Reserved
+	//------------------------------------------------------------------------------------------
+	// Library: LAxisCtrl
+	// Tested with: S7-1515T-2 PN
+	// Engineering: TIA Portal V15
+	// Restrictions: ---
+	// Requirements: S7-1500/S7-1500T FW 2.5
+	// Functionality: The FB is splitting the error word of an external encoder into bits.
+	// Support: tech.team.motioncontrol@siemens.com
+	// Note: Parameter comments are only available in language 'English (United States)'
+	//------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.04   04.10.2016    RS                  First released version
+	//===========================================================================================
+	
+	//----------------------------------------------------------------------------------------------
+	// Read errorword
+	//----------------------------------------------------------------------------------------------
+	#tempErrorWord := #axis.ErrorWord;
+	
+	//----------------------------------------------------------------------------------------------
+	// Write outputs
+	//----------------------------------------------------------------------------------------------
+	#systemFault := #tempErrorWord.%X0;
+	#configFault := #tempErrorWord.%X1;
+	#userFault := #tempErrorWord.%X2;
+	#commandNotAccepted := #tempErrorWord.%X3;
+	#sensorFault := #tempErrorWord.%X5;
+	#communicationFault := #tempErrorWord.%X7;
+	#homingError := #tempErrorWord.%X10;
+	#peripheralError := #tempErrorWord.%X13;
+END_FUNCTION_BLOCK
+

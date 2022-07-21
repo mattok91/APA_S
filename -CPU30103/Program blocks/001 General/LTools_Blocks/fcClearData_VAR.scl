@@ -1,0 +1,46 @@
+﻿FUNCTION "fcClearData_VAR" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_OUTPUT 
+      ou_Error_ARR_Buffer : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      io_VAR_Data : Variant;   // Dane do wyczyszczenia
+      io_ARR_Buffer : Array[*] of Byte;
+   END_VAR
+
+   VAR_TEMP 
+      tPosBuffer : DInt;
+      tInternalError : Int;
+      tLowerLimit : DInt;
+      tUpperLimit : DInt;
+   END_VAR
+
+
+BEGIN
+	
+	#tLowerLimit := LOWER_BOUND(ARR := #io_ARR_Buffer, DIM := 1);
+	#tUpperLimit := UPPER_BOUND(ARR := #io_ARR_Buffer, DIM := 1);
+	
+	//wyczyszczenie struktury danych
+	//przerzucenie z struktury na tablice
+	#tPosBuffer := 0;
+	#tInternalError := Serialize(SRC_VARIABLE := #io_VAR_Data, DEST_ARRAY => #io_ARR_Buffer, POS := #tPosBuffer);
+	
+	//jeżeli błąd tablicy to sygnalizacja oraz zakończenie funkcji
+	#ou_Error_ARR_Buffer := (16#FFF0 AND #tInternalError) = 16#8250;
+	IF #ou_Error_ARR_Buffer THEN
+	    RETURN;
+	END_IF;
+	
+	//wyzerowanie
+	FILL_BLK(IN := 16#00,
+	         COUNT := DINT_TO_UDINT(#tPosBuffer),
+	         OUT => #io_ARR_Buffer[#tLowerLimit]);
+	//przerzucenie spowrotem z tablicy do struktury
+	#tPosBuffer := 0;
+	#tInternalError := Deserialize(SRC_ARRAY := #io_ARR_Buffer, DEST_VARIABLE => #io_VAR_Data, POS := #tPosBuffer);
+	
+END_FUNCTION
+

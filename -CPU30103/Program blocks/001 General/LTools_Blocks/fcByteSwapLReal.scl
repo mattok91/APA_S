@@ -1,0 +1,31 @@
+﻿FUNCTION "fcByteSwapLReal" : LReal
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inLReal : LReal;
+   END_VAR
+
+   VAR_TEMP 
+      tLReal : LReal;
+      tDwords AT tLReal : Struct
+         D0 : DWord;
+         D1 : DWord;
+      END_STRUCT;
+      tDWordHelp : DWord;
+   END_VAR
+
+
+BEGIN
+	#tLReal := #inLReal;
+	
+	#tDWordHelp := #tDwords.D0;
+	#tDwords.D0 := #tDwords.D1;
+	#tDwords.D1 := #tDWordHelp;
+	
+	#tDwords.D0 := SWAP(#tDwords.D0);
+	#tDwords.D1:= SWAP(#tDwords.D1);
+	
+	#fcByteSwapLReal := #tLReal;
+	
+END_FUNCTION
+

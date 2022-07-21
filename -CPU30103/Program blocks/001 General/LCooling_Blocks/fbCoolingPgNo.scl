@@ -1,0 +1,124 @@
+﻿FUNCTION_BLOCK "fbCoolingPgNo"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inEnable : Bool;
+      inLevelForRobot : Int;
+      inTypeProgram : Int;
+   END_VAR
+
+   VAR_OUTPUT 
+      ouStdPgNo1 : Bool;   // Standard program level 1
+      ouStdPgNo2 : Bool;   // Standard program level 2
+      ouStdPgNo3 : Bool;   // Standard program level 3
+      ouStdPgNo4 : Bool;   // Standard program level 4
+      ouStdPgNo5 : Bool;   // Standard program level 5
+      ouFillPgNo1 : Bool;   // Filling program level 1
+      ouFillPgNo2 : Bool;   // Filling program level 2
+      ouFillPgNo3 : Bool;   // Filling program level 3
+      ouFillPgNo4 : Bool;   // Filling program level 4
+      ouFillPgNo5 : Bool;   // Filling program level 5
+      ouEmptyPgNo1 : Bool;   // Emptying program level 1
+      ouEmptyPgNo2 : Bool;   // Emptying program level 2
+      ouEmptyPgNo3 : Bool;   // Emptying program level 3
+      ouEmptyPgNo4 : Bool;   // Emptying program level 4
+      ouEmptyPgNo5 : Bool;   // Emptying program level 5
+      ouEmergencyPgNo1 : Bool;   // Emergency program level 1
+      ouEmergencyPgNo2 : Bool;   // Emergency program level 2
+      ouEmergencyPgNo3 : Bool;   // Emergency program level 3
+      ouEmergencyPgNo4 : Bool;   // Emergency program level 4
+      ouEmergencyPgNo5 : Bool;   // Emergency program level 5
+   END_VAR
+
+
+BEGIN
+	REGION Initialization
+	    
+	    #ouStdPgNo1 := FALSE;
+	    #ouStdPgNo2 := FALSE;
+	    #ouStdPgNo3 := FALSE;
+	    #ouStdPgNo4 := FALSE;
+	    #ouStdPgNo5 := FALSE;
+	    #ouFillPgNo1 := FALSE;
+	    #ouFillPgNo2 := FALSE;
+	    #ouFillPgNo3 := FALSE;
+	    #ouFillPgNo4 := FALSE;
+	    #ouFillPgNo5 := FALSE;
+	    #ouEmptyPgNo1 := FALSE;
+	    #ouEmptyPgNo2 := FALSE;
+	    #ouEmptyPgNo3 := FALSE;
+	    #ouEmptyPgNo4 := FALSE;
+	    #ouEmptyPgNo5 := FALSE;
+	    #ouEmergencyPgNo1 := FALSE;
+	    #ouEmergencyPgNo2 := FALSE;
+	    #ouEmergencyPgNo3 := FALSE;
+	    #ouEmergencyPgNo4 := FALSE;
+	    #ouEmergencyPgNo5 := FALSE;
+	    
+	END_REGION
+	
+	REGION Program selection
+	    
+	    IF #inEnable THEN
+	        CASE #inTypeProgram OF // 1 - filling, 2- emptying, 3 - emergency, 4 - standard
+	            1:
+	                CASE #inLevelForRobot OF
+	                    1:
+	                        #ouFillPgNo1 := TRUE;
+	                    2:
+	                        #ouFillPgNo2 := TRUE;
+	                    3:
+	                        #ouFillPgNo3 := TRUE;
+	                    4:
+	                        #ouFillPgNo4 := TRUE;
+	                    5:
+	                        #ouFillPgNo5 := TRUE;
+	                END_CASE;
+	            2:
+	                CASE #inLevelForRobot OF
+	                    1:
+	                        #ouEmptyPgNo1 := TRUE;
+	                    2:
+	                        #ouEmptyPgNo2 := TRUE;
+	                    3:
+	                        #ouEmptyPgNo3 := TRUE;
+	                    4:
+	                        #ouEmptyPgNo4 := TRUE;
+	                    5:
+	                        #ouEmptyPgNo5 := TRUE;
+	                END_CASE;
+	            3:
+	                CASE #inLevelForRobot OF
+	                    1:
+	                        #ouStdPgNo1 := TRUE;
+	                    2:
+	                        #ouStdPgNo2 := TRUE;
+	                    3:
+	                        #ouStdPgNo3 := TRUE;
+	                    4:
+	                        #ouStdPgNo4 := TRUE;
+	                    5:
+	                        #ouStdPgNo5 := TRUE;
+	
+	                END_CASE;
+	            4:
+	                CASE #inLevelForRobot OF
+	                        
+	                    1:
+	                        #ouEmergencyPgNo1 := TRUE;
+	                    2:
+	                        #ouEmergencyPgNo2 := TRUE;
+	                    3:
+	                        #ouEmergencyPgNo3 := TRUE;
+	                    4:
+	                        #ouEmergencyPgNo4 := TRUE;
+	                    5:
+	                        #ouEmergencyPgNo5 := TRUE;
+	
+	                END_CASE;
+	        END_CASE;
+	    END_IF;
+	 END_REGION
+	 
+END_FUNCTION_BLOCK
+

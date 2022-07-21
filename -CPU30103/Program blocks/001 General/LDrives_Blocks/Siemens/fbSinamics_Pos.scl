@@ -1,0 +1,243 @@
+﻿FUNCTION_BLOCK "fbSinamics_Pos"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      ModePos : Int;
+      EnableAxis : Bool;
+      Jog1 : Bool;
+      Jog2 : Bool;
+      MDIPosition : DInt;
+      MDIVelocity : DInt;
+      ExecuteMode : Bool;
+      RefCamInput : Bool;
+      RefDirection : Bool;
+      AckError : Bool;
+      HWLimitEnable : Bool;
+      SWLimitEnable : Bool;
+      HWIDSTW : HW_IO;
+      HWIDZSW : HW_IO;
+   END_VAR
+
+   VAR_OUTPUT 
+      ModeError : Bool;
+      CommunicationError : Bool;
+      DiagID : Word;
+      AxisEnabled : Bool;
+      AxisError : Bool;
+      AxisWarn : Bool;
+      AxisPosOk : Bool;
+      AxisRef : Bool;
+      ActVelocity : DInt;
+      ActPosition : DInt;
+      ActMode : Int;
+      ActWarn : Word;
+      ActFault : Word;
+   END_VAR
+
+   VAR 
+      sxSendBuf : Struct
+         STW1 : Word := 16#043E;
+         EPosSTW1 : Word;
+         EPosSTW2 : Word;
+         STW2 : Word;
+         OverrideV : Word := 16#4000;
+         Position : DWord;
+         Velocity : DWord;
+         OverrideA : Word := 16#4000;
+         OverrideD : Word := 16#4000;
+         Reserve : Word;
+      END_STRUCT;
+      sxRecvBuf : Struct
+         ZSW1 : Word;
+         EPosZSW1 : Word;
+         EPosZSW2 : Word;
+         ZSW2 : Word;
+         MELDW : Word;
+         Position : DWord;
+         Velocity : DWord;
+         ErrorNr : Word;
+         WarnNr : Word;
+         Reserve : Word;
+      END_STRUCT;
+   END_VAR
+
+   VAR_TEMP 
+      piRetSFC : Int;
+      swSendBuf : Array[0..11] of Word;
+      swRecvBuf : Array[0..11] of Word;
+   END_VAR
+
+
+BEGIN
+	// Author:   MC GMC MP ASIA
+	// Version:  V1.0
+	// Email:    mc_gmc_mp_asia.cn@siemens.com
+	// Language: English only
+	
+	// Check if the input signal ModePos setting is between 1 and 4. If not, the ModeError will output 1.
+	
+	IF #ModePos > 7 OR #ModePos < 1 THEN
+	    #ModeError := true;
+	ELSE
+	    #ModeError := false;
+	END_IF;
+	
+	// Change the position and velocity setpoint format.
+	
+	#sxSendBuf.Position := DINT_TO_DWORD(#MDIPosition);
+	#sxSendBuf.Velocity := DINT_TO_DWORD(#MDIVelocity);
+	
+	// Set the acknowledge drive error, reference cam, reference approaching and activate hardware limit function.
+	
+	#sxSendBuf.STW1.%X7 := #AckError;
+	#sxSendBuf.EPosSTW2.%X9 := #RefDirection;
+	#sxSendBuf.EPosSTW2.%X2 := #RefCamInput;
+	#sxSendBuf.EPosSTW2.%X15 := #HWLimitEnable;
+	#sxSendBuf.EPosSTW2.%X14 := #SWLimitEnable;
+	
+	// Enable the drive.
+	
+	#sxSendBuf.STW1.%X0 := #EnableAxis;
+	
+	// Check the operating mode and set the related function.
+	
+	IF #ModeError = FALSE THEN
+	    
+	    // Relative positioning
+	    
+	    IF #ModePos = 1 THEN
+	        #sxSendBuf.STW1.%X8 := false;
+	        #sxSendBuf.STW1.%X9 := FALSE;
+	        #sxSendBuf.STW1.%X11 := FALSE;
+	        #sxSendBuf.EPosSTW1.%X8 := FALSE;
+	        #sxSendBuf.EPosSTW1.%X15 := TRUE;
+	        #sxSendBuf.STW1.%X6 := #ExecuteMode;
+	        
+	        // Absolute positioning
+	        
+	    ELSIF #ModePos = 2 THEN
+	        #sxSendBuf.STW1.%X8 := false;
+	        #sxSendBuf.STW1.%X9 := FALSE;
+	        #sxSendBuf.STW1.%X11 := FALSE;
+	        #sxSendBuf.EPosSTW1.%X8 := TRUE;
+	        #sxSendBuf.EPosSTW1.%X15 := TRUE;
+	        #sxSendBuf.STW1.%X6 := #ExecuteMode;
+	        
+	        // Reference
+	        
+	    ELSIF #ModePos = 4 THEN
+	        #sxSendBuf.STW1.%X8 := false;
+	        #sxSendBuf.STW1.%X9 := FALSE;
+	        #sxSendBuf.STW1.%X11 := #ExecuteMode;
+	        #sxSendBuf.EPosSTW1.%X8 := FALSE;
+	        #sxSendBuf.EPosSTW1.%X15 := FALSE;
+	        #sxSendBuf.STW1.%X6 := FALSE;
+	        
+	        // Jog
+	        
+	    ELSIF #ModePos = 7 THEN
+	        IF #Jog1 = true AND #Jog2 = false THEN
+	            #sxSendBuf.STW1.%X8 := #Jog1;
+	        ELSIF #Jog1 = false AND #Jog2 = true THEN
+	            #sxSendBuf.STW1.%X9 := #Jog2;
+	        ELSE
+	            #sxSendBuf.STW1.%X8 := false;
+	            #sxSendBuf.STW1.%X9 := FALSE;
+	        END_IF;
+	        #sxSendBuf.STW1.%X11 := FALSE;
+	        #sxSendBuf.EPosSTW1.%X8 := FALSE;
+	        #sxSendBuf.EPosSTW1.%X15 := FALSE;
+	        #sxSendBuf.STW1.%X6 := FALSE;
+	    ELSE
+	        #sxSendBuf.STW1.%X8 := false;
+	        #sxSendBuf.STW1.%X9 := FALSE;
+	        #sxSendBuf.STW1.%X11 := FALSE;
+	        #sxSendBuf.EPosSTW1.%X8 := FALSE;
+	        #sxSendBuf.EPosSTW1.%X15 := FALSE;
+	        #sxSendBuf.STW1.%X6 := FALSE;
+	    END_IF;
+	END_IF;
+	
+	// Move the control command to the send buffer.
+	
+	#swSendBuf[0] := #sxSendBuf.STW1;
+	#swSendBuf[1] := #sxSendBuf.EPosSTW1;
+	#swSendBuf[2] := #sxSendBuf.EPosSTW2;
+	#swSendBuf[3] := #sxSendBuf.STW2;
+	#swSendBuf[4] := #sxSendBuf.OverrideV;
+	#swSendBuf[5] := #sxSendBuf.Position.%W1;
+	#swSendBuf[6] := #sxSendBuf.Position.%W0;
+	#swSendBuf[7] := #sxSendBuf.Velocity.%W1;
+	#swSendBuf[8] := #sxSendBuf.Velocity.%W0;
+	#swSendBuf[9] := #sxSendBuf.OverrideA;
+	#swSendBuf[10] := #sxSendBuf.OverrideD;
+	#swSendBuf[11] := #sxSendBuf.Reserve;
+	
+	// Send the control command to the related drive.
+	
+	#piRetSFC := DPWR_DAT(LADDR := #HWIDSTW, RECORD := #swSendBuf);
+	
+	#DiagID := INT_TO_WORD(#piRetSFC);
+	
+	// If the send function is not error, then receive the status from the drive.
+	
+	IF #piRetSFC = 0 THEN
+	    
+	    // Receive the status from the drive.
+	    
+	    #piRetSFC := DPRD_DAT(LADDR := #HWIDZSW, RECORD => #swRecvBuf);
+	    #DiagID := INT_TO_WORD(#piRetSFC);
+	    
+	    // If the receive is not correct, set all status to 0.
+	    
+	    IF #piRetSFC <> 0 THEN
+	        #CommunicationError := TRUE;
+	        
+	        #sxRecvBuf.ZSW1 := W#16#0;
+	        #sxRecvBuf.EPosZSW1 := W#16#0;
+	        #sxRecvBuf.EPosZSW2 := W#16#0;
+	        #sxRecvBuf.ZSW2 := W#16#0;
+	        #sxRecvBuf.MELDW := W#16#0;
+	        #sxRecvBuf.Position := DW#16#00;
+	        #sxRecvBuf.Velocity := DW#16#00;
+	        #sxRecvBuf.ErrorNr := W#16#0;
+	        #sxRecvBuf.WarnNr := W#16#0;
+	        #sxRecvBuf.Reserve := W#16#0;
+	        
+	        // If the receive is correct, move the status from the receive buffer
+	        
+	    ELSE
+	        #sxRecvBuf.ZSW1 := #swRecvBuf[0];
+	        #sxRecvBuf.EPosZSW1 := #swRecvBuf[1];
+	        #sxRecvBuf.EPosZSW2 := #swRecvBuf[2];
+	        #sxRecvBuf.ZSW2 := #swRecvBuf[3];
+	        #sxRecvBuf.MELDW := #swRecvBuf[4];
+	        #sxRecvBuf.Position.%W1 := #swRecvBuf[5];
+	        #sxRecvBuf.Position.%W0 := #swRecvBuf[6];
+	        #sxRecvBuf.Velocity.%W1 := #swRecvBuf[7];
+	        #sxRecvBuf.Velocity.%W0 := #swRecvBuf[8];
+	        #sxRecvBuf.ErrorNr := #swRecvBuf[9];
+	        #sxRecvBuf.WarnNr := #swRecvBuf[10];
+	        #sxRecvBuf.Reserve := #swRecvBuf[11];
+	    END_IF;
+	ELSE
+	    #CommunicationError := TRUE;
+	END_IF;
+	
+	// Output the drive related status.
+	
+	#AxisEnabled := #sxRecvBuf.ZSW1.%X2;
+	#AxisError := #sxRecvBuf.ZSW1.%X3;
+	#AxisWarn := #sxRecvBuf.ZSW1.%X7;
+	#AxisPosOk := #sxRecvBuf.ZSW1.%X10;
+	#AxisRef := #sxRecvBuf.ZSW1.%X11;
+	
+	#ActVelocity := DWORD_TO_DINT(#sxRecvBuf.Velocity);
+	#ActPosition := DWORD_TO_DINT(#sxRecvBuf.Position);
+	#ActMode := #ModePos;
+	#ActFault := #sxRecvBuf.ErrorNr;
+	#ActWarn := #sxRecvBuf.WarnNr;
+	
+	
+END_FUNCTION_BLOCK
+

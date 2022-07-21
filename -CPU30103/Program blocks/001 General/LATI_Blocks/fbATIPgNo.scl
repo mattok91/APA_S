@@ -1,0 +1,329 @@
+﻿FUNCTION_BLOCK "fbATIPgNo"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inEnable : Bool;   // Zezwolenie
+      inStdandardOperation : Bool;   // Operacja standardowa
+      inIO_Operation : Bool;   // Operacja IO
+      inGoldenSampleOperation : Bool;   // Złota próbka
+      inFillingOperation : Bool;   // Zapełnianie
+      inEmptyingOperation : Bool;   // Opróżnianie
+      inATI1_Occupied : Bool;   // Zajętość ATI1
+      inATI2_Occupied : Bool;   // Zajętość ATI2
+      inATI3_Occupied : Bool;   // Zajętość ATI3
+      inATI4_Occupied : Bool;   // Zajętość ATI4
+      inATI1_TestFinished : Bool;   // Zakończony test na ATI1
+      inATI2_TestFinished : Bool;   // Zakończony test na ATI2
+      inATI3_TestFinished : Bool;   // Zakończony test na ATI3
+      inATI4_TestFinished : Bool;   // Zakończony test na ATI4
+      inATI1_Exists : Bool;
+      inATI2_Exists : Bool;
+      inATI3_Exists : Bool;
+      inATI4_Exists : Bool;
+      inATI1_GoldenSampleTest : Bool;   // Test złotej próbki na ATI1
+      inATI2_GoldenSampleTest : Bool;   // Test złotej próbki na ATI2
+      inATI3_GoldenSampleTest : Bool;   // Test złotej próbki na ATI3
+      inATI4_GoldenSampleTest : Bool;   // Test złotej próbki na ATI4
+   END_VAR
+
+   VAR_OUTPUT 
+      ouStdPgNo1 : Bool;   // Program standardowy 1
+      ouStdPgNo2 : Bool;   // Program standardowy 2
+      ouStdPgNo3 : Bool;   // Program standardowy 3
+      ouStdPgNo4 : Bool;   // Program standardowy 4
+      ouStdPgNo5 : Bool;   // Program standardowy 5
+      ouStdPgNo6 : Bool;   // Program standardowy 6
+      ouStdPgNo7 : Bool;   // Program standardowy 7
+      ouStdPgNo8 : Bool;   // Program standardowy 8
+      ouStdPgNo9 : Bool;   // Program standardowy 9
+      ouStdPgNo10 : Bool;   // Program standardowy 10
+      ouStdPgNo11 : Bool;   // Program standardowy 11
+      ouStdPgNo12 : Bool;   // Program standardowy 12
+      ouIOPgNo1 : Bool;   // Program IO 1
+      ouIOPgNo2 : Bool;   // Program IO 2
+      ouIOPgNo3 : Bool;   // Program IO 3
+      ouIOPgNo4 : Bool;   // Program IO 4
+      ouGoldenSamplePgNo1 : Bool;   // Program złota próbka 1
+      ouGoldenSamplePgNo2 : Bool;   // Program złota próbka 2
+      ouGoldenSamplePgNo3 : Bool;   // Program złota próbka 3
+      ouGoldenSamplePgNo4 : Bool;   // Program złota próbka 4
+      ouFillingPgNo1 : Bool;   // Program napełnianie 1
+      ouFillingPgNo2 : Bool;   // Program napełnianie 2
+      ouFillingPgNo3 : Bool;   // Program napełnianie 3
+      ouFillingPgNo4 : Bool;   // Program napełnianie 4
+      ouEmptyingPgNo1 : Bool;   // Program opróżnianie 1
+      ouEmptyingPgNo2 : Bool;   // Program opróżnianie 2
+      ouEmptyingPgNo3 : Bool;   // Program opróżnianie 3
+      ouEmptyingPgNo4 : Bool;   // Program opróżnianie 4
+      ouStdPgSelected : Bool;   // Wybrano program standardowy
+      ouIOPgSelected : Bool;   // Wybrano program IO
+      ouGoldenSamplePgSelected : Bool;   // Wybrano program złota próbka
+      ouFillingPgSelected : Bool;   // Wybrano zapełnianie
+      ouEmptyingPgSelected : Bool;   // Wybrano opróżnianie
+      ouATI1Place : Bool;
+      ouATI2Place : Bool;
+      ouATI3Place : Bool;
+      ouATI4Place : Bool;
+      ouATI1Pick : Bool;   // Pobranie filtra z ATI 1 w aktualnym programie
+      ouATI2Pick : Bool;   // Pobranie filtra z ATI 2 w aktualnym programie
+      ouATI3Pick : Bool;   // Pobranie filtra z ATI 3 w aktualnym programie
+      ouATI4Pick : Bool;   // Pobranie filtra z ATI 4 w aktualnym programie
+   END_VAR
+
+   VAR 
+      ATI_Occupied : Array[0..3] of Bool;   // Zajętość ATI
+      statInt_Index : Int;
+   END_VAR
+
+
+BEGIN
+	REGION Initialization
+	    
+	    #ouStdPgNo1 := FALSE;
+	    #ouStdPgNo2 := FALSE;
+	    #ouStdPgNo3 := FALSE;
+	    #ouStdPgNo4 := FALSE;
+	    #ouStdPgNo5 := FALSE;
+	    #ouStdPgNo6 := FALSE;
+	    #ouStdPgNo7 := FALSE;
+	    #ouStdPgNo8 := FALSE;
+	    #ouStdPgNo9 := FALSE;
+	    #ouStdPgNo10 := FALSE;
+	    #ouStdPgNo11 := FALSE;
+	    #ouStdPgNo12 := FALSE;
+	    
+	    #ouIOPgNo1 := FALSE;
+	    #ouIOPgNo2 := FALSE;
+	    #ouIOPgNo3 := FALSE;
+	    #ouIOPgNo4 := FALSE;
+	    
+	    #ouGoldenSamplePgNo1 := FALSE;
+	    #ouGoldenSamplePgNo2 := FALSE;
+	    #ouGoldenSamplePgNo3 := FALSE;
+	    #ouGoldenSamplePgNo4 := FALSE;
+	    
+	    #ouFillingPgNo1 := FALSE;
+	    #ouFillingPgNo2 := FALSE;
+	    #ouFillingPgNo3 := FALSE;
+	    #ouFillingPgNo4 := FALSE;
+	    
+	    #ouEmptyingPgNo1 := FALSE;
+	    #ouEmptyingPgNo2 := FALSE;
+	    #ouEmptyingPgNo3 := FALSE;
+	    #ouEmptyingPgNo4 := FALSE;
+	    
+	    #ouStdPgSelected := FALSE;
+	    #ouIOPgSelected := FALSE;
+	    #ouGoldenSamplePgSelected := FALSE;
+	    #ouFillingPgSelected := FALSE;
+	    #ouEmptyingPgSelected := FALSE;
+	    
+	    #ouATI1Place := false;
+	    #ouATI2Place := false;
+	    #ouATI3Place := false;
+	    #ouATI4Place := false;
+	    
+	    #ouATI1Pick := FALSE;
+	    #ouATI2Pick := FALSE;
+	    #ouATI3Pick := FALSE;
+	    #ouATI4Pick := FALSE;
+	    
+	    #ATI_Occupied[0] := #inATI1_Occupied;
+	    #ATI_Occupied[1] := #inATI2_Occupied;
+	    #ATI_Occupied[2] := #inATI3_Occupied;
+	    #ATI_Occupied[3] := #inATI4_Occupied;
+	    
+	END_REGION
+	
+	IF #inEnable THEN
+	    
+	    REGION Golden sample programs
+	        
+	        IF #inGoldenSampleOperation THEN
+	            
+	            IF #ATI_Occupied[0] = 0 AND #inATI1_GoldenSampleTest AND #inATI1_Exists THEN
+	                #ouGoldenSamplePgNo1 := true;
+	                GOTO LabelEndGoldenSample;
+	            ELSIF #ATI_Occupied[1] = 0 AND #inATI2_GoldenSampleTest AND #inATI2_Exists THEN
+	                #ouGoldenSamplePgNo2 := true;
+	                GOTO LabelEndGoldenSample;
+	            ELSIF #ATI_Occupied[2] = 0 AND #inATI3_GoldenSampleTest AND #inATI3_Exists THEN
+	                #ouGoldenSamplePgNo3 := true;
+	                GOTO LabelEndGoldenSample;
+	            ELSIF #ATI_Occupied[3] = 0 AND #inATI4_GoldenSampleTest AND #inATI4_Exists THEN
+	                #ouGoldenSamplePgNo4 := true;
+	                GOTO LabelEndGoldenSample;
+	            END_IF;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION Standard programs
+	        
+	        IF #inStdandardOperation THEN
+	            
+	            IF #ATI_Occupied[0] = 0 AND #inATI1_Exists THEN
+	                #ouATI1Place := TRUE;
+	                IF #inATI2_TestFinished THEN
+	                    #ouStdPgNo1 := true;
+	                    #ouATI2Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                ELSIF #inATI3_TestFinished THEN
+	                    #ouStdPgNo2 := true;
+	                    #ouATI3Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                ELSIF #inATI4_TestFinished THEN
+	                    #ouStdPgNo3 := true;
+	                    #ouATI4Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                END_IF;
+	                
+	            ELSIF #ATI_Occupied[1] = 0 AND #inATI2_Exists THEN
+	                #ouATI2Place := TRUE;
+	                IF #inATI1_TestFinished THEN
+	                    #ouStdPgNo4 := true;
+	                    #ouATI1Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                ELSIF #inATI3_TestFinished THEN
+	                    #ouStdPgNo5 := true;
+	                    #ouATI3Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                ELSIF #inATI4_TestFinished THEN
+	                    #ouStdPgNo6 := true;
+	                    #ouATI4Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                END_IF;
+	                
+	            ELSIF #ATI_Occupied[2] = 0 AND #inATI3_Exists  THEN
+	                #ouATI3Place := TRUE;
+	                IF #inATI1_TestFinished THEN
+	                    #ouStdPgNo7 := true;
+	                    #ouATI1Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                ELSIF #inATI2_TestFinished THEN
+	                    #ouStdPgNo8 := true;
+	                    #ouATI2Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                ELSIF #inATI4_TestFinished THEN
+	                    #ouStdPgNo9 := true;
+	                    #ouATI4Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                END_IF;
+	                
+	            ELSIF #ATI_Occupied[3] = 0 AND #inATI4_Exists  THEN
+	                #ouATI4Place := TRUE;
+	                IF #inATI1_TestFinished THEN
+	                    #ouStdPgNo10 := true;
+	                    #ouATI1Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                ELSIF #inATI2_TestFinished THEN
+	                    #ouStdPgNo11 := true;
+	                    #ouATI2Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                ELSIF #inATI3_TestFinished THEN
+	                    #ouStdPgNo12 := true;
+	                    #ouATI3Pick := TRUE;
+	                    GOTO LabelEndStd;
+	                END_IF;
+	            END_IF;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION IO programs
+	        
+	        IF #inIO_Operation THEN
+	            
+	            IF #ATI_Occupied[0] = 0 AND #inATI1_Exists THEN
+	                #ouIOPgNo1 := true;
+	                GOTO LabelEndIO;
+	            ELSIF #ATI_Occupied[1] = 0 AND #inATI2_Exists THEN
+	                #ouIOPgNo2 := true;
+	                GOTO LabelEndIO;
+	            ELSIF #ATI_Occupied[2] = 0 AND #inATI3_Exists THEN
+	                #ouIOPgNo3 := true;
+	                GOTO LabelEndIO;
+	            ELSIF #ATI_Occupied[3] = 0 AND #inATI4_Exists THEN
+	                #ouIOPgNo4 := true;
+	                GOTO LabelEndIO;
+	            END_IF;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION Line filling programs
+	        
+	        IF #inFillingOperation THEN
+	            
+	            IF #ATI_Occupied[0] = 0 AND #inATI1_Exists THEN
+	                #ouFillingPgNo1 := true;
+	                GOTO LabelEndFilling;
+	            ELSIF #ATI_Occupied[1] = 0 AND #inATI2_Exists THEN
+	                #ouFillingPgNo2 := true;
+	                GOTO LabelEndFilling;
+	            ELSIF #ATI_Occupied[2] = 0 AND #inATI3_Exists THEN
+	                #ouFillingPgNo3 := true;
+	                GOTO LabelEndFilling;
+	            ELSIF #ATI_Occupied[3] = 0 AND #inATI4_Exists THEN
+	                #ouFillingPgNo4 := true;
+	                GOTO LabelEndFilling;
+	            END_IF;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION Line emptying programs
+	        
+	        IF #inEmptyingOperation THEN
+	            
+	            IF #inATI1_TestFinished THEN
+	                #ouEmptyingPgNo1 := true;
+	                #ouATI1Pick := TRUE;
+	                GOTO LabelEndEmptying;
+	            ELSIF #inATI2_TestFinished THEN
+	                #ouEmptyingPgNo2 := true;
+	                #ouATI2Pick := TRUE;
+	                GOTO LabelEndEmptying;
+	            ELSIF #inATI3_TestFinished THEN
+	                #ouEmptyingPgNo3 := true;
+	                #ouATI3Pick := TRUE;
+	                GOTO LabelEndEmptying;
+	            ELSIF #inATI4_TestFinished THEN
+	                #ouEmptyingPgNo4 := true;
+	                #ouATI4Pick := TRUE;
+	                GOTO LabelEndEmptying;
+	            END_IF;
+	        END_IF;
+	    END_REGION
+	    
+	    
+	    REGION LabelEndStd   
+	    LabelEndStd:
+	        #ouStdPgSelected := TRUE;
+	        RETURN;
+	    END_REGION
+	    
+	    REGION LabelEndIO    
+	    LabelEndIO:
+	        #ouIOPgSelected := TRUE;
+	        RETURN;
+	    END_REGION
+	    
+	    REGION LabelEndGoldenSample   
+	    LabelEndGoldenSample:
+	        #ouGoldenSamplePgSelected := TRUE;
+	        RETURN;
+	        
+	    END_REGION
+	    
+	    REGION LabelEndFilling   
+	    LabelEndFilling:
+	        #ouFillingPgSelected := TRUE;
+	        RETURN;
+	    END_REGION
+	    
+	    REGION LabelEndEmptying  
+	    LabelEndEmptying:
+	        #ouEmptyingPgSelected := TRUE;
+	        RETURN;
+	    END_REGION
+	    
+	END_IF;
+END_FUNCTION_BLOCK
+

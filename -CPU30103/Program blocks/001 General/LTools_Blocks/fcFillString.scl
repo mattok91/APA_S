@@ -1,0 +1,31 @@
+﻿FUNCTION "fcFillString" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inFillChar : Char;
+      inLength : Int;
+   END_VAR
+
+   VAR_OUTPUT 
+      ouString : String;
+   END_VAR
+
+   VAR_TEMP 
+      tIndex : Int;
+      tLength : Int;
+   END_VAR
+
+
+BEGIN
+	// define length to fill
+	IF #inLength = 0 THEN
+	    #tLength := MAX_LEN(#ouString);
+	ELSE
+	    #tLength := #inLength;
+	END_IF;
+	// fill string with char
+	FOR #tIndex := 1 TO #tLength DO
+	    #ouString[#tIndex] := #inFillChar;
+	END_FOR;
+END_FUNCTION
+

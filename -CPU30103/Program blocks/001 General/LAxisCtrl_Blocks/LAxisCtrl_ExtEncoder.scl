@@ -1,0 +1,592 @@
+﻿FUNCTION_BLOCK "LAxisCtrl_ExtEncoder"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : AxisCtrl
+VERSION : 1.1
+   VAR_INPUT 
+      enable : Bool := FALSE;   // Zezwolenie
+      enableAxis : Bool := FALSE;   // Zezwolenie dla osi
+      resetAxis : Bool := FALSE;   // Reset osi
+      homing : Bool := FALSE;   // Bazowanie
+      axis {InstructionName := 'TO_ExternalEncoder'; LibVersion := '5.0'} : TO_ExternalEncoder;
+      configuration : "LAxisCtrl_typeAxisConfig";
+   END_VAR
+
+   VAR_OUTPUT 
+      valid { ExternalWritable := 'False'} : Bool := FALSE;
+      busy { ExternalWritable := 'False'} : Bool := FALSE;
+      error { ExternalWritable := 'False'} : Bool := FALSE;
+      status { ExternalWritable := 'False'} : Word := #STATUS_NO_CALL;
+      subfunctionStatus { ExternalWritable := 'False'} : Word;
+      axisEnabled { ExternalWritable := 'False'} : Bool := FALSE;
+      resetActive { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool := FALSE;
+      homingCommandBusy { ExternalWritable := 'False'} : Bool := FALSE;
+      homingCommandDone { ExternalWritable := 'False'} : Bool := FALSE;
+      homingCommandAborted { ExternalWritable := 'False'} : Bool := FALSE;
+      homingSelected { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool := FALSE;
+      diagnostics { ExternalWritable := 'False'; S7_HiddenAssignment := 'HideIfNoParamAssigned'} : "LAxisCtrl_typeDiagnostics";
+   END_VAR
+
+   VAR 
+      statErrorUserCleared { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := FALSE;
+      statErrorAutoCleared { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := FALSE;
+      statStatus { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Word := #STATUS_NO_CALL;
+      statSubfunctionStatus { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Word;
+      statDiagnostics { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : "LAxisCtrl_typeDiagnostics";
+      statEnableOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := FALSE;
+      statFBState { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : SInt := #AXIS_MOTION;
+      statFirstCycleReset { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := TRUE;
+      statPowerErrorOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := FALSE;
+      statResetState { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int := #CMD_IDLE;
+      statFirstCycleResetError { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := FALSE;
+      statExtendedCommand { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DWord := #CMD_NO_SELECTION;
+      statExtendedCommandOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DWord := #CMD_NO_SELECTION;
+      statEnableAxisOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := FALSE;
+      statEmptyDiagnostics { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : "LAxisCtrl_typeDiagnostics";
+      statHomingOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := FALSE;
+      statFirstCycleHoming { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := TRUE;
+      statPassiveHomingState { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt := #NO_HOMING_ACTIVE;
+      statExeOfHoming { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int := #CMD_BUSY;
+      instPower {InstructionName := 'MC_POWER'; LibVersion := '5.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_POWER;
+      instReset {InstructionName := 'MC_RESET'; LibVersion := '5.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_RESET;
+      instHome {InstructionName := 'MC_HOME'; LibVersion := '5.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_HOME;
+   END_VAR
+
+   VAR_TEMP 
+      tempEnable : Bool;
+      tempNewExtendedCmd : DInt;
+      tempEnableAxis : Bool;
+      tempErrorInCmd : Bool;
+      tempRisingCmd : DWord;
+      tempStopCmdSelected : Bool;
+      tempHoming : Bool;
+   END_VAR
+
+   VAR CONSTANT 
+      AXIS_MOTION : SInt := 1;
+      FB_ERROR : SInt := 5;
+      CMD_NO_SELECTION : DWord := 16#0000_0000;
+      NO_SELECTION : Int := 0;
+      CMD_IDLE : Int := 0;
+      CMD_BUSY : Int := 1;
+      NO_HOMING_ACTIVE : SInt := -10;
+      STANDARD_HOMING : SInt := -1;
+      STATUS_NO_CALL : Word := 16#7000;
+      STATUS_FB_FIRST_CALL : Word := 16#7001;
+      STATUS_SUBSEQUENT_CALL : Word := 16#7002;
+      ERR_INVALID_HOMING_EXTENDED_MODE : Word := 16#8202;
+      ERR_MC_POWER : Word := 16#8600;
+      ERR_MC_RESET : Word := 16#8601;
+      ERR_MC_HOME : Word := 16#8602;
+      ERR_UNDEFINED_FB_STATE : Word := 16#8700;
+      ERR_UNDEFINED_RESET_STATE : Word := 16#8701;
+   END_VAR
+
+
+BEGIN
+	//================================================================================
+	// SIEMENS AG
+	// (c)Copyright 2020 All Rights Reserved
+	//--------------------------------------------------------------------------------
+	// Library: LAxisCtrl 
+	// Tested with: S7-1515T-2 PN
+	// Engineering: TIA Portal V16
+	// Restrictions: -
+	// Requirements: S7-1500/S7-1500T FW 2.8.1
+	// Functionality: This function block offers basic functionalities for axis control
+	// Support: tech.team.motioncontrol@siemens.com
+	// Note: Parameter comments are only available in language 'English (United States)'
+	//--------------------------------------------------------------------------------
+	// Change log table:
+	// Version  Date        Expert in charge  Changes applied
+	// 01.00.01 12.10.2016  RS                First released version
+	// 01.00.02 29.03.2017  RS                Added support information
+	//                                        Block is compilable with V14 SP1
+	// 01.00.05 30.09.2019  RS                Bugfixes
+	// 01.01.00 31.03.2020  RS                New output "subfunctionStatus"
+	//                                        Change of parameter configuration: INOUT --> IN
+	//                                        Output "diagnostics" is only written at end of block             
+	//================================================================================
+	
+	//----------------------------------------------------------------------------------------------
+	// Enable / disable FB
+	//----------------------------------------------------------------------------------------------
+	
+	#tempEnable := #enable; // Create temporary process image
+	
+	REGION ENABLE_FB
+	  IF NOT #tempEnable AND #statEnableOld THEN
+	    REGION FALLING_EDGE_AT_ENABLE_FB
+	      
+	      // Reset outputs 
+	      // ==========================================================
+	      // Error and valid outputs are reset with falling edge of enable input
+	      #error := FALSE;
+	      #valid := FALSE;
+	      #status := #STATUS_NO_CALL;
+	      #subfunctionStatus := #statSubfunctionStatus := 16#0; // V1.1.0
+	      
+	      // Reset status outputs
+	      #axisEnabled := FALSE;
+	      #resetActive := FALSE;
+	      
+	      // Reset outputs for homing commands
+	      #homingCommandBusy := FALSE;
+	      #homingCommandDone := FALSE;
+	      #homingCommandAborted := FALSE;
+	      #homingSelected := FALSE;
+	      
+	      // Reset internal variables
+	      // ==========================================================
+	      #statErrorUserCleared := FALSE;
+	      #statErrorAutoCleared := FALSE;
+	      #statStatus := #STATUS_NO_CALL;
+	      #statDiagnostics := #statEmptyDiagnostics;
+	      
+	      #statFBState := #AXIS_MOTION;
+	      #statFirstCycleReset := FALSE;
+	      #statPowerErrorOld := FALSE;
+	      #statResetState := #CMD_IDLE;
+	      #statFirstCycleResetError := FALSE;
+	      
+	      #statExtendedCommand := #CMD_NO_SELECTION;
+	      #statExtendedCommandOld := #CMD_NO_SELECTION;
+	      #statEnableAxisOld := FALSE;
+	      #statHomingOld := FALSE;
+	      #statFirstCycleHoming := FALSE;
+	      #statPassiveHomingState := #NO_HOMING_ACTIVE;
+	      #statExeOfHoming := #CMD_BUSY;
+	      // ===========================================================
+	      
+	      // Disable Axis
+	      IF (#instPower.Busy = TRUE) THEN
+	        #instPower(Axis := #axis,
+	                   Enable := FALSE,
+	                   StartMode := #configuration.power.startMode,
+	                   StopMode := #configuration.power.stopMode);
+	        // Check if error occurred
+	        IF (#instPower.Error = TRUE) THEN
+	          // Write only diagnostics if error occurred at falling edge of MC_POWER
+	          #diagnostics.status := #ERR_MC_POWER;
+	          #diagnostics.subfunctionStatus := #instPower.ErrorId;
+	        END_IF;
+	      END_IF;
+	      
+	      // Set old value of enable for edge detection and end execution
+	      #statEnableOld := #tempEnable;
+	      RETURN;
+	    END_REGION
+	    
+	    // Check if FB is enabled - first cycle
+	  ELSIF #tempEnable AND NOT #statEnableOld THEN
+	    REGION FB_RISING_EDGE_AT_ENABLE_FB
+	      // Busy is set at rising edge of enable input
+	      #busy := TRUE;
+	      #status := #STATUS_FB_FIRST_CALL;
+	      // StatStatus will be written in next cycle
+	      #statStatus := #STATUS_SUBSEQUENT_CALL;
+	      
+	      // Reset error and diagnostics outputs
+	      #statErrorUserCleared := FALSE;
+	      #statErrorAutoCleared := FALSE;
+	      #diagnostics := #statEmptyDiagnostics;
+	      #statDiagnostics := #statEmptyDiagnostics;
+	      
+	      // Copy inputs
+	      #statExtendedCommand.%X0 := #resetAxis;
+	      // Set old value of homing input
+	      #statHomingOld := #homing;
+	      
+	      #statExtendedCommandOld := #statExtendedCommand;
+	      // Set old value of enable for edge detection and end execution
+	      #statEnableOld := #tempEnable;
+	      RETURN;
+	    END_REGION
+	    
+	    // Check if function block is disabled or UserClearedError is present
+	  ELSIF NOT #tempEnable OR #statErrorUserCleared THEN
+	    REGION FB_DISABLED
+	      IF (#tempEnable = FALSE) THEN
+	        #status := #STATUS_NO_CALL;
+	      END_IF;
+	      
+	      // Disable Axis
+	      IF (#instPower.Busy = TRUE) THEN
+	        #instPower(Axis := #axis,
+	                   Enable := FALSE,
+	                   StartMode := #configuration.power.startMode,
+	                   StopMode := #configuration.power.stopMode);
+	        // Check if error occurred
+	        IF (#instPower.Error = TRUE) THEN
+	          #diagnostics.status := #ERR_MC_POWER;
+	          #diagnostics.subfunctionStatus := #instPower.ErrorId;
+	        END_IF;
+	      ELSE
+	        #busy := FALSE;
+	      END_IF;
+	      
+	      #statEnableOld := #tempEnable;
+	      RETURN;
+	    END_REGION
+	    
+	  ELSE
+	    REGION FB_ENABLED
+	      // Copy extended inputs
+	      #statExtendedCommand.%X0 := #resetAxis;
+	      #tempEnableAxis := #enableAxis;
+	      #tempHoming := #homing;
+	      IF (#tempHoming = TRUE) AND (#statHomingOld = FALSE)
+	      THEN
+	        // Rising edge on homing input
+	        #statExtendedCommand.%X2 := TRUE;
+	        
+	      ELSIF (#tempHoming = FALSE) AND (#statHomingOld = TRUE)
+	      THEN
+	        // Falling edge on homing input
+	        #statExtendedCommand.%X2 := FALSE;
+	      ELSE
+	        ; // Do nothing - wait for rising / Falling edge
+	      END_IF;
+	      
+	      // Enable and disable axis
+	      REGION POWER
+	        // Call MC_POWER
+	        #instPower(Axis := #axis,
+	                   Enable := #tempEnableAxis,
+	                   StartMode := #configuration.power.startMode,
+	                   StopMode := #configuration.power.stopMode);
+	        
+	        // Set and Reset of Error
+	        IF (#instPower.Error = TRUE) AND
+	          ((#statStatus = #STATUS_SUBSEQUENT_CALL) OR (#statPowerErrorOld = FALSE))
+	        THEN
+	          // Error is set at rising edge of MC_POWER.Error 
+	          // Errorhandling
+	          #statStatus := #ERR_MC_POWER;
+	          #statErrorAutoCleared := TRUE;
+	          #statDiagnostics.subfunctionStatus := #statSubfunctionStatus := #instPower.ErrorId;
+	          
+	        ELSIF (#statStatus = #ERR_MC_POWER) AND (#instPower.Error = FALSE)
+	        THEN
+	          // Reset Error
+	          #statStatus := #STATUS_SUBSEQUENT_CALL;
+	          #statErrorAutoCleared := FALSE;
+	          
+	        ELSIF (#tempEnableAxis = TRUE) AND (#statEnableAxisOld = FALSE) THEN
+	          // Reset Error
+	          #statStatus := #STATUS_SUBSEQUENT_CALL;
+	          #statErrorAutoCleared := FALSE;
+	          #statDiagnostics := #statEmptyDiagnostics;
+	        ELSE
+	          ; // Do nothing
+	        END_IF;
+	      END_REGION
+	    END_REGION
+	  END_IF;
+	END_REGION
+	
+	//----------------------------------------------------------------------------------------------
+	// FB Statemachine 
+	//----------------------------------------------------------------------------------------------
+	REGION FB_STATEMACHINE
+	  CASE #statFBState OF
+	    #AXIS_MOTION:
+	      // Check command inputs
+	      IF (#statExtendedCommand = #CMD_NO_SELECTION)
+	      THEN
+	        // Command is reset
+	        IF (#instPower.Error = TRUE) THEN
+	          // Errorhandling
+	          #statStatus := #ERR_MC_POWER;
+	          #statErrorAutoCleared := TRUE;
+	          //#diagnostics := #statDiagnostics;
+	          
+	          
+	        ELSE
+	          // Reset Error only if no Error at MC_POWER is present
+	          #statStatus := #STATUS_SUBSEQUENT_CALL;
+	          #statErrorAutoCleared := FALSE;
+	        END_IF;
+	        
+	      ELSIF (#statExtendedCommand = #statExtendedCommandOld)
+	      THEN
+	        ; // No change at command - do nothing
+	        
+	      ELSE
+	        // Command changed
+	        #tempNewExtendedCmd := #NO_SELECTION;
+	        #tempErrorInCmd := FALSE;
+	        
+	        REGION CHECK_EXT_CMD
+	          // Check extended command (reset, homing, torquelimiting)
+	          IF (#statExtendedCommand = #statExtendedCommandOld) THEN
+	            ; // Do nothing
+	          ELSE
+	            // Extended command selected
+	            IF (#tempErrorInCmd = FALSE)
+	            THEN
+	              #tempRisingCmd := ((#statExtendedCommand XOR #statExtendedCommandOld) AND #statExtendedCommand);
+	              // Rising edge on passive homing command
+	              IF (#tempRisingCmd.%X2 = TRUE)
+	              THEN
+	                #tempNewExtendedCmd.%X2 := TRUE;
+	              END_IF;
+	            ELSE
+	              ; // Error in basic motion command or superimposed motion command 
+	            END_IF;
+	          END_IF;
+	        END_REGION
+	        // Enable commands
+	        IF (#tempErrorInCmd = TRUE) AND (#tempStopCmdSelected = FALSE)
+	        THEN
+	          // Error in current command - No Execution
+	          #statErrorAutoCleared := TRUE;
+	          #statDiagnostics.subfunctionStatus := #statSubfunctionStatus := 0;
+	          // Write diagnostics
+	        ELSE
+	          // No Error in command occurred
+	          IF (
+	            (#tempNewExtendedCmd <> #NO_SELECTION)
+	            )
+	          THEN
+	            // Extended commands
+	            REGION ENABLE_EXT_CMD
+	              IF (#tempNewExtendedCmd <> #NO_SELECTION) THEN
+	                // Homing command
+	                IF (#tempNewExtendedCmd.%X2 = TRUE) THEN
+	                  #statPassiveHomingState := #configuration.homing.extendedMode;
+	                  #statFirstCycleHoming := TRUE;
+	                END_IF;
+	              END_IF;
+	            END_REGION
+	            // Reset error
+	            #statStatus := #STATUS_SUBSEQUENT_CALL;
+	            #statErrorAutoCleared := FALSE;
+	            #statDiagnostics := #statEmptyDiagnostics;
+	          ELSE
+	            ; // No rising edge at commands
+	          END_IF;
+	        END_IF;
+	      END_IF;
+	      
+	    #FB_ERROR: // Error state
+	      ; // Do nothing, status already set
+	      
+	    ELSE
+	      // Errorhandling
+	      #statStatus := #ERR_UNDEFINED_FB_STATE;
+	      #statErrorUserCleared := TRUE;
+	      #statDiagnostics.subfunctionStatus := #statSubfunctionStatus := 0;
+	      // Set error state
+	      #statFBState := #FB_ERROR;
+	  END_CASE;
+	END_REGION
+	
+	//----------------------------------------------------------------------------------------------
+	// Execution of reset functionality
+	//----------------------------------------------------------------------------------------------
+	REGION EXECUTION_OF_RESET_COMMAND
+	  // Firstcycle of command
+	  IF (#statExtendedCommand.%X0 = TRUE) AND (#statExtendedCommandOld.%X0 = FALSE) THEN
+	    #statFirstCycleReset := TRUE;
+	    // Reset MC_RESET command
+	    #instReset(Axis := #axis,
+	               Execute := FALSE);
+	    #statFirstCycleResetError := FALSE;
+	    #statResetState := #CMD_BUSY;
+	  END_IF;
+	  
+	  CASE #statResetState OF
+	    #CMD_IDLE:
+	      ; // Do nothing
+	      
+	    #CMD_BUSY:
+	      // Call MC_Command
+	      #instReset(Axis := #axis,
+	                 Execute := #statExtendedCommand.%X0,
+	                 Restart := #configuration.generalSettings.resetWithRestart);
+	      
+	      // Evaluate MC_Command
+	      IF (#instReset.Error = TRUE) THEN
+	        // Errorhandling
+	        IF (#statFirstCycleResetError = FALSE) THEN
+	          #statErrorAutoCleared := TRUE;
+	          #statStatus := #ERR_MC_RESET;
+	          #statDiagnostics.status := #ERR_MC_RESET;
+	          #statDiagnostics.subfunctionStatus := #statSubfunctionStatus := #instReset.ErrorId;
+	          #statFirstCycleResetError := TRUE;
+	          // Set next state
+	          #statResetState := #CMD_IDLE;
+	        END_IF;
+	        
+	      ELSIF (#instReset.Busy = FALSE) THEN
+	        // Set next state
+	        #statResetState := #CMD_IDLE;
+	      ELSE
+	        ; // Command selected
+	      END_IF;
+	    ELSE
+	      // Errorhandling    
+	      #statStatus := #ERR_UNDEFINED_RESET_STATE;
+	      #statErrorUserCleared := TRUE;
+	      #statDiagnostics.subfunctionStatus := #statSubfunctionStatus := 0;
+	  END_CASE;
+	END_REGION
+	
+	//----------------------------------------------------------------------------------------------
+	// Execution of homing functionality 
+	//----------------------------------------------------------------------------------------------
+	REGION EXECUTION_OF_PASSIVE_HOMING
+	  // Statemachine for homing functionality
+	  CASE #statPassiveHomingState OF
+	      // Selection of extended homing mode  
+	    #NO_HOMING_ACTIVE:
+	      ; // Do nothing
+	      
+	    #STANDARD_HOMING:
+	      // No additional features
+	      REGION STANDARD_HOMING
+	        // Firstcycle of command
+	        IF (#statFirstCycleHoming = TRUE) THEN
+	          // Reset MC_HOME command
+	          #instHome(Axis := #axis,
+	                    Execute := FALSE);
+	        END_IF;
+	        
+	        // Call MC_Command
+	        #instHome(Axis := #axis,
+	                  Execute := #statExtendedCommand.%X2, // Input: homing
+	                  Position := #configuration.homing.position,
+	                  Mode := #configuration.homing.mode);
+	        
+	        // Evaluate MC_Command
+	        IF (#instHome.Busy = FALSE) AND
+	          (#instHome.Done = FALSE) AND
+	          (#instHome.CommandAborted = FALSE) AND
+	          (#instHome.Error = FALSE)
+	        THEN
+	          // Return to NO_SELECTION if command finished
+	          #statPassiveHomingState := #NO_HOMING_ACTIVE;
+	          
+	        ELSIF (#instHome.Error = TRUE) THEN
+	          // Errorhandling
+	          #statStatus := #ERR_MC_HOME;
+	          #statErrorAutoCleared := TRUE;
+	          #statDiagnostics.subfunctionStatus := #statSubfunctionStatus := #instHome.ErrorId;
+	          #statPassiveHomingState := #NO_HOMING_ACTIVE;
+	        ELSE
+	          ; // Command selected
+	        END_IF;
+	        #statExeOfHoming := 16#0;
+	        #statExeOfHoming.%X0 := #instHome.Busy;
+	        #statExeOfHoming.%X1 := #instHome.Done;
+	        #statExeOfHoming.%X2 := #instHome.CommandAborted;
+	        #statExeOfHoming.%X3 := #instHome.Error;
+	      END_REGION
+	    ELSE
+	      // Errorhandling
+	      #statStatus := #ERR_INVALID_HOMING_EXTENDED_MODE;
+	      #statErrorAutoCleared := TRUE;
+	      #statDiagnostics.subfunctionStatus := #statSubfunctionStatus := 0;
+	      #statPassiveHomingState := #NO_HOMING_ACTIVE;
+	  END_CASE;
+	END_REGION
+	
+	//----------------------------------------------------------------------------------------------
+	// Store values and reset variables
+	//----------------------------------------------------------------------------------------------
+	REGION STORE_AND_RESET
+	  // Reset variables to determine first cycle of a new command
+	  IF (#statFirstCycleReset = TRUE) THEN
+	    #statFirstCycleReset := FALSE;
+	  END_IF;
+	  IF (#statFirstCycleHoming = TRUE) THEN
+	    #statFirstCycleHoming := FALSE;
+	  END_IF;
+	  #statHomingOld := #tempHoming;
+	  
+	  // Store last values for edge detection
+	  #statEnableOld := #tempEnable;
+	  #statEnableAxisOld := #tempEnableAxis;
+	  #statExtendedCommandOld := #statExtendedCommand;
+	  #statPowerErrorOld := #instPower.Error;
+	END_REGION
+	
+	//----------------------------------------------------------------------------------------------
+	// Writing outputs
+	//----------------------------------------------------------------------------------------------
+	REGION WRITING_OF_OUTPUTS
+	  // Writing status outputs
+	  #resetActive := (#statResetState = #CMD_BUSY);
+	  
+	  IF (#statErrorUserCleared = TRUE) THEN
+	    ; // Reset variables at ErrorUserCleared
+	    #statExeOfHoming := #NO_SELECTION;
+	  END_IF;
+	  IF (#instPower.Status = TRUE)
+	  THEN
+	    // Axis enabled
+	    #axisEnabled := TRUE;
+	    
+	  ELSIF (#instPower.Error = TRUE) AND (#instPower.Status = FALSE)
+	  THEN
+	    // Reset status if error occurred
+	    #axisEnabled := FALSE;
+	    
+	  ELSIF (#instPower.Busy = FALSE)
+	  THEN
+	    // Reset if MC_Power is not busy
+	    #axisEnabled := FALSE;
+	  ELSE
+	    ;
+	  END_IF;
+	  
+	  REGION WRITING_HOMING_OUTPUTS
+	    // Writing Busy, Done and Aborted outputs for homing
+	    IF (#statPassiveHomingState = #STANDARD_HOMING)
+	    THEN
+	      #homingSelected := TRUE;
+	      #homingCommandBusy := #statExeOfHoming.%X0;
+	      #homingCommandDone := #statExeOfHoming.%X1;
+	      #homingCommandAborted := #statExeOfHoming.%X2;
+	    ELSE
+	      #homingSelected := FALSE;
+	      #homingCommandBusy := FALSE;
+	      #homingCommandDone := FALSE;
+	      #homingCommandAborted := FALSE;
+	    END_IF;
+	  END_REGION
+	END_REGION
+	
+	//----------------------------------------------------------------------------------------------
+	// Error handling 
+	//----------------------------------------------------------------------------------------------
+	REGION ERROR_HANDLING
+	  IF #statErrorUserCleared THEN
+	    #valid := FALSE;
+	    #busy := TRUE;
+	    #error := TRUE;
+	    #status := #statStatus;
+	    #subfunctionStatus := #statSubfunctionStatus; // V1.1.0
+	    #statDiagnostics.status := #statStatus;
+	    
+	  ELSIF #statErrorAutoCleared THEN
+	    #valid := FALSE;
+	    #busy := TRUE;
+	    #error := TRUE;
+	    #status := #statStatus;
+	    #subfunctionStatus := #statSubfunctionStatus; // V1.1.0
+	    #statDiagnostics.status := #statStatus;
+	    
+	  ELSE
+	    // Process normal output values
+	    #valid := TRUE;
+	    #error := FALSE;
+	    #status := #statStatus;
+	    #subfunctionStatus := #statSubfunctionStatus := 16#0; // V1.1.0
+	  END_IF;
+	  
+	  #diagnostics := #statDiagnostics; // V1.1.0
+	END_REGION
+END_FUNCTION_BLOCK
+

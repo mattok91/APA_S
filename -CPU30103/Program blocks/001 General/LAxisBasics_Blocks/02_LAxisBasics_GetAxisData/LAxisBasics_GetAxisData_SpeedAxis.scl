@@ -1,0 +1,224 @@
+﻿FUNCTION "LAxisBasics_GetAxisData_SpeedAxis" : "LAxisBasics_typeAxisData"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : ArSc
+FAMILY : LAxisBasics
+VERSION : 1.1
+   VAR_INPUT 
+      axis {InstructionName := 'TO_SpeedAxis'; LibVersion := '5.0'} : TO_SpeedAxis;
+   END_VAR
+
+   VAR_TEMP 
+      tempAxisPositions : "LAxisBasics_typeAxisPositions";
+      tempAxisStatus : "LAxisBasics_typeAxisStatus";
+      tempAxisSensorStatus : "LAxisBasics_typeAxisSensorStatus";
+      tempAxisUnits : "LAxisBasics_typeAxisUnits";
+      tempDWORD : DWord;
+      tempCount : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      DEFAULT_POSITION : LReal := 0.0;
+      DEFAULT_VELOCITY : LReal := 0.0;
+      DEFAULT_ACCELERATION : LReal := 0.0;
+      DEFAULT_SENSOR : UDInt := 0;
+      SENSOR_MIN : Int := 1;
+      SENSOR_MAX : Int := 4;
+      DEFAULT_SENSOR_STATE : DInt := 0;
+      DEFAULT_SENSOR_COMMUNICATIONOK : Bool := False;
+      DEFAULT_SENSOR_ERROR : Bool := False;
+      DEFAULT_SENSOR_ABSENCODEROFFSET : LReal := 0.0;
+      DEFAULT_SENSOR_CONTROL : Bool := False;
+      DEFAULT_SENSOR_POSITION : LReal := 0.0;
+      DEFAULT_SENSOR_VELOCITY : LReal := 0.0;
+      DEFAULT_SENSOR_ADAPTIONSTATE : DInt := 0;
+   END_VAR
+
+
+BEGIN
+	//=============================================================================
+	//SIEMENS AG
+	//(c)Copyright 2016 All Rights Reserved
+	//-----------------------------------------------------------------------------
+	//Library:       Axis Basics
+	//Tested with:   S7-1500T V2.5
+	//Engineering:   TIA Portal V15
+	//Restrictions:  Motion Control Library V4.0
+	//Requirements:  S7-1500(T)
+	//Functionality: Get axis data of TO_SpeedAxis
+	//-----------------------------------------------------------------------------
+	//Change log table:
+	//Version  Date       Expert in charge Changes applied
+	//01.01.00 17.04.2018 ArSc             Add copy of axis sensor data
+	//                                     Add copy of axis units
+	//01.00.00 26.07.2017 ArSc             First released version
+	//=============================================================================
+	
+	
+	//-----------------------------------------------------------------------------
+	//Write axis position data
+	//-----------------------------------------------------------------------------
+	
+	#tempAxisPositions.position := #DEFAULT_POSITION;
+	#tempAxisPositions.velocity := #axis.Velocity;
+	#tempAxisPositions.acceleration := #axis.Acceleration;
+	#tempAxisPositions.actualPosition := #DEFAULT_POSITION;
+	#tempAxisPositions.actualVelocity := #axis.ActualSpeed;
+	#tempAxisPositions.actualAcceleration := #DEFAULT_ACCELERATION;
+	#tempAxisPositions.actualSpeed := #axis.ActualSpeed;
+	#tempAxisPositions.operativeSensor := #DEFAULT_SENSOR;
+	
+	
+	//-----------------------------------------------------------------------------
+	//Write axis sensor data
+	//-----------------------------------------------------------------------------
+	
+	FOR #tempCount := #SENSOR_MIN TO #SENSOR_MAX DO
+	  #tempAxisSensorStatus.sensor[#tempCount].state := #DEFAULT_SENSOR_STATE;
+	  #tempAxisSensorStatus.sensor[#tempCount].communicationOK := #DEFAULT_SENSOR_COMMUNICATIONOK;
+	  #tempAxisSensorStatus.sensor[#tempCount].error := #DEFAULT_SENSOR_ERROR;
+	  #tempAxisSensorStatus.sensor[#tempCount].absEncoderOffset := #DEFAULT_SENSOR_ABSENCODEROFFSET;
+	  #tempAxisSensorStatus.sensor[#tempCount].control := #DEFAULT_SENSOR_CONTROL;
+	  #tempAxisSensorStatus.sensor[#tempCount].position := #DEFAULT_SENSOR_POSITION;
+	  #tempAxisSensorStatus.sensor[#tempCount].velocity := #DEFAULT_SENSOR_VELOCITY;
+	  #tempAxisSensorStatus.sensor[#tempCount].adaptionState := #DEFAULT_SENSOR_ADAPTIONSTATE;
+	END_FOR;
+	
+	
+	//-----------------------------------------------------------------------------
+	//Write axis units
+	//-----------------------------------------------------------------------------
+	
+	#tempAxisUnits.lengthUnit := #axis.Units.LengthUnit;
+	#tempAxisUnits.velocityUnit := #axis.Units.VelocityUnit;
+	#tempAxisUnits.timeUnit := #axis.Units.TimeUnit;
+	#tempAxisUnits.torqueUnit := #axis.Units.TorqueUnit;
+	#tempAxisUnits.forceUnit := #axis.Units.ForceUnit;
+	
+	
+	//-----------------------------------------------------------------------------
+	//Write axis status data
+	//-----------------------------------------------------------------------------
+	
+	//Read DWORD from axis
+	#tempDWORD := #axis.StatusWord;
+	//Write bits to data type
+	#tempAxisStatus.statusWord.bit00_Enable := #tempDWORD.%X0;
+	#tempAxisStatus.statusWord.bit01_Error := #tempDWORD.%X1;
+	#tempAxisStatus.statusWord.bit02_RestartActive := #tempDWORD.%X2;
+	#tempAxisStatus.statusWord.bit03_OnlineStartValuesChanged := #tempDWORD.%X3;
+	#tempAxisStatus.statusWord.bit04_ControlPanelActive := #tempDWORD.%X4;
+	#tempAxisStatus.statusWord.bit05_HomingDone := #tempDWORD.%X5;
+	#tempAxisStatus.statusWord.bit06_Done := #tempDWORD.%X6;
+	#tempAxisStatus.statusWord.bit07_StandStill := #tempDWORD.%X7;
+	#tempAxisStatus.statusWord.bit08_PositioningCommand := #tempDWORD.%X8;
+	#tempAxisStatus.statusWord.bit09_JogCommand := #tempDWORD.%X9;
+	#tempAxisStatus.statusWord.bit10_VelocityCommand := #tempDWORD.%X10;
+	#tempAxisStatus.statusWord.bit11_HomingCommand := #tempDWORD.%X11;
+	#tempAxisStatus.statusWord.bit12_ConstantVelocity := #tempDWORD.%X12;
+	#tempAxisStatus.statusWord.bit13_Accelerating := #tempDWORD.%X13;
+	#tempAxisStatus.statusWord.bit14_Decelerating := #tempDWORD.%X14;
+	#tempAxisStatus.statusWord.bit15_SWLimitMinActive := #tempDWORD.%X15;
+	#tempAxisStatus.statusWord.bit16_SWLimitMaxActive := #tempDWORD.%X16;
+	#tempAxisStatus.statusWord.bit17_HWLimitMinActive := #tempDWORD.%X17;
+	#tempAxisStatus.statusWord.bit18_HWLimitMaxActive := #tempDWORD.%X18;
+	#tempAxisStatus.statusWord.bit19_Reserved := #tempDWORD.%X19;
+	#tempAxisStatus.statusWord.bit20_Reserved := #tempDWORD.%X20;
+	#tempAxisStatus.statusWord.bit21_Synchronizing := #tempDWORD.%X21;
+	#tempAxisStatus.statusWord.bit22_Synchronous := #tempDWORD.%X22;
+	#tempAxisStatus.statusWord.bit23_SuperimposedMotionCommand := #tempDWORD.%X23;
+	#tempAxisStatus.statusWord.bit24_PhasingCommand := #tempDWORD.%X24;
+	#tempAxisStatus.statusWord.bit25_AxisSimulation := #tempDWORD.%X25;
+	#tempAxisStatus.statusWord.bit26_TorqueLimitingCommand := #tempDWORD.%X26;
+	#tempAxisStatus.statusWord.bit27_InLimitation := #tempDWORD.%X27;
+	#tempAxisStatus.statusWord.bit28_NonPositionControlled := #tempDWORD.%X28;
+	#tempAxisStatus.statusWord.bit29_Reserved := #tempDWORD.%X29;
+	#tempAxisStatus.statusWord.bit30_InClamping := #tempDWORD.%X30;
+	#tempAxisStatus.statusWord.bit31_Reserved := #tempDWORD.%X31;
+	
+	//Read DWORD from axis
+	#tempDWORD := #axis.WarningWord;
+	//Write bits to data type
+	#tempAxisStatus.warningWord.bit00_SystemWarning := #tempDWORD.%X0;
+	#tempAxisStatus.warningWord.bit01_ConfigWarning := #tempDWORD.%X1;
+	#tempAxisStatus.warningWord.bit02_UserWarning := #tempDWORD.%X2;
+	#tempAxisStatus.warningWord.bit03_CommandNotAccepted := #tempDWORD.%X3;
+	#tempAxisStatus.warningWord.bit04_DriveWarning := #tempDWORD.%X4;
+	#tempAxisStatus.warningWord.bit05_SensorWarning := #tempDWORD.%X5;
+	#tempAxisStatus.warningWord.bit06_DynamicError := #tempDWORD.%X6;
+	#tempAxisStatus.warningWord.bit07_CommunicationWarning := #tempDWORD.%X7;
+	#tempAxisStatus.warningWord.bit08_SWLimitMin := #tempDWORD.%X8;
+	#tempAxisStatus.warningWord.bit09_SWLimitMax := #tempDWORD.%X9;
+	#tempAxisStatus.warningWord.bit10_HomingWarning := #tempDWORD.%X10;
+	#tempAxisStatus.warningWord.bit11_FollowingErrorWarning := #tempDWORD.%X11;
+	#tempAxisStatus.warningWord.bit12_PositioningWarning := #tempDWORD.%X12;
+	#tempAxisStatus.warningWord.bit13_PeripheralWarning := #tempDWORD.%X13;
+	#tempAxisStatus.warningWord.bit14_SynchronousWarning := #tempDWORD.%X14;
+	#tempAxisStatus.warningWord.bit15_AdaptionWarning := #tempDWORD.%X15;
+	#tempAxisStatus.warningWord.bit16_Reserved := #tempDWORD.%X16;
+	#tempAxisStatus.warningWord.bit17_Reserved := #tempDWORD.%X17;
+	#tempAxisStatus.warningWord.bit18_Reserved := #tempDWORD.%X18;
+	#tempAxisStatus.warningWord.bit19_Reserved := #tempDWORD.%X19;
+	#tempAxisStatus.warningWord.bit20_Reserved := #tempDWORD.%X20;
+	#tempAxisStatus.warningWord.bit21_Reserved := #tempDWORD.%X21;
+	#tempAxisStatus.warningWord.bit22_Reserved := #tempDWORD.%X22;
+	#tempAxisStatus.warningWord.bit23_Reserved := #tempDWORD.%X23;
+	#tempAxisStatus.warningWord.bit24_Reserved := #tempDWORD.%X24;
+	#tempAxisStatus.warningWord.bit25_Reserved := #tempDWORD.%X25;
+	#tempAxisStatus.warningWord.bit26_Reserved := #tempDWORD.%X26;
+	#tempAxisStatus.warningWord.bit27_Reserved := #tempDWORD.%X27;
+	#tempAxisStatus.warningWord.bit28_Reserved := #tempDWORD.%X28;
+	#tempAxisStatus.warningWord.bit29_Reserved := #tempDWORD.%X29;
+	#tempAxisStatus.warningWord.bit30_Reserved := #tempDWORD.%X30;
+	#tempAxisStatus.warningWord.bit31_Reserved := #tempDWORD.%X31;
+	
+	//Read DWORD from axis
+	#tempDWORD := #axis.ErrorWord;
+	//Write bits to data type
+	#tempAxisStatus.errorWord.bit00_SystemFault := #tempDWORD.%X0;
+	#tempAxisStatus.errorWord.bit01_ConfigFault := #tempDWORD.%X1;
+	#tempAxisStatus.errorWord.bit03_CommandNotAccepted := #tempDWORD.%X2;
+	#tempAxisStatus.errorWord.bit03_CommandNotAccepted := #tempDWORD.%X3;
+	#tempAxisStatus.errorWord.bit04_DriveFault := #tempDWORD.%X4;
+	#tempAxisStatus.errorWord.bit05_SensorFault := #tempDWORD.%X5;
+	#tempAxisStatus.errorWord.bit06_DynamicError := #tempDWORD.%X6;
+	#tempAxisStatus.errorWord.bit07_CommunicationFault := #tempDWORD.%X7;
+	#tempAxisStatus.errorWord.bit08_SWLimit := #tempDWORD.%X8;
+	#tempAxisStatus.errorWord.bit09_HWLimit := #tempDWORD.%X9;
+	#tempAxisStatus.errorWord.bit10_HomingError := #tempDWORD.%X10;
+	#tempAxisStatus.errorWord.bit11_FollowingErrorFault := #tempDWORD.%X11;
+	#tempAxisStatus.errorWord.bit12_PositioningFault := #tempDWORD.%X12;
+	#tempAxisStatus.errorWord.bit13_PeripheralError := #tempDWORD.%X13;
+	#tempAxisStatus.errorWord.bit14_SynchronousError := #tempDWORD.%X14;
+	#tempAxisStatus.errorWord.bit15_AdaptionError := #tempDWORD.%X15;
+	#tempAxisStatus.errorWord.bit16_Reserved := #tempDWORD.%X16;
+	#tempAxisStatus.errorWord.bit17_Reserved := #tempDWORD.%X17;
+	#tempAxisStatus.errorWord.bit18_Reserved := #tempDWORD.%X18;
+	#tempAxisStatus.errorWord.bit19_Reserved := #tempDWORD.%X19;
+	#tempAxisStatus.errorWord.bit20_Reserved := #tempDWORD.%X20;
+	#tempAxisStatus.errorWord.bit21_Reserved := #tempDWORD.%X21;
+	#tempAxisStatus.errorWord.bit22_Reserved := #tempDWORD.%X22;
+	#tempAxisStatus.errorWord.bit23_Reserved := #tempDWORD.%X23;
+	#tempAxisStatus.errorWord.bit24_Reserved := #tempDWORD.%X24;
+	#tempAxisStatus.errorWord.bit25_Reserved := #tempDWORD.%X25;
+	#tempAxisStatus.errorWord.bit26_Reserved := #tempDWORD.%X26;
+	#tempAxisStatus.errorWord.bit27_Reserved := #tempDWORD.%X27;
+	#tempAxisStatus.errorWord.bit28_Reserved := #tempDWORD.%X28;
+	#tempAxisStatus.errorWord.bit29_Reserved := #tempDWORD.%X29;
+	#tempAxisStatus.errorWord.bit30_Reserved := #tempDWORD.%X30;
+	#tempAxisStatus.errorWord.bit31_Reserved := #tempDWORD.%X31;
+	
+	//Read data from axis
+	#tempAxisStatus.errorDetail.number := #axis.ErrorDetail.Number;
+	#tempAxisStatus.errorDetail.reaction := #axis.ErrorDetail.Reaction;
+	
+	
+	//-----------------------------------------------------------------------------
+	//Write output data
+	//-----------------------------------------------------------------------------
+	
+	#LAxisBasics_GetAxisData_SpeedAxis.axisPositions := #tempAxisPositions;
+	#LAxisBasics_GetAxisData_SpeedAxis.axisStatus := #tempAxisStatus;
+	#LAxisBasics_GetAxisData_SpeedAxis.axisSensorStatus := #tempAxisSensorStatus;
+	#LAxisBasics_GetAxisData_SpeedAxis.axisUnits := #tempAxisUnits;
+END_FUNCTION
+

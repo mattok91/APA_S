@@ -1,0 +1,42 @@
+﻿FUNCTION "fcEnergySaving" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inEnable : Bool;   // Zezwolenie
+      inDriveIsRunning : Bool;   // Przenośnik wysterowany
+      inResetEnergySaving : Bool;   // Reset stanu energy saving
+      inTimeEnergySaving : Time;   // Czas energy saving
+   END_VAR
+
+   VAR_OUTPUT 
+      ouTimeTillEnergySaving : Time;   // Czas do osiągniecia stanu energy saving
+      ouReqEnergySaving : Bool;   // Stan energy saving
+   END_VAR
+
+   VAR_IN_OUT 
+      ioRuntime : Time;
+   END_VAR
+
+   VAR_TEMP 
+      tResetEnergySaving : Bool;
+   END_VAR
+
+
+BEGIN
+	//-- Kalkulacja czasu energy saving
+	#tResetEnergySaving := #inResetEnergySaving;
+	IF #tResetEnergySaving THEN
+	    #ioRuntime := t#0ms;
+	ELSIF #inDriveIsRunning THEN
+	    #ioRuntime := MIN(IN1 := #ioRuntime + "CycleTimeData".PrevScanTime."Time",
+	                      IN2 := #inTimeEnergySaving);
+	END_IF;
+	
+	//-- Wyjście
+	#ouReqEnergySaving := #ioRuntime >= #inTimeEnergySaving
+	AND NOT #tResetEnergySaving
+	AND (#inEnable = TRUE);
+	
+	#ouTimeTillEnergySaving := #inTimeEnergySaving - #ioRuntime;
+END_FUNCTION
+

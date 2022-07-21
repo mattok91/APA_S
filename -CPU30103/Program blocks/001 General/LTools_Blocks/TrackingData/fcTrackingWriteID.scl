@@ -1,0 +1,40 @@
+﻿FUNCTION "fcTrackingWriteID" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inOffset : UInt;
+      inID : UInt;
+   END_VAR
+
+   VAR_IN_OUT 
+      ioArray : Array[*] of "typeTrackingStep";
+      ioData : "typeTrackingData";
+   END_VAR
+
+   VAR_TEMP 
+      tQuotient : UInt;
+      tReminder : UInt;
+      tArrayLength : DInt;
+      tFirstIndex : DInt;
+      tInc : Int;
+   END_VAR
+
+
+BEGIN
+	
+	// określenie górny/dolny zakres tablicy
+	#tArrayLength := UPPER_BOUND(ARR := #ioArray, DIM := 1);
+	#tFirstIndex := LOWER_BOUND(ARR := #ioArray, DIM := 1);
+	
+	#tQuotient := #inOffset / #ioData.WindowLength;
+	#tReminder := #inOffset MOD #ioData.WindowLength;
+	
+	IF #tQuotient >= #tFirstIndex AND #tQuotient <= #tArrayLength THEN
+	    IF #inID > 0 THEN
+	        #ioArray[#tQuotient].ID := #inID;
+	        #ioArray[#tQuotient].Window := #tReminder;
+	    END_IF;
+	        
+	END_IF;
+END_FUNCTION
+

@@ -1,0 +1,158 @@
+﻿FUNCTION_BLOCK "LAxisBasics_AxisDataToHMI"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : ArSc
+FAMILY : LAxisBasics
+VERSION : 1.1
+   VAR_IN_OUT 
+      axisDataBlock : Array[*] of "LAxisBasics_typeAxisBasicsData";
+      dataConnectionToHMI : "LAxisBasics_typeAxisDataToHMI";
+   END_VAR
+
+   VAR 
+      statFirstRunDone : Bool;
+      statArrayMinIndex : Int;
+      statArrayMaxIndex : Int;
+      statActualAxisIndex : Int;
+      statActualAxisIndexOld : Int;
+      statSelectPreviousAxisOld : Bool;
+      statSelectNextAxisOld : Bool;
+      statExecuteDirectIndexSelectionOld : Bool;
+   END_VAR
+
+
+BEGIN
+	//=============================================================================
+	//SIEMENS AG
+	//(c)Copyright 2016 All Rights Reserved
+	//-----------------------------------------------------------------------------
+	//Library:       Axis Basics
+	//Tested with:   S7-1500T V2.5
+	//Engineering:   TIA Portal V15
+	//Restrictions:  Motion Control Library V4.0
+	//Requirements:  S7-1500(T)
+	//Functionality: Control axis via HMI - Select axis on AxisDataBlock
+	//-----------------------------------------------------------------------------
+	//Change log table:
+	//Version  Date       Expert in charge Changes applied
+	//01.00.00 03.08.2017 ArSc             First released version
+	//=============================================================================
+	
+	
+	//-----------------------------------------------------------------------------
+	//Function block interface.
+	//-----------------------------------------------------------------------------
+	
+	//Get array indices
+	IF (#statFirstRunDone = False)
+	THEN
+	    //Get MIN and MAX of array indices
+	    #statArrayMinIndex := DINT_TO_INT(LOWER_BOUND(ARR := #axisDataBlock, DIM := 1));
+	    #statArrayMaxIndex := DINT_TO_INT(UPPER_BOUND(ARR := #axisDataBlock, DIM := 1));
+	    // #statArrayMinIndex := 0;
+	    // #statArrayMaxIndex := 3;
+	    //Set default value of actual axis index
+	    #statActualAxisIndex := #statArrayMinIndex;
+	ELSE
+	    //Select axis (in axis data array)
+	    //Previous axis
+	    IF ((#dataConnectionToHMI.selectPreviousAxis = True)
+	        AND (#statSelectPreviousAxisOld = False)
+	        AND (#dataConnectionToHMI.selectNextAxis = False)
+	        AND (#dataConnectionToHMI.executeDirectIndexSelection = False))
+	    THEN
+	        //Decrement actual axis index
+	        #statActualAxisIndex := #statActualAxisIndex - INT#1;
+	        //Check index minimum
+	        IF (#statActualAxisIndex < #statArrayMinIndex)
+	        THEN
+	            //Select last axis by index
+	            #statActualAxisIndex := #statArrayMaxIndex;
+	        END_IF;
+	        //Next axis  
+	    ELSIF ((#dataConnectionToHMI.selectNextAxis = True)
+	        AND (#statSelectNextAxisOld = False)
+	        AND (#dataConnectionToHMI.selectPreviousAxis = False)
+	        AND (#dataConnectionToHMI.executeDirectIndexSelection = False))
+	    THEN
+	        //Increment actual axis index
+	        #statActualAxisIndex := #statActualAxisIndex + INT#1;
+	        //Check index minimum
+	        IF (#statActualAxisIndex > #statArrayMaxIndex)
+	        THEN
+	            //Select first axis by index
+	            #statActualAxisIndex := #statArrayMinIndex;
+	        END_IF;
+	        //Direct selection
+	    ELSIF ((#dataConnectionToHMI.executeDirectIndexSelection = True)
+	        AND (#statExecuteDirectIndexSelectionOld = False)
+	        AND (#dataConnectionToHMI.selectNextAxis = False)
+	        AND (#dataConnectionToHMI.selectPreviousAxis = False))
+	    THEN
+	        IF ((#dataConnectionToHMI.directIndexSelection >= #statArrayMinIndex)
+	            AND (#dataConnectionToHMI.directIndexSelection <= #statArrayMaxIndex))
+	        THEN
+	            //Set axis index directly
+	            #statActualAxisIndex := DINT_TO_INT(#dataConnectionToHMI.directIndexSelection);
+	        END_IF;
+	    END_IF;
+	    
+	    
+	    //-----------------------------------------------------------------------------
+	    //Connect axis data to HMI
+	    //-----------------------------------------------------------------------------
+	    
+	    //Data from PLC to HMI
+	    //====================
+	    
+	    //AxisBasics data
+	    #dataConnectionToHMI.axisBasicsData.axisInformation := #axisDataBlock[#statActualAxisIndex].axisInformation;
+	    #dataConnectionToHMI.axisBasicsData.axisData := #axisDataBlock[#statActualAxisIndex].axisData;
+	    #dataConnectionToHMI.axisBasicsData.axisControl.axisControlStatus := #axisDataBlock[#statActualAxisIndex].axisControl.axisControlStatus;
+	    //MoveToEndPos data
+	    #dataConnectionToHMI.axisBasicsData.moveToEndPos.moveToEndPosStatus := #axisDataBlock[#statActualAxisIndex].moveToEndPos.moveToEndPosStatus;
+	    //AlternateMotion data
+	    #dataConnectionToHMI.axisBasicsData.alternateMotion.alternateMotionStatus := #axisDataBlock[#statActualAxisIndex].alternateMotion.alternateMotionStatus;
+	    //AxisIndex
+	    #dataConnectionToHMI.actualAxisIndex := #statActualAxisIndex;
+	    
+	    //Data from HMI to PLC
+	    //====================
+	    
+	    //Preset command data from HMI to PLC after switching axis
+	    IF ((#statFirstRunDone = False)
+	        OR (#statActualAxisIndexOld <> #statActualAxisIndex))
+	    THEN
+	        //AxisBasics data
+	        #dataConnectionToHMI.axisBasicsData.axisControl.axisControlCommand := #axisDataBlock[#statActualAxisIndex].axisControl.axisControlCommand;
+	        //MoveToEndPos data
+	        #dataConnectionToHMI.axisBasicsData.moveToEndPos.moveToEndPosCommand := #axisDataBlock[#statActualAxisIndex].moveToEndPos.moveToEndPosCommand;
+	        //AlternateMotion data
+	        #dataConnectionToHMI.axisBasicsData.alternateMotion.alternateMotionCommand := #axisDataBlock[#statActualAxisIndex].alternateMotion.alternateMotionCommand;
+	    END_IF;
+	    //Write AxisBasics data from HMI to PLC
+	
+	    #axisDataBlock[#statActualAxisIndex].axisControl.axisControlCommand := #dataConnectionToHMI.axisBasicsData.axisControl.axisControlCommand;
+	    //Write MoveToEndPos data from HMI to PLC
+	    #axisDataBlock[#statActualAxisIndex].moveToEndPos.moveToEndPosCommand := #dataConnectionToHMI.axisBasicsData.moveToEndPos.moveToEndPosCommand;
+	    //Write AlternateMotion data from HMI to PLC
+	    #axisDataBlock[#statActualAxisIndex].alternateMotion.alternateMotionCommand := #dataConnectionToHMI.axisBasicsData.alternateMotion.alternateMotionCommand;
+	    
+	END_IF;
+	
+	
+	//-----------------------------------------------------------------------------
+	//Function block system functions
+	//-----------------------------------------------------------------------------
+	
+	//Save signals for edge control
+	#statSelectPreviousAxisOld := #dataConnectionToHMI.selectPreviousAxis;
+	#statSelectNextAxisOld := #dataConnectionToHMI.selectNextAxis;
+	#statExecuteDirectIndexSelectionOld := #dataConnectionToHMI.executeDirectIndexSelection;
+	//Save AxisIndex for edge control
+	#statActualAxisIndexOld := #statActualAxisIndex;
+	
+	//Mark first run of function block
+	#statFirstRunDone := True;
+	
+END_FUNCTION_BLOCK
+

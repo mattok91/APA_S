@@ -1,0 +1,42 @@
+﻿FUNCTION "fcCalculateDistancePerCycle" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inCurrentSpeed : Real;   // Aktualna prędkość [m/s]
+      inSpeedPrevScan : Real;   // Prędkość ostatniego cyklu [m/s]
+   END_VAR
+
+   VAR_OUTPUT 
+      ouDistancePrevScan : USInt;   // Obliczony dystans ostatniego cyklu [mm]
+   END_VAR
+
+   VAR_IN_OUT 
+      ioRemainder : Real;   // Reszta dla kolejnego cyklu
+   END_VAR
+
+   VAR_TEMP 
+      tDistancePrevScan : Real;
+      tDeltaV : Real;
+      tTime : Real;
+      tV0 : Real;
+   END_VAR
+
+
+BEGIN
+	REGION scale values   
+	    //-- wyliczenie deltaV oraz konwersja z m/sec na mm/sec
+	    #tDeltaV := (#inCurrentSpeed - #inSpeedPrevScan) * 1000;
+	    //-- convert PrevScanTime to Real and  from msec to sec
+	    #tTime := USINT_TO_REAL("CycleTimeData".PrevScanTime.Milliseconds) / 1000;
+	    //-- konwersja z m/sec na mm/sec
+	    #tV0 := #inSpeedPrevScan * 1000;
+	END_REGION
+	REGION calculate distance prev scan
+	    //-- s = a*t^2/2 + v0*t with a = deltaV/t => s = deltaV*t/2 + v0*t
+	    #tDistancePrevScan := ABS((#tDeltaV * #tTime / 2.0) + (#tV0 * #tTime)) + #ioRemainder;
+	    #ouDistancePrevScan := FLOOR_USINT(#tDistancePrevScan);
+	    //-- reszta
+	    #ioRemainder := #tDistancePrevScan - USINT_TO_REAL(#ouDistancePrevScan);
+	END_REGION
+END_FUNCTION
+

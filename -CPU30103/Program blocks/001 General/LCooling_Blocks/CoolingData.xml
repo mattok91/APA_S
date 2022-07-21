@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V16" />
+  <DocumentInfo>
+    <Created>2022-07-21T09:35:20.2522337Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V16 Update 2</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V16 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V16 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V16 Update 5</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V16</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.GlobalDB ID="0">
+    <AttributeList>
+      <AutoNumber>false</AutoNumber>
+      <DBAccessibleFromOPCUA>true</DBAccessibleFromOPCUA>
+      <HeaderAuthor />
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v4">
+  <Section Name="Static">
+    <Member Name="Data" Datatype="&quot;typeCoolingTracking&quot;" Remanence="Retain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="ActualLevel" Datatype="Int" /><Member Name="AmountRotaryOnLevel" Datatype="Int" /><Member Name="ActualDrivePosition" Datatype="Int" /><Member Name="StartSlotNumber" Datatype="Int" /><Member Name="Timers" Datatype="Struct"><Member Name="ElapsedTimePrevFilter" Datatype="String[21]" /><Member Name="TimeBetweenEntrance" Datatype="String[21]" /></Member><Member Name="AvaLevel" Datatype="Array[1..5] of Bool" /><Member Name="Slots" Datatype="Array[1..5, 1..12] of Struct"><Member Name="Occupied" Datatype="Bool" /><Member Name="Blocked" Datatype="Bool" /><Member Name="EntryTime" Datatype="Struct"><Member Name="formatTime" Datatype="Date_And_Time" /><Member Name="formatString" Datatype="String[21]" /></Member><Member Name="ElapsedTime" Datatype="Struct"><Member Name="formatString" Datatype="String[21]" /></Member></Member></Section></Sections></Member>
+    <Member Name="DataHMI" Datatype="&quot;typeHMICoolingTracking&quot;" Remanence="Retain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="StandardData" Datatype="&quot;typeCoolingTracking&quot;"><Sections><Section Name="None"><Member Name="ActualLevel" Datatype="Int" /><Member Name="AmountRotaryOnLevel" Datatype="Int" /><Member Name="ActualDrivePosition" Datatype="Int" /><Member Name="StartSlotNumber" Datatype="Int" /><Member Name="Timers" Datatype="Struct"><Member Name="ElapsedTimePrevFilter" Datatype="String[21]" /><Member Name="TimeBetweenEntrance" Datatype="String[21]" /></Member><Member Name="AvaLevel" Datatype="Array[1..5] of Bool" /><Member Name="Slots" Datatype="Array[1..5, 1..12] of Struct"><Member Name="Occupied" Datatype="Bool" /><Member Name="Blocked" Datatype="Bool" /><Member Name="EntryTime" Datatype="Struct"><Member Name="formatTime" Datatype="Date_And_Time" /><Member Name="formatString" Datatype="String[21]" /></Member><Member Name="ElapsedTime" Datatype="Struct"><Member Name="formatString" Datatype="String[21]" /></Member></Member></Section></Sections></Member><Member Name="ExtraData" Datatype="&quot;typeHMICoolingFunction&quot;"><Sections><Section Name="None"><Member Name="SelectedSlot" Datatype="Int" /><Member Name="SelectedSlotZone" Datatype="Int" /><Member Name="SelectedLevel" Datatype="Int" /><Member Name="SlotsOnSelectedLevel" Datatype="Array[1..12] of Struct"><Member Name="Occupied" Datatype="Bool" /><Member Name="Blocked" Datatype="Bool" /><Member Name="EntryTime" Datatype="Struct"><Member Name="formatTime" Datatype="Date_And_Time" /><Member Name="formatString" Datatype="String[21]" /></Member><Member Name="ElapsedTime" Datatype="Struct"><Member Name="formatString" Datatype="String[21]" /></Member></Member><Member Name="TimersOnSelectedSlot" Datatype="Struct"><Member Name="EntryTime" Datatype="Struct"><Member Name="formatTime" Datatype="Date_And_Time" /><Member Name="formatString" Datatype="String[21]" /></Member><Member Name="ElapsedTime" Datatype="Struct"><Member Name="formatString" Datatype="String[21]" /></Member></Member><Member Name="rq" Datatype="Struct"><Member Name="noOccupied" Datatype="Bool" /><Member Name="occupied" Datatype="Bool" /><Member Name="blocked" Datatype="Bool" /><Member Name="noBlocked" Datatype="Bool" /><Member Name="deleteData" Datatype="Bool" /><Member Name="accept" Datatype="Bool" /><Member Name="cancel" Datatype="Bool" /></Member><Member Name="sts" Datatype="Struct"><Member Name="coolingEmpty" Datatype="Bool" /><Member Name="emptyingActive" Datatype="Bool" /><Member Name="fullingActive" Datatype="Bool" /><Member Name="countOccSlots" Datatype="Int" /><Member Name="countBlckSlots" Datatype="Int" /><Member Name="enableEntrForRobot" Datatype="Bool" /><Member Name="enableEntrForRobotEMode" Datatype="Bool" /><Member Name="moveTTPermit" Datatype="Bool" /><Member Name="deleteData" Datatype="Bool" /></Member></Section></Sections></Member></Section></Sections></Member>
+  </Section>
+</Sections></Interface>
+      <IsOnlyStoredInLoadMemory>false</IsOnlyStoredInLoadMemory>
+      <IsRetainMemResEnabled>false</IsRetainMemResEnabled>
+      <IsWriteProtectedInAS>false</IsWriteProtectedInAS>
+      <MemoryLayout>Optimized</MemoryLayout>
+      <MemoryReserve>100</MemoryReserve>
+      <Name>CoolingData</Name>
+      <Number>15220</Number>
+      <ProgrammingLanguage>DB</ProgrammingLanguage>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-US</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="3" CompositionName="Items">
+            <AttributeList>
+              <Culture>pl-PL</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <MultilingualText ID="4" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="5" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-US</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="6" CompositionName="Items">
+            <AttributeList>
+              <Culture>pl-PL</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.GlobalDB>
+</Document>

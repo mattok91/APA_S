@@ -1,0 +1,66 @@
+﻿FUNCTION "fcTimeDiffString" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      Time1 : Date_And_Time;
+      Time2 : Date_And_Time;
+   END_VAR
+
+   VAR_OUTPUT 
+      TimeDiff : String;
+   END_VAR
+
+   VAR_TEMP 
+      tCharArray : Array[0..20] of Char;
+      tDateArray : Array[0..2] of String[4];
+      tDate : "typeDateSplit";
+      tStr : String;
+      tRetVal : Int;
+      tSeparator : Char;
+      tPosition : UDInt;
+   END_VAR
+
+
+BEGIN
+	
+	"fcClearData"(io_VAR_Data := #tCharArray);
+	"fcTimeDiffStruct"(inTime1 := #Time1,
+	                   inTime2 := #Time2,
+	                   ouDate => #tDate);
+	
+	#tDateArray[0] := #tDate.Year;
+	#tDateArray[1] := #tDate.Month;
+	#tDateArray[2] := #tDate.Day;
+	
+	#tSeparator := '-';
+	#tPosition := 0;
+	
+	#tRetVal := JOIN(Mode := 0,
+	                 RecSeparator := #tSeparator,
+	                 EndSeparator := #tSeparator,
+	                 SrcStruct := #tDateArray,
+	                 Count := 3,
+	                 DstArray := #tCharArray,
+	                 Position := #tPosition);
+	
+	#tDateArray[0] := #tDate.Hour;
+	#tDateArray[1] := #tDate.Minute;
+	#tDateArray[2] := #tDate.Second;
+	#tSeparator := ':';
+	#tCharArray[#tPosition] := '-';
+	#tPosition += 1;
+	
+	#tRetVal := JOIN(Mode := 0, //no end separator
+	                 RecSeparator := #tSeparator,
+	                 EndSeparator := #tSeparator,
+	                 SrcStruct := #tDateArray,
+	                 Count := 3,
+	                 DstArray := #tCharArray,
+	                 Position := #tPosition);
+	
+	Chars_TO_Strg(Chars := #tCharArray,
+	              pChars := 0,
+	              Cnt := 0,
+	              Strg => #TimeDiff);
+END_FUNCTION
+

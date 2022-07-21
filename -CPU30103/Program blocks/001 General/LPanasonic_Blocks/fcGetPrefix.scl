@@ -1,0 +1,39 @@
+﻿FUNCTION "fcGetPrefix" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inLotCode : String;
+   END_VAR
+
+   VAR_OUTPUT 
+      ouPrefix : String;
+      ouTR300 : Bool;
+      ouADFLO : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      i : Int;
+   END_VAR
+
+
+BEGIN
+	
+	#ouADFLO := FALSE;
+	#ouTR300 := FALSE;
+	
+	FOR #i := 1 TO 10 DO
+	    IF "dbLotCode".Product_ADFLO[#i].SKU = #inLotCode THEN
+	        #ouPrefix := "dbLotCode".Product_ADFLO[#i].Code;
+	        #ouADFLO := TRUE;
+	        EXIT;
+	    END_IF;
+	    
+	    IF "dbLotCode".Product_TR300[#i].SKU = #inLotCode THEN
+	        #ouPrefix := "dbLotCode".Product_TR300[#i].Code;
+	        #ouTR300 := TRUE;
+	        EXIT;
+	    END_IF;
+	END_FOR;
+	
+END_FUNCTION
+

@@ -1,0 +1,98 @@
+﻿FUNCTION_BLOCK "fbATIDataStatistic"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inTesterSIMU : Bool;
+      inMaxCounter : Int;
+   END_VAR
+
+   VAR_IN_OUT 
+      ATI : "typeTester";   // Dane HMI
+      ATIDataStat : "typeATIDataStat";
+   END_VAR
+
+   VAR 
+      s_TRIG {InstructionName := 'R_TRIG'; LibVersion := '1.0'} : R_TRIG;
+   END_VAR
+
+   VAR_TEMP 
+      tInc : Int;
+      tCountOK : Int;
+      tCountNOK : Int;
+      tEvaluateCounter : Int;
+      tRetVal : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      cMAX : Int := 500;
+   END_VAR
+
+
+BEGIN
+	
+	REGION Zbieranie wyników ATI - inicjalizacja max ilości danych
+	    IF #inMaxCounter > #cMAX THEN
+	        #ATIDataStat.MaxCounter := #cMAX;
+	    ELSE
+	        #ATIDataStat.MaxCounter := #inMaxCounter;
+	    END_IF;
+	END_REGION
+	
+	REGION Nowe dane
+	    #s_TRIG(CLK := #ATI.sts.newResult);
+	    
+	    IF #s_TRIG.Q THEN                             // Nowy rezultat testu z ATI
+	        
+	        #ATIDataStat.Counter += 1;
+	        #ATIDataStat.Counter := #ATIDataStat.Counter MOD #ATIDataStat.MaxCounter;
+	        
+	        #ATIDataStat.Buffer[#ATIDataStat.Counter] := #ATI.sts.lastResult;
+	    END_IF;
+	END_REGION
+	
+	REGION Ilość próbek w buforze
+	    #tEvaluateCounter := 0;
+	    FOR #tInc := 0 TO #ATIDataStat.MaxCounter DO
+	        IF #ATIDataStat.Buffer[#tInc].unitID <> '' THEN
+	            //sprawdzanie czy nie wartości z SIMU
+	            IF FIND(IN1 := #ATIDataStat.Buffer[#tInc].unitID, IN2 := 'SIM') = 0 THEN
+	                #tEvaluateCounter += 1;
+	            END_IF;
+	        END_IF;
+	    END_FOR;
+	    
+	    IF #tEvaluateCounter > #ATIDataStat.MaxCounter + 1 THEN
+	        #tEvaluateCounter := #ATIDataStat.MaxCounter + 1;
+	    END_IF;
+	END_REGION
+	
+	REGION ATI statystyka
+	    #tCountOK := 0;
+	    #tCountNOK := 0;
+	    
+	    FOR #tInc := 0 TO #ATIDataStat.MaxCounter DO
+	        IF FIND(IN1 := #ATIDataStat.Buffer[#tInc].unitID, IN2 := 'SIM') = 0 THEN
+	            IF #ATIDataStat.Buffer[#tInc].result = 'F' THEN
+	                #tCountNOK += 1;
+	            ELSIF #ATIDataStat.Buffer[#tInc].result = 'P' THEN
+	                #tCountOK += 1;
+	            END_IF;
+	        END_IF;
+	    END_FOR;
+	    
+	    IF #tEvaluateCounter > 0 THEN
+	        #ATIDataStat.PercOK := INT_TO_REAL(#tCountOK) / INT_TO_REAL(#tEvaluateCounter) * 100.0;
+	        #ATIDataStat.PercNOK := INT_TO_REAL(#tCountNOK) / INT_TO_REAL(#tEvaluateCounter) * 100.0;
+	    ELSE
+	        #ATIDataStat.PercOK := 0.0;
+	        #ATIDataStat.PercNOK := 0.0;
+	    END_IF;
+	END_REGION
+	
+	REGION Reset NewResult dla trybu SIM
+	    IF #inTesterSIMU AND NOT #s_TRIG.Q THEN
+	        #ATI.sts.newResult := false;
+	    END_IF;
+	END_REGION
+END_FUNCTION_BLOCK
+

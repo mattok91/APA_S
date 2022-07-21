@@ -1,0 +1,363 @@
+﻿FUNCTION_BLOCK "fbMarkerLP"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      enable : Bool;
+      seqTrigger : Bool;
+      positionAdflo : Bool;
+      positionTR300 : Bool;
+      resetAlm : Bool;
+      strLOT : String;
+      laserOutputsIOA : "typeLaserIOAIn";
+      laserOutputsIOB : "typeLaserIOBIn";
+      laserOutputsFileNo : "typeLaserFileNoIn";
+      laserOutputsErrorCode : "typeLaserErrorIn";
+      group : "typeGroup";
+   END_VAR
+
+   VAR_OUTPUT 
+      laserInputsIOA : "typeLaserIOAOut";
+      laserInputsIOB : "typeLaserIOBOut";
+      laserInputsTxtBuff : "typeLaserTxtBufferOut";
+      seqEnd : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      Laser : "typeLaser";
+   END_VAR
+
+   VAR 
+      statSequenceNo : Int;
+      statStringNo { S7_SetPoint := 'True'} : Int;
+      statFileSend : Bool;
+      statTriggerReq {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      statTimerReq {InstructionName := 'TP_TIME'; LibVersion := '1.0'; S7_SetPoint := 'False'} : TP_TIME;
+      statTimerSetIn {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      statTimerLaserSupply {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      instGetTime : "fbGetTimeLocal";
+      statDateString { S7_SetPoint := 'False'} : "typeDateSplit";
+      statStrNo1ToLaser : String;
+      statStrNo2ToLaser : String;
+      statStrNo3ToLaser : String;
+      statError : Struct
+         GenerateData : Bool;
+         LaserPumping : Bool;
+         SetOUT : Bool;
+      END_STRUCT;
+      R_TRIG_setOK {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+   END_VAR
+
+   VAR_TEMP 
+      tempAutoModeActive : Bool;
+      tempStr : String;
+      tempRDSYST : Int;
+      tempUintOut : UInt;
+      tempPrefix : String;
+      tempPrefixAdflo : Bool;
+      tempPrefixTR300 : Bool;
+      tempFiller : Char;
+      tempExpYear : String;
+      tempTrigger : Bool;
+      tempFillerEmpty : String;
+   END_VAR
+
+   VAR CONSTANT 
+      cExpDate : UInt := 5;
+      cMaxStringNo : Int := 3;
+   END_VAR
+
+
+BEGIN
+	
+	REGION Init
+	    #tempAutoModeActive := #group.sts.auto OR #group.sts.step;                      //Auto or step mode
+	    #laserInputsIOB.D8_D15 := 0;                                                    //Clear outputs for laser (for SIN commend)
+	    
+	    #laserInputsIOB.select0 := FALSE;
+	    #laserInputsIOB.select1 := FALSE;
+	    #laserInputsIOB.select2 := FALSE;
+	    
+	END_REGION
+	
+	REGION Alarms
+	    #Laser.sts.alm.%X0 := NOT #laserOutputsIOA.alm;                                 //Alarm output from laser
+	    #Laser.sts.alm.%X1 := NOT (#positionAdflo XOR #positionTR300);                  //Sensor type alarm
+	    
+	    IF #Laser.sts.alm = 0 THEN
+	        #Laser.sts.noAlm := True;                                                   //No alarms
+	    ELSE
+	        #Laser.sts.noAlm := False;
+	    END_IF;
+	    #Laser.sts.warning := NOT #laserOutputsIOA.warn;                                //Warning
+	    #laserInputsIOA.almRst := #resetAlm;                                            //Alarm and warning reset
+	    
+	    IF #resetAlm THEN
+	        "fcClearData"(io_VAR_Data := #statError);
+	    END_IF;
+	END_REGION
+	
+	REGION Read and convert date and time
+	    
+	    //Get date and time from system when DataWait Request
+	    #instGetTime(inGetTime := #laserOutputsIOB.dataWait,
+	                 ouDate => #statDateString,
+	                 ouErrorStr => #statError.GenerateData);
+	    
+	
+	    // Jeżeli wprowadzono na wejscie numer LOT wówczas przeszukiwanie dbLotCode w celu odnalezienia odpowiedniego Prefix
+	    IF #strLOT <> '' THEN
+	        
+	        "fcGetPrefix"(inLotCode := #tempStr,
+	                      ouPrefix => #tempPrefix,
+	                      ouADFLO => #tempPrefixAdflo,
+	                      ouTR300 => #tempPrefixTR300);
+	    ELSE
+	        // Jeżeli brak na wejściu numer LOT 
+	        IF #positionAdflo THEN
+	            #tempPrefix := 'ADE';
+	        ELSIF #positionTR300 THEN
+	            #tempPrefix := '3712U';
+	        END_IF;
+	        
+	    END_IF;
+	    
+	    IF #laserOutputsIOB.dataWait THEN
+	        
+	        // String No. 1 to Laser
+	        #statStrNo1ToLaser := CONCAT(IN1 := #tempPrefix, IN2 := #statDateString.Month);
+	        #statStrNo1ToLaser := CONCAT(IN1 := #statStrNo1ToLaser, IN2 := #statDateString.YearShort);
+	        #statStrNo1ToLaser := CONCAT(IN1 := #statStrNo1ToLaser, IN2 := #statDateString.Day);
+	
+	        // String No. 2 - Expiry date
+	        IF #positionAdflo THEN
+	            #tempFiller := '/';
+	        ELSE
+	            #tempFiller := '\'; //TR-300    
+	        END_IF;
+	        
+	        #tempExpYear := INT_TO_STRING(STRING_TO_INT(#statDateString.Year)+5);
+	        
+	        IF FIND(IN1 := #tempExpYear, IN2 := '+') <> 0 THEN
+	            #tempExpYear := DELETE(IN := #tempExpYear, L := 1, P := 1);
+	        END_IF;
+	        
+	        #statStrNo2ToLaser := CONCAT(IN1 := 'EXP ', IN2 :=#tempExpYear );
+	        #statStrNo2ToLaser := CONCAT(IN1 := #statStrNo2ToLaser, IN2 := #tempFiller);
+	        #statStrNo2ToLaser := CONCAT(IN1 := #statStrNo2ToLaser, IN2 := #statDateString.Month);
+	
+	        // String No. 3  - DDMMYYHHmmSS 
+	        #statStrNo3ToLaser := CONCAT(IN1 := #statDateString.Day, IN2 := #statDateString.Month);
+	        #statStrNo3ToLaser := CONCAT(IN1 := #statStrNo3ToLaser, IN2 := #statDateString.YearShort);
+	        #statStrNo3ToLaser := CONCAT(IN1 := #statStrNo3ToLaser, IN2 := #statDateString.Hour);
+	        #statStrNo3ToLaser := CONCAT(IN1 := #statStrNo3ToLaser, IN2 := #statDateString.Minute);
+	        #statStrNo3ToLaser := CONCAT(IN1 := #statStrNo3ToLaser, IN2 := #statDateString.Second);
+	
+	    END_IF;
+	    
+	    //converse fault
+	    #statError.GenerateData := #statError.GenerateData; //OR NOT (#tempPrefixAdflo XOR #tempPrefixTR300);
+	    
+	END_REGION
+	
+	(*
+	1. Turn on Key
+	2. aprox. 10sec system startup (SYSTEM STANDBY OUT)
+	3. Set Remote_In
+	4. Remote_Out is active
+	5. Set Laser_Supply_In
+	6. If Laser_Supply_Out is active after aprox. 10s Laser_StandBy has TO be active
+	7. System is ready...
+	*)
+	
+	REGION Remote/laser pumping
+	    // Remote mode
+	    #laserInputsIOA."remote" := #enable AND #laserOutputsIOA.systStandBy;
+	    
+	    // Laser pumping
+	    IF #enable AND #group.sts.safe AND #laserOutputsIOA."remote" AND (#group.sts.manual OR #tempAutoModeActive) THEN
+	        #laserInputsIOA.laserSup := TRUE; //supply laser
+	        #laserInputsIOA.laserStop_1 := true;
+	        #laserInputsIOA.laserStop_2 := true;
+	    ELSE
+	        #laserInputsIOA.laserSup := FALSE;
+	        #laserInputsIOA.laserStop_1 := FALSE;
+	        #laserInputsIOA.laserStop_2 := FALSE;
+	    END_IF;
+	    
+	    //Error laser pumping
+	    IF #statTimerLaserSupply.Q AND NOT #laserOutputsIOA.laserStandBy THEN
+	        #statError.LaserPumping := TRUE;
+	
+	    END_IF;
+	    
+	END_REGION
+	
+	REGION Shutter
+	    IF NOT #laserOutputsIOA.laserStandBy OR (#group.sts.manual AND #Laser.rq.closeShutter) THEN
+	        #laserInputsIOA.shutter := FALSE;
+	        #laserInputsIOA.shutterEn := FALSE;
+	    ELSIF (NOT #group.sts.manual OR #Laser.rq.openShutter) AND #laserOutputsIOA.laserStandBy THEN
+	        #laserInputsIOA.shutter := TRUE;
+	        #laserInputsIOA.shutterEn := true;
+	    END_IF;
+	END_REGION
+	
+	REGION Trigger sequence
+	    #tempTrigger := (#seqTrigger AND #tempAutoModeActive) OR (#Laser.rq.reqMarking AND #group.sts.manual);
+	    
+	    //Pulse
+	    #statTimerReq(IN := #tempTrigger,
+	                  PT := t#500ms);
+	    //Trigger
+	    #statTriggerReq(CLK := #statTimerReq.Q);
+	    
+	    REGION SET/RESET cmd
+	        IF #statTriggerReq.Q AND NOT #Laser.cmd.reqMarking THEN
+	            //SET request trigger sequence
+	            #Laser.cmd.reqMarking := TRUE;              
+	            //Init data
+	            #statStringNo := 0;
+	            #statSequenceNo := 0;
+	            #statFileSend := FALSE;
+	        END_IF;
+	        
+	        IF  #seqEnd OR NOT (#tempAutoModeActive OR #group.sts.manual) THEN
+	            #seqEnd := #Laser.cmd.reqMarking := FALSE;
+	        END_IF;
+	    END_REGION
+	    
+	END_REGION
+	
+	REGION File selection and text implementation
+	
+	    IF #laserOutputsIOA."remote" AND #Laser.cmd.reqMarking THEN
+	        CASE #statSequenceNo OF
+	            0:
+	                IF #laserOutputsIOB.dataWait AND NOT #laserOutputsIOB.setOK AND NOT #Laser.sts.alm.%X1 AND NOT #statError.GenerateData AND NOT #statError.SetOUT THEN
+	                    IF #statFileSend  THEN
+	                        #statStringNo += 1;
+	                        #laserInputsIOB.exSelect := TRUE;
+	                        #statFileSend := false;
+	
+	                    ELSE
+	                        #statStringNo := 0;
+	                        #laserInputsIOB.exSelect := FALSE;
+	                    END_IF;
+	                    
+	                    #statSequenceNo := 1;
+	                    #tempStr := '';
+	                END_IF;
+	            1:                                      //StringNoX
+	                CASE #statStringNo OF
+	                    0:
+	                        IF #positionAdflo THEN
+	                            #laserInputsIOB.D0_D7 := 1; //1;
+	                        ELSIF #positionTR300 THEN
+	                            #laserInputsIOB.D0_D7 := 0; //2;
+	                        END_IF;
+	                    1:
+	                        #tempStr := #statStrNo1ToLaser;
+	                        #laserInputsIOB.D0_D7 := 1;
+	                    2:
+	                        #tempStr := #statStrNo2ToLaser;
+	                        #laserInputsIOB.D0_D7 := 2;
+	                    3:
+	                        #tempStr := #statStrNo3ToLaser;
+	                        #laserInputsIOB.D0_D7 := 3;
+	                    ELSE
+	                        #statSequenceNo := 0;
+	                END_CASE;
+	                
+	                FILL_BLK(IN:=' ',
+	                         COUNT:=60,
+	                         OUT=>#laserInputsTxtBuff.textBuff60_Out[0]);
+	      
+	                
+	                Strg_TO_Chars(Strg := #tempStr,
+	                              pChars := 0,
+	                              Cnt => #tempUintOut,
+	                              Chars := #laserInputsTxtBuff.textBuff60_Out);
+	                
+	                #statSequenceNo := 2;
+	            2:                                      //Set SET_IN
+	                IF #laserOutputsIOB.shuttOpn THEN
+	                    #laserInputsIOB.set := TRUE;
+	                    #statSequenceNo := 3;
+	                END_IF;
+	            3:                                       //Reset SET_OUT if SET_OK or fault missing SET_OK
+	                    #R_TRIG_setOK(CLK := #laserOutputsIOB.setOK);
+	                
+	                    IF #R_TRIG_setOK.Q THEN
+	                        
+	                    IF #statStringNo >= #cMaxStringNo THEN
+	                        #statSequenceNo := 4;       //obsługa stringów
+	                        #laserInputsIOB.set := FALSE;
+	                       #statFileSend := false;
+	                    ELSE
+	                        #statSequenceNo := 0;       //obsługa pliku, stringów
+	                        #laserInputsIOB.set := FALSE;
+	                        
+	                        #statFileSend := TRUE;
+	                    END_IF;
+	                    
+	                
+	                   
+	                ELSIF #statTimerSetIn.Q THEN        //If Error 
+	                    #statSequenceNo := 0;
+	                    #statError.SetOUT := TRUE;
+	                END_IF;
+	                
+	                
+	            4:                                      //Trigger ON
+	                IF NOT #laserOutputsIOB.dataWait AND #laserOutputsIOA.ready THEN
+	                    #laserInputsIOA.trigger := TRUE;
+	                    #statSequenceNo := 5;
+	                END_IF;
+	            5:                                      //Trigger OFF
+	                IF #laserOutputsIOA.processing THEN
+	                    #laserInputsIOA.trigger := FALSE;
+	                    #statSequenceNo := 6;
+	                END_IF;
+	            6:                                      //End Sequence
+	                IF #laserOutputsIOA.procEnd OR #laserOutputsIOB.dataWait THEN
+	                    #statSequenceNo := 0;
+	                    #seqEnd := TRUE;
+	                END_IF;
+	                
+	        END_CASE;
+	    END_IF;
+	    
+	END_REGION
+	
+	#statTimerSetIn(IN := #laserInputsIOB.set,
+	                PT := t#1s);
+	
+	#statTimerLaserSupply(IN := #laserInputsIOA.laserSup,
+	                      PT := t#10s);
+	
+	
+	REGION HMI
+	    
+	    // States to HMI
+	    #Laser.sts.remoteOn := #laserOutputsIOA."remote";       //Remote mode
+	    #Laser.sts.perm := #enable;                             //all conditions to run OK
+	    #Laser.sts.sysStandBy := #laserOutputsIOA.systStandBy;  // System stand by - turned on
+	    #Laser.sts.standBy := #laserOutputsIOA.laserStandBy;    // Laser stand by - pumping completion
+	    #Laser.sts.shuttOpn := #laserOutputsIOB.shuttOpn;       // Shutter open
+	    #Laser.sts.supply := #laserOutputsIOA.laserSup;    // laser supply  - pumping on
+	    
+	    #Laser.in.A := #laserOutputsIOA;
+	    #Laser.in.B := #laserOutputsIOB;
+	    #Laser.in.er.errorCode := #laserOutputsErrorCode.errorCode;
+	    
+	    #Laser.ou.A := #laserInputsIOA;
+	    #Laser.ou.B := #laserInputsIOB;
+	    
+	    #Laser.sts.lastMarkedString[0] := #statStrNo1ToLaser;
+	    #Laser.sts.lastMarkedString[1] := #statStrNo2ToLaser;
+	    #Laser.sts.lastMarkedString[2] := #statStrNo3ToLaser;
+	    
+	END_REGION
+	
+END_FUNCTION_BLOCK
+

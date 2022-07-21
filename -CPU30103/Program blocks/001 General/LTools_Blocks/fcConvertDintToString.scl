@@ -1,0 +1,60 @@
+﻿FUNCTION "fcConvertDintToString" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inDINT : DInt;   // wartość DINT
+      inAlignmentReminder : Int;   // Ilość miejsc po przecinku
+   END_VAR
+
+   VAR_OUTPUT 
+      ouString : String;   // String
+   END_VAR
+
+   VAR_TEMP 
+      Str : String;
+      Str2 : String;
+      Length : Int;
+      i : Int;
+      Divider : DInt;
+      Minus : Bool;
+      tDINT : DInt;
+   END_VAR
+
+
+BEGIN
+	
+	//ustalenie dzielnika/mnożnika
+	#Divider := 1;
+	FOR #i := 1 TO #inAlignmentReminder DO
+	    #Divider := #Divider * 10;
+	END_FOR;
+	
+	IF #inDINT < 0 THEN
+	    #Minus := TRUE;
+	    #tDINT := #inDINT * -1;
+	ELSE
+	    #Minus := FALSE;
+	    #tDINT := #inDINT;
+	END_IF;
+	
+	#Str := DINT_TO_STRING(#tDINT / #Divider);
+	#Str := DELETE(IN := #Str, L := 1, P := 1); //usuniecie znaku
+	
+	//DINT -> String
+	IF #Minus THEN
+	    #Str := CONCAT(IN1 := '-', IN2 := #Str); //'-'
+	END_IF;
+	#Str := CONCAT(IN1 := #Str, IN2 := '.'); //'.'
+	
+	#Str2 := DINT_TO_STRING(#tDINT MOD #Divider);
+	#Str2 := DELETE(IN := #Str2, L := 1, P := 1); //usuniecie znaku
+	#Length := LEN(IN := #Str2);
+	
+	//dopełnienie 
+	FOR #i := #Length+1 TO #inAlignmentReminder DO
+	    #Str2 := CONCAT(IN1 := '0', IN2 := #Str2);
+	END_FOR;
+	
+	#ouString := CONCAT(IN1 := #Str, IN2 := #Str2);
+END_FUNCTION
+

@@ -1,0 +1,92 @@
+﻿FUNCTION_BLOCK "fbGetIDTester"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      ATIconnected : Bool;   // sygnał o podłączeniu ATI
+   END_VAR
+
+   VAR_OUTPUT 
+      errorID : Bool;   // Brak numeru ID testera
+   END_VAR
+
+   VAR_IN_OUT 
+      ATI : "typeTester";   // Tester ATI
+      ATIP2P : "typeATIP2P";   // Blok danych do obsługi połączenia z testerem
+   END_VAR
+
+   VAR 
+      ATIConnectionTRIG {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      staRecvNDR { S7_SetPoint := 'True'} : Bool;
+      statRecievedData : String;
+      statRecvLength : Int;
+      statSendData : String;
+   END_VAR
+
+   VAR_TEMP 
+      temp_cRL : Char;
+      temp_sRL : String;
+      tempStr : String;
+      tempPosition : Int;
+      tempLen : Int;
+      tempTime : Time;
+   END_VAR
+
+
+BEGIN
+	
+	IF NOT #ATIconnected OR #ATI.sts.deact THEN
+	    #errorID := true;
+	    #ATI.sts.IDExists := false;
+	    #ATI.sts.unitID := '?????';
+	END_IF;
+	
+	#ATIConnectionTRIG(CLK := #ATI.rq.readID);
+	
+	REGION Telegram  
+	    #temp_cRL := BYTE_TO_CHAR(16#D);
+	    #temp_sRL := CHAR_TO_STRING(IN := #temp_cRL);
+	    
+	    #statSendData := CONCAT(IN1 := 'GET SERIAL', IN2 := #temp_sRL);
+	
+	END_REGION
+	
+	REGION Nowy telegram do wysyłki
+	    
+	    IF #ATIConnectionTRIG.Q AND NOT #ATI.sts.IDExists AND NOT #ATIP2P.BufferFull THEN
+	        #ATIP2P.CounterMsg += 1;
+	        #ATIP2P.P2PSend[#ATIP2P.CounterMsg].buffer := #statSendData; //dane do wysyłki
+	        #ATIP2P.P2PSend[#ATIP2P.CounterMsg].ReqRcvMsg := TRUE;       //zadanie odpowiedzi
+	        
+	        //po wstawieniu nowego telegramu do wysyłki sprawdzenie zapełnienia bufora
+	        IF #ATIP2P.CounterMsg >= "ATI_MaxMsg" THEN
+	            #ATIP2P.BufferFull := TRUE;
+	        END_IF;
+	    END_IF;
+	    
+	    #staRecvNDR := #ATIP2P.P2PRecv.newMsg;
+	    #statRecievedData := #ATIP2P.P2PRecv.buffer;
+	    #statRecvLength := LEN(#statRecievedData);
+	    
+	END_REGION
+	
+	REGION Sprawdzenie pobranego telegramu
+	    IF #staRecvNDR THEN
+	        //sprawdzenie czy odpowiedz na 'SERIAL'
+	        #tempPosition := FIND(IN1 := #statRecievedData, IN2 := 'SERIAL=');
+	        IF #tempPosition <> 0 THEN
+	            
+	            //zapis Serial No. ATI
+	            #tempLen := #statRecvLength - 7 - 1; //dł. 'Serial=' + znak końca TG
+	            #ATI.sts.unitID := MID(IN := #statRecievedData, L := #tempLen, P := 8);
+	            
+	            #errorID := FALSE;
+	            #ATI.sts.IDExists := TRUE;
+	        END_IF;
+	    
+	    END_IF;
+	END_REGION
+	
+	    
+	    
+END_FUNCTION_BLOCK
+

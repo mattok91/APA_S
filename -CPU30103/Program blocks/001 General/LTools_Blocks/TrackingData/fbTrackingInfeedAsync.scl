@@ -1,0 +1,67 @@
+﻿FUNCTION_BLOCK "fbTrackingInfeedAsync"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inNewData : Bool;
+      inOffset : UInt;
+   END_VAR
+
+   VAR_OUTPUT 
+      ouActualIDEntry : UInt;
+      ouNewDataEntry : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      ioArray : Array[*] of "typeTrackingStep";
+      ioData : "typeTrackingData";
+   END_VAR
+
+   VAR 
+      TRIG {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+   END_VAR
+
+   VAR_TEMP 
+      tQuotient : UInt;
+      tReminder : UInt;
+      tArrayLength : DInt;
+      tFirstIndex : DInt;
+      tInc : Int;
+   END_VAR
+
+
+BEGIN
+	
+	#TRIG(CLK:=#inNewData);
+	// określenie górny/dolny zakres tablicy
+	#tArrayLength := UPPER_BOUND(ARR := #ioArray, DIM := 1);
+	#tFirstIndex := LOWER_BOUND(ARR := #ioArray, DIM := 1);
+	#ouNewDataEntry := FALSE;
+	
+	IF #TRIG.Q THEN
+	    
+	    #ioData.ActualID += 1;
+	    // Aby uniknąć ID = 0 !
+	    IF #ioData.ActualID = #ioData.MaxID THEN
+	        #ioData.ActualID += 1;
+	    END_IF;
+	    #ouActualIDEntry := #ioData.ActualID := #ioData.ActualID MOD #ioData.MaxID;
+	    #tQuotient := #inOffset / #ioData.WindowLength;
+	    #tReminder := #inOffset MOD #ioData.WindowLength;
+	    
+	    //Nowy element w data trackingu. Inicjalizacja ID + Offset na przesunieciu wzgledem inOffset
+	    IF #tQuotient >= #tFirstIndex AND #tQuotient <= #tArrayLength THEN
+	        #ioArray[#tQuotient].ID := #ioData.ActualID;
+	        #ioArray[#tQuotient].Window := #tReminder;
+	    END_IF;
+	    
+	    //inicjalizacja nowych danych
+	    #ioData.UserData[#ouActualIDEntry] := #ioData.UserData[0];
+	    
+	    //dopełnienie danych
+	    #ioData.UserData[#ouActualIDEntry].Status := 0;
+	    #ioData.UserData[#ouActualIDEntry].Length := #ioData.ObjectDefaultLength;
+	    
+	    #ouNewDataEntry := TRUE;
+	END_IF;
+END_FUNCTION_BLOCK
+

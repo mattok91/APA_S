@@ -1,0 +1,5028 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V16" />
+  <DocumentInfo>
+    <Created>2022-07-21T09:35:18.9169309Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V16 Update 2</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V16 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V16 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V16 Update 5</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V16</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V16 Update 4</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.FB ID="0">
+    <AttributeList>
+      <AutoNumber>true</AutoNumber>
+      <HeaderAuthor />
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v4">
+  <Section Name="Input">
+    <Member Name="hwAdr" Datatype="HW_IO" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Hardware ID modułu</MultiLanguageText></Comment></Member>
+    <Member Name="dataFromSafety" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="heaterOn" Datatype="Bool" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Załączenie grzałek (=1)</MultiLanguageText></Comment></Member>
+    <Member Name="motorsOn" Datatype="Bool" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Wszystkie silniki włącz (=1)</MultiLanguageText></Comment></Member>
+    <Member Name="pump1On" Datatype="Bool" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Udostępnienie silnika 1 ON (=1)</MultiLanguageText></Comment></Member>
+    <Member Name="pump2On" Datatype="Bool" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Udostępnienie silnika 2 ON (=1)</MultiLanguageText></Comment></Member>
+    <Member Name="standbyOn" Datatype="Bool" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Załącz czuwanie (=1)</MultiLanguageText></Comment></Member>
+    <Member Name="autoOn" Datatype="Bool" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Tryb automatyczny  (=1)</MultiLanguageText></Comment></Member>
+    <Member Name="maxRpm" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Maksymalna predkość pomp wg. nastaw Nordson</MultiLanguageText></Comment><StartValue>80</StartValue></Member>
+  </Section>
+  <Section Name="Output">
+    <Member Name="dataSendError" Datatype="Bool" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Bład podczas wysyłki TG</MultiLanguageText></Comment></Member>
+    <Member Name="dataReceiveError" Datatype="Bool" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Błąd podczas pobierania TG</MultiLanguageText></Comment></Member>
+    <Member Name="incorrectParam" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Niepoprawne parametry do Nordsona</MultiLanguageText></Comment></Member>
+    <Member Name="SpeedLine1Perc" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Predkość linii po konwersji prędkości pompy</MultiLanguageText></Comment></Member>
+    <Member Name="SpeedLine2Perc" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="pl-PL">Predkość linii po konwersji prędkości pompy</MultiLanguageText></Comment></Member>
+  </Section>
+  <Section Name="InOut">
+    <Member Name="monitoringError" Datatype="&quot;typeNordsonMonitoring&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="PTrigError" Datatype="Bool" />
+          <Member Name="CounterTG" Datatype="Int" />
+          <Member Name="IndexError" Datatype="Int" />
+          <Member Name="ChannelError" Datatype="Int" />
+          <Member Name="DataValError" Datatype="UInt" />
+        </Section>
+      </Sections>
+    </Member>
+    <Member Name="device" Datatype="&quot;typeNordson&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="sts" Datatype="&quot;typeNordsonSts&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="alm" Datatype="Word" />
+                <Member Name="intlk" Datatype="Word" />
+                <Member Name="rdy" Datatype="Bool" />
+                <Member Name="noAlm" Datatype="Bool" />
+                <Member Name="warning" Datatype="Bool" />
+                <Member Name="heatUp" Datatype="Bool" />
+                <Member Name="strtProt" Datatype="Bool" />
+                <Member Name="switchOff" Datatype="Bool" />
+                <Member Name="stndBy" Datatype="Bool" />
+                <Member Name="motRun1" Datatype="Bool" />
+                <Member Name="motRun2" Datatype="Bool" />
+                <Member Name="heatersOn" Datatype="Bool" />
+                <Member Name="tankFilling" Datatype="Bool" />
+                <Member Name="safe" Datatype="Bool" />
+                <Member Name="perm" Datatype="Bool" />
+                <Member Name="active" Datatype="Bool" />
+                <Member Name="maskAlm" Datatype="Word" />
+                <Member Name="motor1Deactivated" Datatype="Bool" />
+                <Member Name="motor2Deactivated" Datatype="Bool" />
+                <Member Name="heaterDeactivated" Datatype="Bool" />
+                <Member Name="AnalogSignals" Datatype="&quot;typeNordsonAnalogSignals&quot;">
+                  <Sections>
+                    <Section Name="None">
+                      <Member Name="ActualStatus" Datatype="Struct">
+                        <Member Name="Versa_Status" Datatype="Word" />
+                      </Member>
+                      <Member Name="ActualAlarms" Datatype="Struct">
+                        <Member Name="Versa_Alarms_Melter" Datatype="Word" />
+                        <Member Name="Versa_Alarms_Global" Datatype="Word" />
+                        <Member Name="Versa_Alarms_Motor1" Datatype="Word" />
+                        <Member Name="Versa_Alarms_Motor2" Datatype="Word" />
+                      </Member>
+                      <Member Name="Temperature" Datatype="Struct">
+                        <Member Name="Set" Datatype="Struct">
+                          <Member Name="Versa_SetTemp_Stemp" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_Pump" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_Hose_1" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_HoseDistrib_1" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_Hose_2" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_HoseDistrib_2" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_Zone7" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_Zone8" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_Zone9" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_Zone10" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_Zone11" Datatype="Word" />
+                          <Member Name="Versa_SetTemp_Zone12" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_Stemp" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_Pump" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_Hose_1" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_HoseDistrib_1" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_Hose_2" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_HoseDistrib_2" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_Zone7" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_Zone8" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_Zone9" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_Zone10" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_Zone11" Datatype="Word" />
+                          <Member Name="Versa_SbyTemp_Zone12" Datatype="Word" />
+                        </Member>
+                        <Member Name="Read" Datatype="Struct">
+                          <Member Name="Versa_ActTemp_Stemp" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_Pump" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_Hose_1" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_HoseDistrib_1" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_Hose_2" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_HoseDistrib_2" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_Zone7" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_Zone8" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_Zone9" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_Zone10" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_Zone11" Datatype="Word" />
+                          <Member Name="Versa_ActTemp_Zone12" Datatype="Word" />
+                        </Member>
+                      </Member>
+                      <Member Name="Speed" Datatype="Struct">
+                        <Member Name="Set" Datatype="Struct">
+                          <Member Name="Versa_Speed1" Datatype="Word" />
+                          <Member Name="Versa_Speed2" Datatype="Word" />
+                          <Member Name="Versa_Speed3" Datatype="Word" />
+                          <Member Name="Versa_Speed4" Datatype="Word" />
+                          <Member Name="Versa_Speed5" Datatype="Word" />
+                          <Member Name="Versa_Speed6" Datatype="Word" />
+                        </Member>
+                        <Member Name="Read" Datatype="Struct">
+                          <Member Name="Versa_Speed1" Datatype="Word" />
+                          <Member Name="Versa_Speed2" Datatype="Word" />
+                          <Member Name="Versa_Speed3" Datatype="Word" />
+                          <Member Name="Versa_Speed4" Datatype="Word" />
+                          <Member Name="Versa_Speed5" Datatype="Word" />
+                          <Member Name="Versa_Speed6" Datatype="Word" />
+                        </Member>
+                      </Member>
+                      <Member Name="Pressure" Datatype="Struct">
+                        <Member Name="Set" Datatype="Struct">
+                          <Member Name="Versa_LowPressWarning1" Datatype="Word" />
+                          <Member Name="Versa_HighPressWarning1" Datatype="Word" />
+                          <Member Name="Versa_HighPressFault1" Datatype="Word" />
+                          <Member Name="Versa_LowPressWarning2" Datatype="Word" />
+                          <Member Name="Versa_HighPressWarning2" Datatype="Word" />
+                          <Member Name="Versa_HighPressFault2" Datatype="Word" />
+                        </Member>
+                        <Member Name="Read" Datatype="Struct">
+                          <Member Name="Versa_Motor1" Datatype="Word" />
+                          <Member Name="Versa_Motor2" Datatype="Word" />
+                          <Member Name="lowPressWarning1" Datatype="Bool" />
+                          <Member Name="highPressWarning1" Datatype="Bool" />
+                          <Member Name="highPressFault1" Datatype="Bool" />
+                          <Member Name="lowPressWarning2" Datatype="Bool" />
+                          <Member Name="highPressWarning2" Datatype="Bool" />
+                          <Member Name="highPressFault2" Datatype="Bool" />
+                        </Member>
+                      </Member>
+                      <Member Name="Limits" Datatype="Struct">
+                        <Member Name="Versa1_OL_Temp_Stemp" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_Stemp" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_Pump" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_Pump" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_Hose_1" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_Hose_1" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_HoseDistrib_1" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_HoseDistrib_1" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_Hose_2" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_Hose_2" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_HoseDistrib_2" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_HoseDistrib_2" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_Zone7" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_Zone7" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_Zone8" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_Zone8" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_Zone9" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_Zone9" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_Zone10" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_Zone10" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_Zone11" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_Zone11" Datatype="Word" />
+                        <Member Name="Versa1_OL_Temp_Zone12" Datatype="Word" />
+                        <Member Name="Versa1_UL_Temp_Zone12" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_Stemp" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_Stemp" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_Pump" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_Pump" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_Hose_1" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_Hose_1" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_HoseDistrib_1" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_HoseDistrib_1" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_Hose_2" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_Hose_2" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_HoseDistrib_2" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_HoseDistrib_2" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_Zone7" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_Zone7" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_Zone8" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_Zone8" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_Zone9" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_Zone9" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_Zone10" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_Zone10" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_Zone11" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_Zone11" Datatype="Word" />
+                        <Member Name="Versa1_OL_SbyTemp_Zone12" Datatype="Word" />
+                        <Member Name="Versa1_UL_SbyTemp_Zone12" Datatype="Word" />
+                      </Member>
+                      <Member Name="Versa_EmptyDelayTime" Datatype="Word" />
+                    </Section>
+                  </Sections>
+                </Member>
+              </Section>
+            </Sections>
+          </Member>
+          <Member Name="rq" Datatype="&quot;typeNordsonRq&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="almAck" Datatype="Word" />
+                <Member Name="actGun1" Datatype="Bool" />
+                <Member Name="actGun2" Datatype="Bool" />
+                <Member Name="pressureControl" Datatype="Bool" />
+                <Member Name="standby" Datatype="Bool" />
+                <Member Name="deactMotor1" Datatype="Bool" />
+                <Member Name="deactMotor2" Datatype="Bool" />
+                <Member Name="deactHeater" Datatype="Bool" />
+              </Section>
+            </Sections>
+          </Member>
+          <Member Name="cmd" Datatype="&quot;typeNordsonCmd&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="standby" Datatype="Bool" />
+              </Section>
+            </Sections>
+          </Member>
+        </Section>
+      </Sections>
+    </Member>
+  </Section>
+  <Section Name="Static">
+    <Member Name="dataSend" Datatype="&quot;typeNordsonTGOut&quot;" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="melterControl" Datatype="Struct"><Member Name="heatersOn" Datatype="Bool" /><Member Name="allMotorsOn" Datatype="Bool" /><Member Name="motor1" Datatype="Bool" /><Member Name="motor2" Datatype="Bool" /><Member Name="motor3" Datatype="Bool" /><Member Name="motor4" Datatype="Bool" /><Member Name="standby" Datatype="Bool" /><Member Name="autoOn" Datatype="Bool" /><Member Name="command" Datatype="Byte" /></Member><Member Name="dataIndex" Datatype="Byte" /><Member Name="channelNr" Datatype="Byte" /><Member Name="writeDataVal" Datatype="Word" /><Member Name="lineSpdP1" Datatype="Word" /><Member Name="lineSpdP2" Datatype="Word" /><Member Name="lineSpdP3" Datatype="Word" /><Member Name="lineSpdP4" Datatype="Word" /><Member Name="reserve" Datatype="Word" /></Section></Sections></Member>
+    <Member Name="dataReceive" Datatype="&quot;typeNordsonTGIn&quot;" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="melterStatus" Datatype="Struct"><Member Name="systRdy" Datatype="Bool" /><Member Name="strtProt" Datatype="Bool" /><Member Name="warn" Datatype="Bool" /><Member Name="err" Datatype="Bool" /><Member Name="switchOff" Datatype="Bool" /><Member Name="heatUpPhase" Datatype="Bool" /><Member Name="stendBy" Datatype="Bool" /><Member Name="mtrRun1" Datatype="Bool" /><Member Name="mtrRun2" Datatype="Bool" /><Member Name="mtrRun3" Datatype="Bool" /><Member Name="mtrRun4" Datatype="Bool" /><Member Name="tankFilling" Datatype="Bool" /><Member Name="heatersOff" Datatype="Bool" /><Member Name="reserve" Datatype="Bool" /><Member Name="indexErr" Datatype="Bool" /><Member Name="comErr" Datatype="Bool" /></Member><Member Name="dataIndexConfirm" Datatype="Byte" /><Member Name="dataChannelConfirm" Datatype="Byte" /><Member Name="readDataVal1" Datatype="Word" /><Member Name="readDataVal2" Datatype="Word" /><Member Name="readDataVal3" Datatype="Word" /><Member Name="readDataVal4" Datatype="Word" /><Member Name="readDataVal5" Datatype="Word" /><Member Name="readDataVal6" Datatype="Word" /></Section></Sections></Member>
+    <Member Name="hwAddress" Datatype="HW_IO" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="retValRead" Datatype="Int" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="retValSend" Datatype="Int" Remanence="SetInIDB" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+  </Section>
+  <Section Name="Temp">
+    <Member Name="tpump1Speed" Datatype="Int">
+      <Comment>
+        <MultiLanguageText Lang="pl-PL">Prędkość pompy 1</MultiLanguageText>
+      </Comment>
+    </Member>
+    <Member Name="tpump2Speed" Datatype="Int">
+      <Comment>
+        <MultiLanguageText Lang="pl-PL">Prędkość pompy 2</MultiLanguageText>
+      </Comment>
+    </Member>
+    <Member Name="tFactor" Datatype="Real" />
+    <Member Name="tpump1SpeedPerc" Datatype="Int">
+      <Comment>
+        <MultiLanguageText Lang="pl-PL">Prędkość pompy 1</MultiLanguageText>
+      </Comment>
+    </Member>
+    <Member Name="tpump2SpeedPerc" Datatype="Int">
+      <Comment>
+        <MultiLanguageText Lang="pl-PL">Prędkość pompy 2</MultiLanguageText>
+      </Comment>
+    </Member>
+    <Member Name="tMaxRpm" Datatype="Real" />
+  </Section>
+  <Section Name="Constant" />
+</Sections></Interface>
+      <IsIECCheckEnabled>false</IsIECCheckEnabled>
+      <IsRetainMemResEnabled>false</IsRetainMemResEnabled>
+      <MemoryLayout>Optimized</MemoryLayout>
+      <MemoryReserve>100</MemoryReserve>
+      <Name>fbVersaStandardCom</Name>
+      <Number>22</Number>
+      <ProgrammingLanguage>LAD</ProgrammingLanguage>
+      <SetENOAutomatically>false</SetENOAutomatically>
+      <UDABlockProperties />
+      <UDAEnableTagReadback>false</UDAEnableTagReadback>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-US</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="3" CompositionName="Items">
+            <AttributeList>
+              <Culture>pl-PL</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <SW.Blocks.CompileUnit ID="4" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="hwAdr" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="hwAddress" />
+      </Symbol>
+    </Access>
+    <Part Name="Move" UId="23" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">1</TemplateValue>
+    </Part>
+  </Parts>
+  <Wires>
+    <Wire UId="24">
+      <Powerrail />
+      <NameCon UId="23" Name="en" />
+    </Wire>
+    <Wire UId="25">
+      <IdentCon UId="21" />
+      <NameCon UId="23" Name="in" />
+    </Wire>
+    <Wire UId="26">
+      <NameCon UId="23" Name="out1" />
+      <IdentCon UId="22" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="5" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="6" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="7" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="8" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="9" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="A" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Załaduj adres modułu</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="B" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="dataFromSafety" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="safe" />
+      </Symbol>
+    </Access>
+    <Part Name="Contact" UId="23" />
+    <Part Name="Coil" UId="24" />
+  </Parts>
+  <Wires>
+    <Wire UId="25">
+      <Powerrail />
+      <NameCon UId="23" Name="in" />
+    </Wire>
+    <Wire UId="26">
+      <IdentCon UId="21" />
+      <NameCon UId="23" Name="operand" />
+    </Wire>
+    <Wire UId="27">
+      <NameCon UId="23" Name="out" />
+      <NameCon UId="24" Name="in" />
+    </Wire>
+    <Wire UId="28">
+      <IdentCon UId="22" />
+      <NameCon UId="24" Name="operand" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="C" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="D" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="E" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="F" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="10" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="11" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Zezwolenie z obwodu bezpieczeństwa</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="12" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="safe" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="noAlm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="perm" />
+      </Symbol>
+    </Access>
+    <Part Name="Contact" UId="24" />
+    <Part Name="Contact" UId="25" />
+    <Part Name="Coil" UId="26" />
+  </Parts>
+  <Wires>
+    <Wire UId="27">
+      <Powerrail />
+      <NameCon UId="24" Name="in" />
+    </Wire>
+    <Wire UId="28">
+      <IdentCon UId="21" />
+      <NameCon UId="24" Name="operand" />
+    </Wire>
+    <Wire UId="29">
+      <NameCon UId="24" Name="out" />
+      <NameCon UId="25" Name="in" />
+    </Wire>
+    <Wire UId="30">
+      <IdentCon UId="22" />
+      <NameCon UId="25" Name="operand" />
+    </Wire>
+    <Wire UId="31">
+      <NameCon UId="25" Name="out" />
+      <NameCon UId="26" Name="in" />
+    </Wire>
+    <Wire UId="32">
+      <IdentCon UId="23" />
+      <NameCon UId="26" Name="operand" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="13" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="14" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="15" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Warunki konieczne: obwód bezpieczeństwa musi byś zresetowany i nie ma aktywnych alarmów</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="16" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="17" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="18" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Warunki konieczne spełnione</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="19" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="rq" />
+        <Component Name="deactHeater" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="heaterDeactivated" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="rq" />
+        <Component Name="deactMotor1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="motor1Deactivated" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="rq" />
+        <Component Name="deactMotor2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="26">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="motor2Deactivated" />
+      </Symbol>
+    </Access>
+    <Part Name="Contact" UId="27" />
+    <Part Name="Coil" UId="28" />
+    <Part Name="Contact" UId="29" />
+    <Part Name="Coil" UId="30" />
+    <Part Name="Contact" UId="31" />
+    <Part Name="Coil" UId="32" />
+  </Parts>
+  <Wires>
+    <Wire UId="33">
+      <Powerrail />
+      <NameCon UId="27" Name="in" />
+      <NameCon UId="29" Name="in" />
+      <NameCon UId="31" Name="in" />
+    </Wire>
+    <Wire UId="34">
+      <IdentCon UId="21" />
+      <NameCon UId="27" Name="operand" />
+    </Wire>
+    <Wire UId="35">
+      <NameCon UId="27" Name="out" />
+      <NameCon UId="28" Name="in" />
+    </Wire>
+    <Wire UId="36">
+      <IdentCon UId="22" />
+      <NameCon UId="28" Name="operand" />
+    </Wire>
+    <Wire UId="37">
+      <IdentCon UId="23" />
+      <NameCon UId="29" Name="operand" />
+    </Wire>
+    <Wire UId="38">
+      <NameCon UId="29" Name="out" />
+      <NameCon UId="30" Name="in" />
+    </Wire>
+    <Wire UId="39">
+      <IdentCon UId="24" />
+      <NameCon UId="30" Name="operand" />
+    </Wire>
+    <Wire UId="40">
+      <IdentCon UId="25" />
+      <NameCon UId="31" Name="operand" />
+    </Wire>
+    <Wire UId="41">
+      <NameCon UId="31" Name="out" />
+      <NameCon UId="32" Name="in" />
+    </Wire>
+    <Wire UId="42">
+      <IdentCon UId="26" />
+      <NameCon UId="32" Name="operand" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="1A" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="1B" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="1C" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="1D" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="1E" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="1F" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Sygnały sterujące z HMI</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="20" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="heaterOn" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="heaterDeactivated" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="melterControl" />
+        <Component Name="heatersOn" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="motorsOn" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="melterControl" />
+        <Component Name="allMotorsOn" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="26">
+      <Symbol>
+        <Component Name="pump1On" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="27">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="motor1Deactivated" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="28">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="melterControl" />
+        <Component Name="motor1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="29">
+      <Symbol>
+        <Component Name="pump2On" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="30">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="motor2Deactivated" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="31">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="melterControl" />
+        <Component Name="motor2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="32">
+      <Symbol>
+        <Component Name="standbyOn" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="33">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="rq" />
+        <Component Name="standby" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="34">
+      <Symbol>
+        <Component Name="heaterOn" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="35">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="melterControl" />
+        <Component Name="standby" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="36">
+      <Symbol>
+        <Component Name="autoOn" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="37">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="melterControl" />
+        <Component Name="autoOn" />
+      </Symbol>
+    </Access>
+    <Part Name="Contact" UId="38" />
+    <Part Name="Contact" UId="39" />
+    <Part Name="Coil" UId="40" />
+    <Part Name="Contact" UId="41" />
+    <Part Name="Coil" UId="42" />
+    <Part Name="Contact" UId="43" />
+    <Part Name="Contact" UId="44" />
+    <Part Name="Coil" UId="45" />
+    <Part Name="Contact" UId="46" />
+    <Part Name="Contact" UId="47" />
+    <Part Name="Coil" UId="48" />
+    <Part Name="Contact" UId="49" />
+    <Part Name="Contact" UId="50" />
+    <Part Name="O" UId="51">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Contact" UId="52" />
+    <Part Name="Coil" UId="53" />
+    <Part Name="Contact" UId="54" />
+    <Part Name="Coil" UId="55" />
+  </Parts>
+  <Wires>
+    <Wire UId="56">
+      <Powerrail />
+      <NameCon UId="38" Name="in" />
+      <NameCon UId="41" Name="in" />
+      <NameCon UId="43" Name="in" />
+      <NameCon UId="46" Name="in" />
+      <NameCon UId="49" Name="in" />
+      <NameCon UId="50" Name="in" />
+      <NameCon UId="54" Name="in" />
+    </Wire>
+    <Wire UId="57">
+      <IdentCon UId="21" />
+      <NameCon UId="38" Name="operand" />
+    </Wire>
+    <Wire UId="58">
+      <NameCon UId="38" Name="out" />
+      <NameCon UId="39" Name="in" />
+    </Wire>
+    <Wire UId="59">
+      <IdentCon UId="22" />
+      <NameCon UId="39" Name="operand" />
+    </Wire>
+    <Wire UId="60">
+      <NameCon UId="39" Name="out" />
+      <NameCon UId="40" Name="in" />
+    </Wire>
+    <Wire UId="61">
+      <IdentCon UId="23" />
+      <NameCon UId="40" Name="operand" />
+    </Wire>
+    <Wire UId="62">
+      <IdentCon UId="24" />
+      <NameCon UId="41" Name="operand" />
+    </Wire>
+    <Wire UId="63">
+      <NameCon UId="41" Name="out" />
+      <NameCon UId="42" Name="in" />
+    </Wire>
+    <Wire UId="64">
+      <IdentCon UId="25" />
+      <NameCon UId="42" Name="operand" />
+    </Wire>
+    <Wire UId="65">
+      <IdentCon UId="26" />
+      <NameCon UId="43" Name="operand" />
+    </Wire>
+    <Wire UId="66">
+      <NameCon UId="43" Name="out" />
+      <NameCon UId="44" Name="in" />
+    </Wire>
+    <Wire UId="67">
+      <IdentCon UId="27" />
+      <NameCon UId="44" Name="operand" />
+    </Wire>
+    <Wire UId="68">
+      <NameCon UId="44" Name="out" />
+      <NameCon UId="45" Name="in" />
+    </Wire>
+    <Wire UId="69">
+      <IdentCon UId="28" />
+      <NameCon UId="45" Name="operand" />
+    </Wire>
+    <Wire UId="70">
+      <IdentCon UId="29" />
+      <NameCon UId="46" Name="operand" />
+    </Wire>
+    <Wire UId="71">
+      <NameCon UId="46" Name="out" />
+      <NameCon UId="47" Name="in" />
+    </Wire>
+    <Wire UId="72">
+      <IdentCon UId="30" />
+      <NameCon UId="47" Name="operand" />
+    </Wire>
+    <Wire UId="73">
+      <NameCon UId="47" Name="out" />
+      <NameCon UId="48" Name="in" />
+    </Wire>
+    <Wire UId="74">
+      <IdentCon UId="31" />
+      <NameCon UId="48" Name="operand" />
+    </Wire>
+    <Wire UId="75">
+      <IdentCon UId="32" />
+      <NameCon UId="49" Name="operand" />
+    </Wire>
+    <Wire UId="76">
+      <NameCon UId="49" Name="out" />
+      <NameCon UId="51" Name="in1" />
+    </Wire>
+    <Wire UId="77">
+      <IdentCon UId="33" />
+      <NameCon UId="50" Name="operand" />
+    </Wire>
+    <Wire UId="78">
+      <NameCon UId="50" Name="out" />
+      <NameCon UId="51" Name="in2" />
+    </Wire>
+    <Wire UId="79">
+      <NameCon UId="51" Name="out" />
+      <NameCon UId="52" Name="in" />
+    </Wire>
+    <Wire UId="80">
+      <IdentCon UId="34" />
+      <NameCon UId="52" Name="operand" />
+    </Wire>
+    <Wire UId="81">
+      <NameCon UId="52" Name="out" />
+      <NameCon UId="53" Name="in" />
+    </Wire>
+    <Wire UId="82">
+      <IdentCon UId="35" />
+      <NameCon UId="53" Name="operand" />
+    </Wire>
+    <Wire UId="83">
+      <IdentCon UId="36" />
+      <NameCon UId="54" Name="operand" />
+    </Wire>
+    <Wire UId="84">
+      <NameCon UId="54" Name="out" />
+      <NameCon UId="55" Name="in" />
+    </Wire>
+    <Wire UId="85">
+      <IdentCon UId="37" />
+      <NameCon UId="55" Name="operand" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="21" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="22" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="23" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="24" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="25" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="26" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Prześlij sygnały sterujące</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="27" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="AnalogSignals" />
+        <Component Name="Speed" />
+        <Component Name="Set" />
+        <Component Name="Versa_Speed1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="maxRpm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="maxRpm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="tpump1Speed" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="AnalogSignals" />
+        <Component Name="Speed" />
+        <Component Name="Set" />
+        <Component Name="Versa_Speed1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="26">
+      <Symbol>
+        <Component Name="tpump1Speed" />
+      </Symbol>
+    </Access>
+    <Part Name="Gt" UId="27">
+      <TemplateValue Name="SrcType" Type="Type">Int</TemplateValue>
+    </Part>
+    <Part Name="Move" UId="28" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">1</TemplateValue>
+    </Part>
+    <Part Name="Not" UId="29" />
+    <Part Name="Move" UId="30" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">1</TemplateValue>
+    </Part>
+  </Parts>
+  <Wires>
+    <Wire UId="31">
+      <Powerrail />
+      <NameCon UId="27" Name="pre" />
+    </Wire>
+    <Wire UId="32">
+      <IdentCon UId="21" />
+      <NameCon UId="27" Name="in1" />
+    </Wire>
+    <Wire UId="33">
+      <IdentCon UId="22" />
+      <NameCon UId="27" Name="in2" />
+    </Wire>
+    <Wire UId="34">
+      <NameCon UId="27" Name="out" />
+      <NameCon UId="28" Name="en" />
+      <NameCon UId="29" Name="in" />
+    </Wire>
+    <Wire UId="35">
+      <IdentCon UId="23" />
+      <NameCon UId="28" Name="in" />
+    </Wire>
+    <Wire UId="36">
+      <NameCon UId="28" Name="out1" />
+      <IdentCon UId="24" />
+    </Wire>
+    <Wire UId="37">
+      <NameCon UId="29" Name="out" />
+      <NameCon UId="30" Name="en" />
+    </Wire>
+    <Wire UId="38">
+      <IdentCon UId="25" />
+      <NameCon UId="30" Name="in" />
+    </Wire>
+    <Wire UId="39">
+      <NameCon UId="30" Name="out1" />
+      <IdentCon UId="26" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="28" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="29" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="2A" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="2B" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="2C" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="2D" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Sprawdzanie maksymalnej prędkości 1</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="2E" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="AnalogSignals" />
+        <Component Name="Speed" />
+        <Component Name="Set" />
+        <Component Name="Versa_Speed2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="maxRpm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="maxRpm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="tpump2Speed" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="AnalogSignals" />
+        <Component Name="Speed" />
+        <Component Name="Set" />
+        <Component Name="Versa_Speed2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="26">
+      <Symbol>
+        <Component Name="tpump2Speed" />
+      </Symbol>
+    </Access>
+    <Part Name="Gt" UId="27">
+      <TemplateValue Name="SrcType" Type="Type">Int</TemplateValue>
+    </Part>
+    <Part Name="Move" UId="28" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">1</TemplateValue>
+    </Part>
+    <Part Name="Not" UId="29" />
+    <Part Name="Move" UId="30" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">1</TemplateValue>
+    </Part>
+  </Parts>
+  <Wires>
+    <Wire UId="31">
+      <Powerrail />
+      <NameCon UId="27" Name="pre" />
+    </Wire>
+    <Wire UId="32">
+      <IdentCon UId="21" />
+      <NameCon UId="27" Name="in1" />
+    </Wire>
+    <Wire UId="33">
+      <IdentCon UId="22" />
+      <NameCon UId="27" Name="in2" />
+    </Wire>
+    <Wire UId="34">
+      <NameCon UId="27" Name="out" />
+      <NameCon UId="28" Name="en" />
+      <NameCon UId="29" Name="in" />
+    </Wire>
+    <Wire UId="35">
+      <IdentCon UId="23" />
+      <NameCon UId="28" Name="in" />
+    </Wire>
+    <Wire UId="36">
+      <NameCon UId="28" Name="out1" />
+      <IdentCon UId="24" />
+    </Wire>
+    <Wire UId="37">
+      <NameCon UId="29" Name="out" />
+      <NameCon UId="30" Name="en" />
+    </Wire>
+    <Wire UId="38">
+      <IdentCon UId="25" />
+      <NameCon UId="30" Name="in" />
+    </Wire>
+    <Wire UId="39">
+      <NameCon UId="30" Name="out1" />
+      <IdentCon UId="26" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="2F" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="30" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="31" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="32" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="33" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="34" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Sprawdzanie maksymalnej prędkości 2</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="35" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="maxRpm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="tMaxRpm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LiteralConstant" UId="23">
+      <Constant>
+        <ConstantType>Real</ConstantType>
+        <ConstantValue>100.0</ConstantValue>
+      </Constant>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="tMaxRpm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="tFactor" />
+      </Symbol>
+    </Access>
+    <Part Name="Convert" UId="26" DisabledENO="true">
+      <TemplateValue Name="SrcType" Type="Type">Int</TemplateValue>
+      <TemplateValue Name="DestType" Type="Type">Real</TemplateValue>
+    </Part>
+    <Part Name="Div" UId="27" DisabledENO="true">
+      <AutomaticTyped Name="SrcType" />
+    </Part>
+  </Parts>
+  <Wires>
+    <Wire UId="28">
+      <Powerrail />
+      <NameCon UId="26" Name="en" />
+    </Wire>
+    <Wire UId="29">
+      <IdentCon UId="21" />
+      <NameCon UId="26" Name="in" />
+    </Wire>
+    <Wire UId="30">
+      <NameCon UId="26" Name="eno" />
+      <NameCon UId="27" Name="en" />
+    </Wire>
+    <Wire UId="31">
+      <NameCon UId="26" Name="out" />
+      <IdentCon UId="22" />
+    </Wire>
+    <Wire UId="32">
+      <IdentCon UId="23" />
+      <NameCon UId="27" Name="in1" />
+    </Wire>
+    <Wire UId="33">
+      <IdentCon UId="24" />
+      <NameCon UId="27" Name="in2" />
+    </Wire>
+    <Wire UId="34">
+      <NameCon UId="27" Name="out" />
+      <IdentCon UId="25" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="36" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="37" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="38" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="39" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="3A" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="3B" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Faktor prędkości</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="3C" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="tFactor" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="tpump1Speed" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="tpump1SpeedPerc" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="tpump1SpeedPerc" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="SpeedLine1Perc" />
+      </Symbol>
+    </Access>
+    <Part Name="Mul" UId="26" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+      <AutomaticTyped Name="SrcType" />
+    </Part>
+    <Part Name="Move" UId="27" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">1</TemplateValue>
+    </Part>
+  </Parts>
+  <Wires>
+    <Wire UId="28">
+      <Powerrail />
+      <NameCon UId="26" Name="en" />
+    </Wire>
+    <Wire UId="29">
+      <IdentCon UId="21" />
+      <NameCon UId="26" Name="in1" />
+    </Wire>
+    <Wire UId="30">
+      <IdentCon UId="22" />
+      <NameCon UId="26" Name="in2" />
+    </Wire>
+    <Wire UId="31">
+      <NameCon UId="26" Name="eno" />
+      <NameCon UId="27" Name="en" />
+    </Wire>
+    <Wire UId="32">
+      <NameCon UId="26" Name="out" />
+      <IdentCon UId="23" />
+    </Wire>
+    <Wire UId="33">
+      <IdentCon UId="24" />
+      <NameCon UId="27" Name="in" />
+    </Wire>
+    <Wire UId="34">
+      <NameCon UId="27" Name="out1" />
+      <IdentCon UId="25" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="3D" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="3E" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="3F" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="40" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="41" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="42" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Konwersja prędkości na prędkość linii 1</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="43" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="tFactor" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="tpump2Speed" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="tpump2SpeedPerc" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="tpump2SpeedPerc" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="SpeedLine2Perc" />
+      </Symbol>
+    </Access>
+    <Part Name="Mul" UId="26" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+      <AutomaticTyped Name="SrcType" />
+    </Part>
+    <Part Name="Move" UId="27" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">1</TemplateValue>
+    </Part>
+  </Parts>
+  <Wires>
+    <Wire UId="28">
+      <Powerrail />
+      <NameCon UId="26" Name="en" />
+    </Wire>
+    <Wire UId="29">
+      <IdentCon UId="21" />
+      <NameCon UId="26" Name="in1" />
+    </Wire>
+    <Wire UId="30">
+      <IdentCon UId="22" />
+      <NameCon UId="26" Name="in2" />
+    </Wire>
+    <Wire UId="31">
+      <NameCon UId="26" Name="eno" />
+      <NameCon UId="27" Name="en" />
+    </Wire>
+    <Wire UId="32">
+      <NameCon UId="26" Name="out" />
+      <IdentCon UId="23" />
+    </Wire>
+    <Wire UId="33">
+      <IdentCon UId="24" />
+      <NameCon UId="27" Name="in" />
+    </Wire>
+    <Wire UId="34">
+      <NameCon UId="27" Name="out1" />
+      <IdentCon UId="25" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="44" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="45" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="46" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="47" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="48" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="49" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Konwersja prędkości na prędkość linii 2</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="4A" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="tpump1SpeedPerc" />
+      </Symbol>
+    </Access>
+    <Access Scope="LiteralConstant" UId="22">
+      <Constant>
+        <ConstantType>Int</ConstantType>
+        <ConstantValue>10</ConstantValue>
+      </Constant>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="lineSpdP1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="lineSpdP1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LiteralConstant" UId="25">
+      <Constant>
+        <ConstantType>UInt</ConstantType>
+        <ConstantValue>8</ConstantValue>
+      </Constant>
+    </Access>
+    <Access Scope="LocalVariable" UId="26">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="lineSpdP1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="27">
+      <Symbol>
+        <Component Name="tpump2SpeedPerc" />
+      </Symbol>
+    </Access>
+    <Access Scope="LiteralConstant" UId="28">
+      <Constant>
+        <ConstantType>Int</ConstantType>
+        <ConstantValue>10</ConstantValue>
+      </Constant>
+    </Access>
+    <Access Scope="LocalVariable" UId="29">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="lineSpdP2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="30">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="lineSpdP2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LiteralConstant" UId="31">
+      <Constant>
+        <ConstantType>UInt</ConstantType>
+        <ConstantValue>8</ConstantValue>
+      </Constant>
+    </Access>
+    <Access Scope="LocalVariable" UId="32">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="lineSpdP2" />
+      </Symbol>
+    </Access>
+    <Part Name="Mul" UId="33" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+      <AutomaticTyped Name="SrcType" />
+    </Part>
+    <Part Name="Rl" UId="34" DisabledENO="true">
+      <TemplateValue Name="SrcType" Type="Type">Word</TemplateValue>
+    </Part>
+    <Part Name="Mul" UId="35" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+      <AutomaticTyped Name="SrcType" />
+    </Part>
+    <Part Name="Rl" UId="36" DisabledENO="true">
+      <TemplateValue Name="SrcType" Type="Type">Word</TemplateValue>
+    </Part>
+  </Parts>
+  <Wires>
+    <Wire UId="37">
+      <Powerrail />
+      <NameCon UId="33" Name="en" />
+      <NameCon UId="35" Name="en" />
+    </Wire>
+    <Wire UId="38">
+      <IdentCon UId="21" />
+      <NameCon UId="33" Name="in1" />
+    </Wire>
+    <Wire UId="39">
+      <IdentCon UId="22" />
+      <NameCon UId="33" Name="in2" />
+    </Wire>
+    <Wire UId="40">
+      <NameCon UId="33" Name="eno" />
+      <NameCon UId="34" Name="en" />
+    </Wire>
+    <Wire UId="41">
+      <NameCon UId="33" Name="out" />
+      <IdentCon UId="23" />
+    </Wire>
+    <Wire UId="42">
+      <IdentCon UId="24" />
+      <NameCon UId="34" Name="in" />
+    </Wire>
+    <Wire UId="43">
+      <IdentCon UId="25" />
+      <NameCon UId="34" Name="n" />
+    </Wire>
+    <Wire UId="44">
+      <NameCon UId="34" Name="out" />
+      <IdentCon UId="26" />
+    </Wire>
+    <Wire UId="45">
+      <IdentCon UId="27" />
+      <NameCon UId="35" Name="in1" />
+    </Wire>
+    <Wire UId="46">
+      <IdentCon UId="28" />
+      <NameCon UId="35" Name="in2" />
+    </Wire>
+    <Wire UId="47">
+      <NameCon UId="35" Name="eno" />
+      <NameCon UId="36" Name="en" />
+    </Wire>
+    <Wire UId="48">
+      <NameCon UId="35" Name="out" />
+      <IdentCon UId="29" />
+    </Wire>
+    <Wire UId="49">
+      <IdentCon UId="30" />
+      <NameCon UId="36" Name="in" />
+    </Wire>
+    <Wire UId="50">
+      <IdentCon UId="31" />
+      <NameCon UId="36" Name="n" />
+    </Wire>
+    <Wire UId="51">
+      <NameCon UId="36" Name="out" />
+      <IdentCon UId="32" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="4B" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="4C" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="4D" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="4E" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="4F" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="50" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Skalowanie prędkości linii</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="51" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="hwAddress" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="dataSend" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="retValSend" />
+      </Symbol>
+    </Access>
+    <Part Name="DPWR_DAT" Version="1.0" UId="24">
+      <TemplateValue Name="ptr_type" Type="Type">Variant</TemplateValue>
+      <TemplateValue Name="laddr_type" Type="Type">HW_IO</TemplateValue>
+    </Part>
+  </Parts>
+  <Wires>
+    <Wire UId="25">
+      <Powerrail />
+      <NameCon UId="24" Name="en" />
+    </Wire>
+    <Wire UId="26">
+      <IdentCon UId="21" />
+      <NameCon UId="24" Name="LADDR" />
+    </Wire>
+    <Wire UId="27">
+      <IdentCon UId="22" />
+      <NameCon UId="24" Name="RECORD" />
+    </Wire>
+    <Wire UId="28">
+      <NameCon UId="24" Name="RET_VAL" />
+      <IdentCon UId="23" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="52" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="53" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="54" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="55" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="56" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="57" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Wyślij dane</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="58" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="retValSend" />
+      </Symbol>
+    </Access>
+    <Access Scope="LiteralConstant" UId="22">
+      <Constant>
+        <ConstantType>Int</ConstantType>
+        <ConstantValue>0</ConstantValue>
+      </Constant>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="dataSendError" />
+      </Symbol>
+    </Access>
+    <Part Name="Ne" UId="24">
+      <TemplateValue Name="SrcType" Type="Type">Int</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="25" />
+  </Parts>
+  <Wires>
+    <Wire UId="26">
+      <Powerrail />
+      <NameCon UId="24" Name="pre" />
+    </Wire>
+    <Wire UId="27">
+      <IdentCon UId="21" />
+      <NameCon UId="24" Name="in1" />
+    </Wire>
+    <Wire UId="28">
+      <IdentCon UId="22" />
+      <NameCon UId="24" Name="in2" />
+    </Wire>
+    <Wire UId="29">
+      <NameCon UId="24" Name="out" />
+      <NameCon UId="25" Name="in" />
+    </Wire>
+    <Wire UId="30">
+      <IdentCon UId="23" />
+      <NameCon UId="25" Name="operand" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="59" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="5A" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="5B" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="5C" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="5D" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="5E" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Sprawdzenie błędu przy wysyłaniu danych</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="5F" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="hwAddress" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="retValRead" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="dataReceive" />
+      </Symbol>
+    </Access>
+    <Part Name="DPRD_DAT" Version="1.0" UId="24">
+      <TemplateValue Name="ptr_type" Type="Type">Variant</TemplateValue>
+      <TemplateValue Name="laddr_type" Type="Type">HW_IO</TemplateValue>
+    </Part>
+  </Parts>
+  <Wires>
+    <Wire UId="25">
+      <Powerrail />
+      <NameCon UId="24" Name="en" />
+    </Wire>
+    <Wire UId="26">
+      <IdentCon UId="21" />
+      <NameCon UId="24" Name="LADDR" />
+    </Wire>
+    <Wire UId="27">
+      <NameCon UId="24" Name="RET_VAL" />
+      <IdentCon UId="22" />
+    </Wire>
+    <Wire UId="28">
+      <NameCon UId="24" Name="RECORD" />
+      <IdentCon UId="23" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="60" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="61" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="62" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="63" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="64" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="65" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Odebranie danych</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="66" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="retValRead" />
+      </Symbol>
+    </Access>
+    <Access Scope="LiteralConstant" UId="22">
+      <Constant>
+        <ConstantType>Int</ConstantType>
+        <ConstantValue>0</ConstantValue>
+      </Constant>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Part Name="Ne" UId="24">
+      <TemplateValue Name="SrcType" Type="Type">Int</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="25" />
+  </Parts>
+  <Wires>
+    <Wire UId="26">
+      <Powerrail />
+      <NameCon UId="24" Name="pre" />
+    </Wire>
+    <Wire UId="27">
+      <IdentCon UId="21" />
+      <NameCon UId="24" Name="in1" />
+    </Wire>
+    <Wire UId="28">
+      <IdentCon UId="22" />
+      <NameCon UId="24" Name="in2" />
+    </Wire>
+    <Wire UId="29">
+      <NameCon UId="24" Name="out" />
+      <NameCon UId="25" Name="in" />
+    </Wire>
+    <Wire UId="30">
+      <IdentCon UId="23" />
+      <NameCon UId="25" Name="operand" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="67" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="68" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="69" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="6A" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="6B" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="6C" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Sprawdzenie błędu przy odebraniu danych</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="6D" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="indexErr" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="comErr" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="monitoringError" />
+        <Component Name="PTrigError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="incorrectParam" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="26">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="dataIndexConfirm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="27">
+      <Symbol>
+        <Component Name="monitoringError" />
+        <Component Name="IndexError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="28">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="dataChannelConfirm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="29">
+      <Symbol>
+        <Component Name="monitoringError" />
+        <Component Name="ChannelError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="30">
+      <Symbol>
+        <Component Name="dataSend" />
+        <Component Name="writeDataVal" />
+      </Symbol>
+    </Access>
+    <Access Scope="LiteralConstant" UId="31">
+      <Constant>
+        <ConstantType>UInt</ConstantType>
+        <ConstantValue>8</ConstantValue>
+      </Constant>
+    </Access>
+    <Access Scope="LocalVariable" UId="32">
+      <Symbol>
+        <Component Name="monitoringError" />
+        <Component Name="DataValError" />
+      </Symbol>
+    </Access>
+    <Part Name="Contact" UId="33" />
+    <Part Name="Contact" UId="34">
+      <Negated Name="operand" />
+    </Part>
+    <Part Name="Contact" UId="35" />
+    <Part Name="O" UId="36">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="PBox" UId="37" />
+    <Part Name="Coil" UId="38" />
+    <Part Name="Move" UId="39" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">1</TemplateValue>
+    </Part>
+    <Part Name="Move" UId="40" DisabledENO="true">
+      <TemplateValue Name="Card" Type="Cardinality">1</TemplateValue>
+    </Part>
+    <Part Name="Rr" UId="41" DisabledENO="true">
+      <TemplateValue Name="SrcType" Type="Type">Word</TemplateValue>
+    </Part>
+  </Parts>
+  <Wires>
+    <Wire UId="42">
+      <Powerrail />
+      <NameCon UId="33" Name="in" />
+      <NameCon UId="35" Name="in" />
+    </Wire>
+    <Wire UId="43">
+      <IdentCon UId="21" />
+      <NameCon UId="33" Name="operand" />
+    </Wire>
+    <Wire UId="44">
+      <NameCon UId="33" Name="out" />
+      <NameCon UId="34" Name="in" />
+    </Wire>
+    <Wire UId="45">
+      <IdentCon UId="22" />
+      <NameCon UId="34" Name="operand" />
+    </Wire>
+    <Wire UId="46">
+      <NameCon UId="34" Name="out" />
+      <NameCon UId="36" Name="in1" />
+    </Wire>
+    <Wire UId="47">
+      <IdentCon UId="23" />
+      <NameCon UId="35" Name="operand" />
+    </Wire>
+    <Wire UId="48">
+      <NameCon UId="35" Name="out" />
+      <NameCon UId="36" Name="in2" />
+    </Wire>
+    <Wire UId="49">
+      <NameCon UId="36" Name="out" />
+      <NameCon UId="37" Name="in" />
+    </Wire>
+    <Wire UId="50">
+      <IdentCon UId="24" />
+      <NameCon UId="37" Name="bit" />
+    </Wire>
+    <Wire UId="51">
+      <NameCon UId="37" Name="out" />
+      <NameCon UId="38" Name="in" />
+      <NameCon UId="40" Name="en" />
+      <NameCon UId="41" Name="en" />
+    </Wire>
+    <Wire UId="52">
+      <IdentCon UId="25" />
+      <NameCon UId="38" Name="operand" />
+    </Wire>
+    <Wire UId="53">
+      <NameCon UId="38" Name="out" />
+      <NameCon UId="39" Name="en" />
+    </Wire>
+    <Wire UId="54">
+      <IdentCon UId="26" />
+      <NameCon UId="39" Name="in" />
+    </Wire>
+    <Wire UId="55">
+      <NameCon UId="39" Name="out1" />
+      <IdentCon UId="27" />
+    </Wire>
+    <Wire UId="56">
+      <IdentCon UId="28" />
+      <NameCon UId="40" Name="in" />
+    </Wire>
+    <Wire UId="57">
+      <NameCon UId="40" Name="out1" />
+      <IdentCon UId="29" />
+    </Wire>
+    <Wire UId="58">
+      <IdentCon UId="30" />
+      <NameCon UId="41" Name="in" />
+    </Wire>
+    <Wire UId="59">
+      <IdentCon UId="31" />
+      <NameCon UId="41" Name="n" />
+    </Wire>
+    <Wire UId="60">
+      <NameCon UId="41" Name="out" />
+      <IdentCon UId="32" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="6E" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="6F" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="70" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="71" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="72" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="73" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Monitoring</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="74" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="systRdy" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="rdy" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="rdy" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="strtProt" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="26">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="strtProt" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="27">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="28">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="strtProt" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="29">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="warn" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="30">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="warning" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="31">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="32">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="warning" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="33">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="switchOff" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="34">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="switchOff" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="35">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="36">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="switchOff" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="37">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="heatUpPhase" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="38">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="heatUp" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="39">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="40">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="heatUp" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="41">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="stendBy" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="42">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="stndBy" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="43">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="44">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="stndBy" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="45">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="mtrRun1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="46">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="motRun1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="47">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="48">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="motRun1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="49">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="mtrRun2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="50">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="motRun2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="51">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="52">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="motRun2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="53">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="tankFilling" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="54">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="tankFilling" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="55">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="56">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="tankFilling" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="57">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="heatersOff" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="58">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="59">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="heatersOn" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="60">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="61">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="heatersOn" />
+      </Symbol>
+    </Access>
+    <Part Name="Contact" UId="62" />
+    <Part Name="Contact" UId="63" />
+    <Part Name="Contact" UId="64" />
+    <Part Name="O" UId="65">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="66" />
+    <Part Name="Contact" UId="67" />
+    <Part Name="Contact" UId="68" />
+    <Part Name="Contact" UId="69" />
+    <Part Name="O" UId="70">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="71" />
+    <Part Name="Contact" UId="72" />
+    <Part Name="Contact" UId="73" />
+    <Part Name="Contact" UId="74" />
+    <Part Name="O" UId="75">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="76" />
+    <Part Name="Contact" UId="77" />
+    <Part Name="Contact" UId="78" />
+    <Part Name="Contact" UId="79" />
+    <Part Name="O" UId="80">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="81" />
+    <Part Name="Contact" UId="82" />
+    <Part Name="Contact" UId="83" />
+    <Part Name="Contact" UId="84" />
+    <Part Name="O" UId="85">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="86" />
+    <Part Name="Contact" UId="87" />
+    <Part Name="Contact" UId="88" />
+    <Part Name="Contact" UId="89" />
+    <Part Name="O" UId="90">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="91" />
+    <Part Name="Contact" UId="92" />
+    <Part Name="Contact" UId="93" />
+    <Part Name="Contact" UId="94" />
+    <Part Name="O" UId="95">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="96" />
+    <Part Name="Contact" UId="97" />
+    <Part Name="Contact" UId="98" />
+    <Part Name="Contact" UId="99" />
+    <Part Name="O" UId="100">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="101" />
+    <Part Name="Contact" UId="102" />
+    <Part Name="Contact" UId="103" />
+    <Part Name="Contact" UId="104" />
+    <Part Name="O" UId="105">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="106" />
+    <Part Name="Contact" UId="107">
+      <Negated Name="operand" />
+    </Part>
+    <Part Name="Contact" UId="108">
+      <Negated Name="operand" />
+    </Part>
+    <Part Name="Contact" UId="109" />
+    <Part Name="Contact" UId="110" />
+    <Part Name="O" UId="111">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="112" />
+  </Parts>
+  <Wires>
+    <Wire UId="113">
+      <Powerrail />
+      <NameCon UId="62" Name="in" />
+      <NameCon UId="63" Name="in" />
+      <NameCon UId="67" Name="in" />
+      <NameCon UId="68" Name="in" />
+      <NameCon UId="72" Name="in" />
+      <NameCon UId="73" Name="in" />
+      <NameCon UId="77" Name="in" />
+      <NameCon UId="78" Name="in" />
+      <NameCon UId="82" Name="in" />
+      <NameCon UId="83" Name="in" />
+      <NameCon UId="87" Name="in" />
+      <NameCon UId="88" Name="in" />
+      <NameCon UId="92" Name="in" />
+      <NameCon UId="93" Name="in" />
+      <NameCon UId="97" Name="in" />
+      <NameCon UId="98" Name="in" />
+      <NameCon UId="102" Name="in" />
+      <NameCon UId="103" Name="in" />
+      <NameCon UId="107" Name="in" />
+      <NameCon UId="109" Name="in" />
+    </Wire>
+    <Wire UId="114">
+      <IdentCon UId="21" />
+      <NameCon UId="62" Name="operand" />
+    </Wire>
+    <Wire UId="115">
+      <NameCon UId="62" Name="out" />
+      <NameCon UId="65" Name="in1" />
+    </Wire>
+    <Wire UId="116">
+      <IdentCon UId="22" />
+      <NameCon UId="63" Name="operand" />
+    </Wire>
+    <Wire UId="117">
+      <NameCon UId="63" Name="out" />
+      <NameCon UId="64" Name="in" />
+    </Wire>
+    <Wire UId="118">
+      <IdentCon UId="23" />
+      <NameCon UId="64" Name="operand" />
+    </Wire>
+    <Wire UId="119">
+      <NameCon UId="64" Name="out" />
+      <NameCon UId="65" Name="in2" />
+    </Wire>
+    <Wire UId="120">
+      <NameCon UId="65" Name="out" />
+      <NameCon UId="66" Name="in" />
+    </Wire>
+    <Wire UId="121">
+      <IdentCon UId="24" />
+      <NameCon UId="66" Name="operand" />
+    </Wire>
+    <Wire UId="122">
+      <IdentCon UId="25" />
+      <NameCon UId="67" Name="operand" />
+    </Wire>
+    <Wire UId="123">
+      <NameCon UId="67" Name="out" />
+      <NameCon UId="70" Name="in1" />
+    </Wire>
+    <Wire UId="124">
+      <IdentCon UId="26" />
+      <NameCon UId="68" Name="operand" />
+    </Wire>
+    <Wire UId="125">
+      <NameCon UId="68" Name="out" />
+      <NameCon UId="69" Name="in" />
+    </Wire>
+    <Wire UId="126">
+      <IdentCon UId="27" />
+      <NameCon UId="69" Name="operand" />
+    </Wire>
+    <Wire UId="127">
+      <NameCon UId="69" Name="out" />
+      <NameCon UId="70" Name="in2" />
+    </Wire>
+    <Wire UId="128">
+      <NameCon UId="70" Name="out" />
+      <NameCon UId="71" Name="in" />
+    </Wire>
+    <Wire UId="129">
+      <IdentCon UId="28" />
+      <NameCon UId="71" Name="operand" />
+    </Wire>
+    <Wire UId="130">
+      <IdentCon UId="29" />
+      <NameCon UId="72" Name="operand" />
+    </Wire>
+    <Wire UId="131">
+      <NameCon UId="72" Name="out" />
+      <NameCon UId="75" Name="in1" />
+    </Wire>
+    <Wire UId="132">
+      <IdentCon UId="30" />
+      <NameCon UId="73" Name="operand" />
+    </Wire>
+    <Wire UId="133">
+      <NameCon UId="73" Name="out" />
+      <NameCon UId="74" Name="in" />
+    </Wire>
+    <Wire UId="134">
+      <IdentCon UId="31" />
+      <NameCon UId="74" Name="operand" />
+    </Wire>
+    <Wire UId="135">
+      <NameCon UId="74" Name="out" />
+      <NameCon UId="75" Name="in2" />
+    </Wire>
+    <Wire UId="136">
+      <NameCon UId="75" Name="out" />
+      <NameCon UId="76" Name="in" />
+    </Wire>
+    <Wire UId="137">
+      <IdentCon UId="32" />
+      <NameCon UId="76" Name="operand" />
+    </Wire>
+    <Wire UId="138">
+      <IdentCon UId="33" />
+      <NameCon UId="77" Name="operand" />
+    </Wire>
+    <Wire UId="139">
+      <NameCon UId="77" Name="out" />
+      <NameCon UId="80" Name="in1" />
+    </Wire>
+    <Wire UId="140">
+      <IdentCon UId="34" />
+      <NameCon UId="78" Name="operand" />
+    </Wire>
+    <Wire UId="141">
+      <NameCon UId="78" Name="out" />
+      <NameCon UId="79" Name="in" />
+    </Wire>
+    <Wire UId="142">
+      <IdentCon UId="35" />
+      <NameCon UId="79" Name="operand" />
+    </Wire>
+    <Wire UId="143">
+      <NameCon UId="79" Name="out" />
+      <NameCon UId="80" Name="in2" />
+    </Wire>
+    <Wire UId="144">
+      <NameCon UId="80" Name="out" />
+      <NameCon UId="81" Name="in" />
+    </Wire>
+    <Wire UId="145">
+      <IdentCon UId="36" />
+      <NameCon UId="81" Name="operand" />
+    </Wire>
+    <Wire UId="146">
+      <IdentCon UId="37" />
+      <NameCon UId="82" Name="operand" />
+    </Wire>
+    <Wire UId="147">
+      <NameCon UId="82" Name="out" />
+      <NameCon UId="85" Name="in1" />
+    </Wire>
+    <Wire UId="148">
+      <IdentCon UId="38" />
+      <NameCon UId="83" Name="operand" />
+    </Wire>
+    <Wire UId="149">
+      <NameCon UId="83" Name="out" />
+      <NameCon UId="84" Name="in" />
+    </Wire>
+    <Wire UId="150">
+      <IdentCon UId="39" />
+      <NameCon UId="84" Name="operand" />
+    </Wire>
+    <Wire UId="151">
+      <NameCon UId="84" Name="out" />
+      <NameCon UId="85" Name="in2" />
+    </Wire>
+    <Wire UId="152">
+      <NameCon UId="85" Name="out" />
+      <NameCon UId="86" Name="in" />
+    </Wire>
+    <Wire UId="153">
+      <IdentCon UId="40" />
+      <NameCon UId="86" Name="operand" />
+    </Wire>
+    <Wire UId="154">
+      <IdentCon UId="41" />
+      <NameCon UId="87" Name="operand" />
+    </Wire>
+    <Wire UId="155">
+      <NameCon UId="87" Name="out" />
+      <NameCon UId="90" Name="in1" />
+    </Wire>
+    <Wire UId="156">
+      <IdentCon UId="42" />
+      <NameCon UId="88" Name="operand" />
+    </Wire>
+    <Wire UId="157">
+      <NameCon UId="88" Name="out" />
+      <NameCon UId="89" Name="in" />
+    </Wire>
+    <Wire UId="158">
+      <IdentCon UId="43" />
+      <NameCon UId="89" Name="operand" />
+    </Wire>
+    <Wire UId="159">
+      <NameCon UId="89" Name="out" />
+      <NameCon UId="90" Name="in2" />
+    </Wire>
+    <Wire UId="160">
+      <NameCon UId="90" Name="out" />
+      <NameCon UId="91" Name="in" />
+    </Wire>
+    <Wire UId="161">
+      <IdentCon UId="44" />
+      <NameCon UId="91" Name="operand" />
+    </Wire>
+    <Wire UId="162">
+      <IdentCon UId="45" />
+      <NameCon UId="92" Name="operand" />
+    </Wire>
+    <Wire UId="163">
+      <NameCon UId="92" Name="out" />
+      <NameCon UId="95" Name="in1" />
+    </Wire>
+    <Wire UId="164">
+      <IdentCon UId="46" />
+      <NameCon UId="93" Name="operand" />
+    </Wire>
+    <Wire UId="165">
+      <NameCon UId="93" Name="out" />
+      <NameCon UId="94" Name="in" />
+    </Wire>
+    <Wire UId="166">
+      <IdentCon UId="47" />
+      <NameCon UId="94" Name="operand" />
+    </Wire>
+    <Wire UId="167">
+      <NameCon UId="94" Name="out" />
+      <NameCon UId="95" Name="in2" />
+    </Wire>
+    <Wire UId="168">
+      <NameCon UId="95" Name="out" />
+      <NameCon UId="96" Name="in" />
+    </Wire>
+    <Wire UId="169">
+      <IdentCon UId="48" />
+      <NameCon UId="96" Name="operand" />
+    </Wire>
+    <Wire UId="170">
+      <IdentCon UId="49" />
+      <NameCon UId="97" Name="operand" />
+    </Wire>
+    <Wire UId="171">
+      <NameCon UId="97" Name="out" />
+      <NameCon UId="100" Name="in1" />
+    </Wire>
+    <Wire UId="172">
+      <IdentCon UId="50" />
+      <NameCon UId="98" Name="operand" />
+    </Wire>
+    <Wire UId="173">
+      <NameCon UId="98" Name="out" />
+      <NameCon UId="99" Name="in" />
+    </Wire>
+    <Wire UId="174">
+      <IdentCon UId="51" />
+      <NameCon UId="99" Name="operand" />
+    </Wire>
+    <Wire UId="175">
+      <NameCon UId="99" Name="out" />
+      <NameCon UId="100" Name="in2" />
+    </Wire>
+    <Wire UId="176">
+      <NameCon UId="100" Name="out" />
+      <NameCon UId="101" Name="in" />
+    </Wire>
+    <Wire UId="177">
+      <IdentCon UId="52" />
+      <NameCon UId="101" Name="operand" />
+    </Wire>
+    <Wire UId="178">
+      <IdentCon UId="53" />
+      <NameCon UId="102" Name="operand" />
+    </Wire>
+    <Wire UId="179">
+      <NameCon UId="102" Name="out" />
+      <NameCon UId="105" Name="in1" />
+    </Wire>
+    <Wire UId="180">
+      <IdentCon UId="54" />
+      <NameCon UId="103" Name="operand" />
+    </Wire>
+    <Wire UId="181">
+      <NameCon UId="103" Name="out" />
+      <NameCon UId="104" Name="in" />
+    </Wire>
+    <Wire UId="182">
+      <IdentCon UId="55" />
+      <NameCon UId="104" Name="operand" />
+    </Wire>
+    <Wire UId="183">
+      <NameCon UId="104" Name="out" />
+      <NameCon UId="105" Name="in2" />
+    </Wire>
+    <Wire UId="184">
+      <NameCon UId="105" Name="out" />
+      <NameCon UId="106" Name="in" />
+    </Wire>
+    <Wire UId="185">
+      <IdentCon UId="56" />
+      <NameCon UId="106" Name="operand" />
+    </Wire>
+    <Wire UId="186">
+      <IdentCon UId="57" />
+      <NameCon UId="107" Name="operand" />
+    </Wire>
+    <Wire UId="187">
+      <NameCon UId="107" Name="out" />
+      <NameCon UId="108" Name="in" />
+    </Wire>
+    <Wire UId="188">
+      <IdentCon UId="58" />
+      <NameCon UId="108" Name="operand" />
+    </Wire>
+    <Wire UId="189">
+      <NameCon UId="108" Name="out" />
+      <NameCon UId="111" Name="in1" />
+    </Wire>
+    <Wire UId="190">
+      <IdentCon UId="59" />
+      <NameCon UId="109" Name="operand" />
+    </Wire>
+    <Wire UId="191">
+      <NameCon UId="109" Name="out" />
+      <NameCon UId="110" Name="in" />
+    </Wire>
+    <Wire UId="192">
+      <IdentCon UId="60" />
+      <NameCon UId="110" Name="operand" />
+    </Wire>
+    <Wire UId="193">
+      <NameCon UId="110" Name="out" />
+      <NameCon UId="111" Name="in2" />
+    </Wire>
+    <Wire UId="194">
+      <NameCon UId="111" Name="out" />
+      <NameCon UId="112" Name="in" />
+    </Wire>
+    <Wire UId="195">
+      <IdentCon UId="61" />
+      <NameCon UId="112" Name="operand" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="75" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="76" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="77" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="78" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="79" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="7A" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Statusy</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="7B" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="rdy" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="heatUp" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="active" />
+      </Symbol>
+    </Access>
+    <Part Name="Contact" UId="24" />
+    <Part Name="Contact" UId="25" />
+    <Part Name="O" UId="26">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="27" />
+  </Parts>
+  <Wires>
+    <Wire UId="28">
+      <Powerrail />
+      <NameCon UId="24" Name="in" />
+      <NameCon UId="25" Name="in" />
+    </Wire>
+    <Wire UId="29">
+      <IdentCon UId="21" />
+      <NameCon UId="24" Name="operand" />
+    </Wire>
+    <Wire UId="30">
+      <NameCon UId="24" Name="out" />
+      <NameCon UId="26" Name="in1" />
+    </Wire>
+    <Wire UId="31">
+      <IdentCon UId="22" />
+      <NameCon UId="25" Name="operand" />
+    </Wire>
+    <Wire UId="32">
+      <NameCon UId="25" Name="out" />
+      <NameCon UId="26" Name="in2" />
+    </Wire>
+    <Wire UId="33">
+      <NameCon UId="26" Name="out" />
+      <NameCon UId="27" Name="in" />
+    </Wire>
+    <Wire UId="34">
+      <IdentCon UId="23" />
+      <NameCon UId="27" Name="operand" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="7C" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="7D" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="7E" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="7F" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="80" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="81" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Aktywny system</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="82" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Access Scope="LocalVariable" UId="21">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="err" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="22">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="alm" SliceAccessModifier="x0" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="23">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="24">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="maskAlm" SliceAccessModifier="x0" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="25">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="alm" SliceAccessModifier="x0" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="26">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="indexErr" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="27">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="alm" SliceAccessModifier="x1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="28">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="29">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="maskAlm" SliceAccessModifier="x1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="30">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="alm" SliceAccessModifier="x1" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="31">
+      <Symbol>
+        <Component Name="dataReceive" />
+        <Component Name="melterStatus" />
+        <Component Name="comErr" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="32">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="alm" SliceAccessModifier="x2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="33">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="34">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="maskAlm" SliceAccessModifier="x2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="35">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="alm" SliceAccessModifier="x2" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="36">
+      <Symbol>
+        <Component Name="dataReceiveError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="37">
+      <Symbol>
+        <Component Name="dataSendError" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="38">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="maskAlm" SliceAccessModifier="x3" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="39">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="alm" SliceAccessModifier="x3" />
+      </Symbol>
+    </Access>
+    <Access Scope="LocalVariable" UId="40">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="alm" />
+      </Symbol>
+    </Access>
+    <Access Scope="LiteralConstant" UId="41">
+      <Constant>
+        <ConstantType>Word</ConstantType>
+        <ConstantValue>0</ConstantValue>
+      </Constant>
+    </Access>
+    <Access Scope="LocalVariable" UId="42">
+      <Symbol>
+        <Component Name="device" />
+        <Component Name="sts" />
+        <Component Name="noAlm" />
+      </Symbol>
+    </Access>
+    <Part Name="Contact" UId="43" />
+    <Part Name="Contact" UId="44" />
+    <Part Name="Contact" UId="45" />
+    <Part Name="O" UId="46">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Contact" UId="47">
+      <Negated Name="operand" />
+    </Part>
+    <Part Name="SCoil" UId="48" />
+    <Part Name="Contact" UId="49" />
+    <Part Name="Contact" UId="50" />
+    <Part Name="Contact" UId="51" />
+    <Part Name="O" UId="52">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Contact" UId="53">
+      <Negated Name="operand" />
+    </Part>
+    <Part Name="SCoil" UId="54" />
+    <Part Name="Contact" UId="55" />
+    <Part Name="Contact" UId="56" />
+    <Part Name="Contact" UId="57" />
+    <Part Name="O" UId="58">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Contact" UId="59">
+      <Negated Name="operand" />
+    </Part>
+    <Part Name="SCoil" UId="60" />
+    <Part Name="Contact" UId="61" />
+    <Part Name="Contact" UId="62" />
+    <Part Name="O" UId="63">
+      <TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>
+    </Part>
+    <Part Name="Contact" UId="64">
+      <Negated Name="operand" />
+    </Part>
+    <Part Name="SCoil" UId="65" />
+    <Part Name="Eq" UId="66">
+      <TemplateValue Name="SrcType" Type="Type">Word</TemplateValue>
+    </Part>
+    <Part Name="Coil" UId="67" />
+  </Parts>
+  <Wires>
+    <Wire UId="68">
+      <Powerrail />
+      <NameCon UId="43" Name="in" />
+      <NameCon UId="44" Name="in" />
+      <NameCon UId="49" Name="in" />
+      <NameCon UId="50" Name="in" />
+      <NameCon UId="55" Name="in" />
+      <NameCon UId="56" Name="in" />
+      <NameCon UId="61" Name="in" />
+      <NameCon UId="62" Name="in" />
+      <NameCon UId="66" Name="pre" />
+    </Wire>
+    <Wire UId="69">
+      <IdentCon UId="21" />
+      <NameCon UId="43" Name="operand" />
+    </Wire>
+    <Wire UId="70">
+      <NameCon UId="43" Name="out" />
+      <NameCon UId="46" Name="in1" />
+    </Wire>
+    <Wire UId="71">
+      <IdentCon UId="22" />
+      <NameCon UId="44" Name="operand" />
+    </Wire>
+    <Wire UId="72">
+      <NameCon UId="44" Name="out" />
+      <NameCon UId="45" Name="in" />
+    </Wire>
+    <Wire UId="73">
+      <IdentCon UId="23" />
+      <NameCon UId="45" Name="operand" />
+    </Wire>
+    <Wire UId="74">
+      <NameCon UId="45" Name="out" />
+      <NameCon UId="46" Name="in2" />
+    </Wire>
+    <Wire UId="75">
+      <NameCon UId="46" Name="out" />
+      <NameCon UId="47" Name="in" />
+    </Wire>
+    <Wire UId="76">
+      <IdentCon UId="24" />
+      <NameCon UId="47" Name="operand" />
+    </Wire>
+    <Wire UId="77">
+      <NameCon UId="47" Name="out" />
+      <NameCon UId="48" Name="in" />
+    </Wire>
+    <Wire UId="78">
+      <IdentCon UId="25" />
+      <NameCon UId="48" Name="operand" />
+    </Wire>
+    <Wire UId="79">
+      <IdentCon UId="26" />
+      <NameCon UId="49" Name="operand" />
+    </Wire>
+    <Wire UId="80">
+      <NameCon UId="49" Name="out" />
+      <NameCon UId="52" Name="in1" />
+    </Wire>
+    <Wire UId="81">
+      <IdentCon UId="27" />
+      <NameCon UId="50" Name="operand" />
+    </Wire>
+    <Wire UId="82">
+      <NameCon UId="50" Name="out" />
+      <NameCon UId="51" Name="in" />
+    </Wire>
+    <Wire UId="83">
+      <IdentCon UId="28" />
+      <NameCon UId="51" Name="operand" />
+    </Wire>
+    <Wire UId="84">
+      <NameCon UId="51" Name="out" />
+      <NameCon UId="52" Name="in2" />
+    </Wire>
+    <Wire UId="85">
+      <NameCon UId="52" Name="out" />
+      <NameCon UId="53" Name="in" />
+    </Wire>
+    <Wire UId="86">
+      <IdentCon UId="29" />
+      <NameCon UId="53" Name="operand" />
+    </Wire>
+    <Wire UId="87">
+      <NameCon UId="53" Name="out" />
+      <NameCon UId="54" Name="in" />
+    </Wire>
+    <Wire UId="88">
+      <IdentCon UId="30" />
+      <NameCon UId="54" Name="operand" />
+    </Wire>
+    <Wire UId="89">
+      <IdentCon UId="31" />
+      <NameCon UId="55" Name="operand" />
+    </Wire>
+    <Wire UId="90">
+      <NameCon UId="55" Name="out" />
+      <NameCon UId="58" Name="in1" />
+    </Wire>
+    <Wire UId="91">
+      <IdentCon UId="32" />
+      <NameCon UId="56" Name="operand" />
+    </Wire>
+    <Wire UId="92">
+      <NameCon UId="56" Name="out" />
+      <NameCon UId="57" Name="in" />
+    </Wire>
+    <Wire UId="93">
+      <IdentCon UId="33" />
+      <NameCon UId="57" Name="operand" />
+    </Wire>
+    <Wire UId="94">
+      <NameCon UId="57" Name="out" />
+      <NameCon UId="58" Name="in2" />
+    </Wire>
+    <Wire UId="95">
+      <NameCon UId="58" Name="out" />
+      <NameCon UId="59" Name="in" />
+    </Wire>
+    <Wire UId="96">
+      <IdentCon UId="34" />
+      <NameCon UId="59" Name="operand" />
+    </Wire>
+    <Wire UId="97">
+      <NameCon UId="59" Name="out" />
+      <NameCon UId="60" Name="in" />
+    </Wire>
+    <Wire UId="98">
+      <IdentCon UId="35" />
+      <NameCon UId="60" Name="operand" />
+    </Wire>
+    <Wire UId="99">
+      <IdentCon UId="36" />
+      <NameCon UId="61" Name="operand" />
+    </Wire>
+    <Wire UId="100">
+      <NameCon UId="61" Name="out" />
+      <NameCon UId="63" Name="in1" />
+    </Wire>
+    <Wire UId="101">
+      <IdentCon UId="37" />
+      <NameCon UId="62" Name="operand" />
+    </Wire>
+    <Wire UId="102">
+      <NameCon UId="62" Name="out" />
+      <NameCon UId="63" Name="in2" />
+    </Wire>
+    <Wire UId="103">
+      <NameCon UId="63" Name="out" />
+      <NameCon UId="64" Name="in" />
+    </Wire>
+    <Wire UId="104">
+      <IdentCon UId="38" />
+      <NameCon UId="64" Name="operand" />
+    </Wire>
+    <Wire UId="105">
+      <NameCon UId="64" Name="out" />
+      <NameCon UId="65" Name="in" />
+    </Wire>
+    <Wire UId="106">
+      <IdentCon UId="39" />
+      <NameCon UId="65" Name="operand" />
+    </Wire>
+    <Wire UId="107">
+      <IdentCon UId="40" />
+      <NameCon UId="66" Name="in1" />
+    </Wire>
+    <Wire UId="108">
+      <IdentCon UId="41" />
+      <NameCon UId="66" Name="in2" />
+    </Wire>
+    <Wire UId="109">
+      <NameCon UId="66" Name="out" />
+      <NameCon UId="67" Name="in" />
+    </Wire>
+    <Wire UId="110">
+      <IdentCon UId="42" />
+      <NameCon UId="67" Name="operand" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>LAD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="83" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="84" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="85" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="86" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="87" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="88" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Alarmy</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="89" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v3">
+  <NewLine Num="1" UId="21" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="22">
+    <Text UId="23">Czy wyświetlić alarm że temperatura jest powyzej/poniżej przyjętych limitów z poziomu HMI ?</Text>
+  </LineComment>
+  <NewLine Num="1" UId="24" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="25">
+    <Text UId="26">Ruszt</Text>
+  </LineComment>
+  <NewLine Num="1" UId="27" />
+  <Token Text="IF" UId="28" />
+  <Blank Num="1" UId="29" />
+  <Token Text="(" UId="30" />
+  <Access Scope="LocalVariable" UId="31">
+    <Symbol UId="32">
+      <Component Name="device" UId="33" />
+      <Token Text="." UId="34" />
+      <Component Name="sts" UId="35" />
+      <Token Text="." UId="36" />
+      <Component Name="AnalogSignals" UId="37" />
+      <Token Text="." UId="38" />
+      <Component Name="Limits" UId="39" />
+      <Token Text="." UId="40" />
+      <Component Name="Versa1_OL_Temp_Stemp" UId="41" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="42" />
+  <Token Text="&lt;" UId="43" />
+  <Blank Num="1" UId="44" />
+  <Access Scope="LocalVariable" UId="45">
+    <Symbol UId="46">
+      <Component Name="device" UId="47" />
+      <Token Text="." UId="48" />
+      <Component Name="sts" UId="49" />
+      <Token Text="." UId="50" />
+      <Component Name="AnalogSignals" UId="51" />
+      <Token Text="." UId="52" />
+      <Component Name="Temperature" UId="53" />
+      <Token Text="." UId="54" />
+      <Component Name="Read" UId="55" />
+      <Token Text="." UId="56" />
+      <Component Name="Versa_ActTemp_Stemp" UId="57" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="58" />
+  <Token Text="OR" UId="59" />
+  <NewLine Num="1" UId="60" />
+  <Blank Num="4" UId="61" />
+  <Access Scope="LocalVariable" UId="62">
+    <Symbol UId="63">
+      <Component Name="device" UId="64" />
+      <Token Text="." UId="65" />
+      <Component Name="sts" UId="66" />
+      <Token Text="." UId="67" />
+      <Component Name="AnalogSignals" UId="68" />
+      <Token Text="." UId="69" />
+      <Component Name="Limits" UId="70" />
+      <Token Text="." UId="71" />
+      <Component Name="Versa1_UL_Temp_Stemp" UId="72" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="73" />
+  <Token Text="&gt;" UId="74" />
+  <Blank Num="1" UId="75" />
+  <Access Scope="LocalVariable" UId="76">
+    <Symbol UId="77">
+      <Component Name="device" UId="78" />
+      <Token Text="." UId="79" />
+      <Component Name="sts" UId="80" />
+      <Token Text="." UId="81" />
+      <Component Name="AnalogSignals" UId="82" />
+      <Token Text="." UId="83" />
+      <Component Name="Temperature" UId="84" />
+      <Token Text="." UId="85" />
+      <Component Name="Read" UId="86" />
+      <Token Text="." UId="87" />
+      <Component Name="Versa_ActTemp_Stemp" UId="88" />
+    </Symbol>
+  </Access>
+  <Token Text=")" UId="89" />
+  <Blank Num="1" UId="90" />
+  <Token Text="AND" UId="91" />
+  <NewLine Num="1" UId="92" />
+  <Blank Num="4" UId="93" />
+  <Token Text="NOT" UId="94" />
+  <Blank Num="1" UId="95" />
+  <Access Scope="LocalVariable" UId="96">
+    <Symbol UId="97">
+      <Component Name="dataReceiveError" UId="98" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="99" />
+  <Token Text="AND" UId="100" />
+  <Blank Num="1" UId="101" />
+  <Token Text="NOT" UId="102" />
+  <Blank Num="1" UId="103" />
+  <Access Scope="LocalVariable" UId="104">
+    <Symbol UId="105">
+      <Component Name="device" UId="106" />
+      <Token Text="." UId="107" />
+      <Component Name="sts" UId="108" />
+      <Token Text="." UId="109" />
+      <Component Name="maskAlm" UId="110" />
+      <Token Text="." UId="111" />
+      <Token Text="%X6" UId="112" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="113" />
+  <Token Text="THEN" UId="114" />
+  <NewLine Num="1" UId="115" />
+  <Blank Num="4" UId="116" />
+  <NewLine Num="1" UId="117" />
+  <Blank Num="4" UId="118" />
+  <Access Scope="LocalVariable" UId="119">
+    <Symbol UId="120">
+      <Component Name="device" UId="121" />
+      <Token Text="." UId="122" />
+      <Component Name="sts" UId="123" />
+      <Token Text="." UId="124" />
+      <Component Name="alm" UId="125" />
+      <Token Text="." UId="126" />
+      <Token Text="%X6" UId="127" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="128" />
+  <Token Text=":=" UId="129" />
+  <Blank Num="1" UId="130" />
+  <Access Scope="LiteralConstant" UId="131">
+    <Constant UId="132">
+      <ConstantValue UId="134">TRUE</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="135" />
+  <NewLine Num="1" UId="136" />
+  <Token Text="END_IF" UId="137" />
+  <Token Text=";" UId="138" />
+  <NewLine Num="2" UId="139" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="140">
+    <Text UId="141">Pojemnik</Text>
+  </LineComment>
+  <NewLine Num="1" UId="142" />
+  <Token Text="IF" UId="143" />
+  <Blank Num="1" UId="144" />
+  <Token Text="(" UId="145" />
+  <Access Scope="LocalVariable" UId="146">
+    <Symbol UId="147">
+      <Component Name="device" UId="148" />
+      <Token Text="." UId="149" />
+      <Component Name="sts" UId="150" />
+      <Token Text="." UId="151" />
+      <Component Name="AnalogSignals" UId="152" />
+      <Token Text="." UId="153" />
+      <Component Name="Limits" UId="154" />
+      <Token Text="." UId="155" />
+      <Component Name="Versa1_OL_Temp_Pump" UId="156" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="157" />
+  <Token Text="&lt;" UId="158" />
+  <Blank Num="1" UId="159" />
+  <Access Scope="LocalVariable" UId="160">
+    <Symbol UId="161">
+      <Component Name="device" UId="162" />
+      <Token Text="." UId="163" />
+      <Component Name="sts" UId="164" />
+      <Token Text="." UId="165" />
+      <Component Name="AnalogSignals" UId="166" />
+      <Token Text="." UId="167" />
+      <Component Name="Temperature" UId="168" />
+      <Token Text="." UId="169" />
+      <Component Name="Read" UId="170" />
+      <Token Text="." UId="171" />
+      <Component Name="Versa_ActTemp_Pump" UId="172" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="173" />
+  <Token Text="OR" UId="174" />
+  <NewLine Num="1" UId="175" />
+  <Blank Num="4" UId="176" />
+  <Access Scope="LocalVariable" UId="177">
+    <Symbol UId="178">
+      <Component Name="device" UId="179" />
+      <Token Text="." UId="180" />
+      <Component Name="sts" UId="181" />
+      <Token Text="." UId="182" />
+      <Component Name="AnalogSignals" UId="183" />
+      <Token Text="." UId="184" />
+      <Component Name="Limits" UId="185" />
+      <Token Text="." UId="186" />
+      <Component Name="Versa1_UL_Temp_Pump" UId="187" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="188" />
+  <Token Text="&gt;" UId="189" />
+  <Blank Num="1" UId="190" />
+  <Access Scope="LocalVariable" UId="191">
+    <Symbol UId="192">
+      <Component Name="device" UId="193" />
+      <Token Text="." UId="194" />
+      <Component Name="sts" UId="195" />
+      <Token Text="." UId="196" />
+      <Component Name="AnalogSignals" UId="197" />
+      <Token Text="." UId="198" />
+      <Component Name="Temperature" UId="199" />
+      <Token Text="." UId="200" />
+      <Component Name="Read" UId="201" />
+      <Token Text="." UId="202" />
+      <Component Name="Versa_ActTemp_Pump" UId="203" />
+    </Symbol>
+  </Access>
+  <Token Text=")" UId="204" />
+  <Blank Num="1" UId="205" />
+  <Token Text="AND" UId="206" />
+  <NewLine Num="1" UId="207" />
+  <Blank Num="4" UId="208" />
+  <Token Text="NOT" UId="209" />
+  <Blank Num="1" UId="210" />
+  <Access Scope="LocalVariable" UId="211">
+    <Symbol UId="212">
+      <Component Name="dataReceiveError" UId="213" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="214" />
+  <Token Text="AND" UId="215" />
+  <Blank Num="1" UId="216" />
+  <Token Text="NOT" UId="217" />
+  <Blank Num="1" UId="218" />
+  <Access Scope="LocalVariable" UId="219">
+    <Symbol UId="220">
+      <Component Name="device" UId="221" />
+      <Token Text="." UId="222" />
+      <Component Name="sts" UId="223" />
+      <Token Text="." UId="224" />
+      <Component Name="maskAlm" UId="225" />
+      <Token Text="." UId="226" />
+      <Token Text="%X7" UId="227" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="228" />
+  <Token Text="THEN" UId="229" />
+  <NewLine Num="1" UId="230" />
+  <Blank Num="4" UId="231" />
+  <NewLine Num="1" UId="232" />
+  <Blank Num="4" UId="233" />
+  <Access Scope="LocalVariable" UId="234">
+    <Symbol UId="235">
+      <Component Name="device" UId="236" />
+      <Token Text="." UId="237" />
+      <Component Name="sts" UId="238" />
+      <Token Text="." UId="239" />
+      <Component Name="alm" UId="240" />
+      <Token Text="." UId="241" />
+      <Token Text="%X7" UId="242" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="243" />
+  <Token Text=":=" UId="244" />
+  <Blank Num="1" UId="245" />
+  <Access Scope="LiteralConstant" UId="246">
+    <Constant UId="247">
+      <ConstantValue UId="249">TRUE</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="250" />
+  <NewLine Num="1" UId="251" />
+  <Token Text="END_IF" UId="252" />
+  <Token Text=";" UId="253" />
+  <NewLine Num="2" UId="254" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="255">
+    <Text UId="256">Wąż 1</Text>
+  </LineComment>
+  <NewLine Num="1" UId="257" />
+  <Token Text="IF" UId="258" />
+  <Blank Num="1" UId="259" />
+  <Token Text="(" UId="260" />
+  <Access Scope="LocalVariable" UId="261">
+    <Symbol UId="262">
+      <Component Name="device" UId="263" />
+      <Token Text="." UId="264" />
+      <Component Name="sts" UId="265" />
+      <Token Text="." UId="266" />
+      <Component Name="AnalogSignals" UId="267" />
+      <Token Text="." UId="268" />
+      <Component Name="Limits" UId="269" />
+      <Token Text="." UId="270" />
+      <Component Name="Versa1_OL_Temp_Hose_1" UId="271" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="272" />
+  <Token Text="&lt;" UId="273" />
+  <Blank Num="1" UId="274" />
+  <Access Scope="LocalVariable" UId="275">
+    <Symbol UId="276">
+      <Component Name="device" UId="277" />
+      <Token Text="." UId="278" />
+      <Component Name="sts" UId="279" />
+      <Token Text="." UId="280" />
+      <Component Name="AnalogSignals" UId="281" />
+      <Token Text="." UId="282" />
+      <Component Name="Temperature" UId="283" />
+      <Token Text="." UId="284" />
+      <Component Name="Read" UId="285" />
+      <Token Text="." UId="286" />
+      <Component Name="Versa_ActTemp_Hose_1" UId="287" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="288" />
+  <Token Text="OR" UId="289" />
+  <NewLine Num="1" UId="290" />
+  <Blank Num="4" UId="291" />
+  <Access Scope="LocalVariable" UId="292">
+    <Symbol UId="293">
+      <Component Name="device" UId="294" />
+      <Token Text="." UId="295" />
+      <Component Name="sts" UId="296" />
+      <Token Text="." UId="297" />
+      <Component Name="AnalogSignals" UId="298" />
+      <Token Text="." UId="299" />
+      <Component Name="Limits" UId="300" />
+      <Token Text="." UId="301" />
+      <Component Name="Versa1_UL_Temp_Hose_1" UId="302" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="303" />
+  <Token Text="&gt;" UId="304" />
+  <Blank Num="1" UId="305" />
+  <Access Scope="LocalVariable" UId="306">
+    <Symbol UId="307">
+      <Component Name="device" UId="308" />
+      <Token Text="." UId="309" />
+      <Component Name="sts" UId="310" />
+      <Token Text="." UId="311" />
+      <Component Name="AnalogSignals" UId="312" />
+      <Token Text="." UId="313" />
+      <Component Name="Temperature" UId="314" />
+      <Token Text="." UId="315" />
+      <Component Name="Read" UId="316" />
+      <Token Text="." UId="317" />
+      <Component Name="Versa_ActTemp_Hose_1" UId="318" />
+    </Symbol>
+  </Access>
+  <Token Text=")" UId="319" />
+  <Blank Num="1" UId="320" />
+  <Token Text="AND" UId="321" />
+  <NewLine Num="1" UId="322" />
+  <Blank Num="4" UId="323" />
+  <Token Text="NOT" UId="324" />
+  <Blank Num="1" UId="325" />
+  <Access Scope="LocalVariable" UId="326">
+    <Symbol UId="327">
+      <Component Name="dataReceiveError" UId="328" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="329" />
+  <Token Text="AND" UId="330" />
+  <Blank Num="1" UId="331" />
+  <Token Text="NOT" UId="332" />
+  <Blank Num="1" UId="333" />
+  <Access Scope="LocalVariable" UId="334">
+    <Symbol UId="335">
+      <Component Name="device" UId="336" />
+      <Token Text="." UId="337" />
+      <Component Name="sts" UId="338" />
+      <Token Text="." UId="339" />
+      <Component Name="maskAlm" UId="340" />
+      <Token Text="." UId="341" />
+      <Token Text="%X8" UId="342" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="343" />
+  <Token Text="THEN" UId="344" />
+  <NewLine Num="1" UId="345" />
+  <Blank Num="4" UId="346" />
+  <NewLine Num="1" UId="347" />
+  <Blank Num="4" UId="348" />
+  <Access Scope="LocalVariable" UId="349">
+    <Symbol UId="350">
+      <Component Name="device" UId="351" />
+      <Token Text="." UId="352" />
+      <Component Name="sts" UId="353" />
+      <Token Text="." UId="354" />
+      <Component Name="alm" UId="355" />
+      <Token Text="." UId="356" />
+      <Token Text="%X8" UId="357" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="358" />
+  <Token Text=":=" UId="359" />
+  <Blank Num="1" UId="360" />
+  <Access Scope="LiteralConstant" UId="361">
+    <Constant UId="362">
+      <ConstantValue UId="364">TRUE</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="365" />
+  <NewLine Num="1" UId="366" />
+  <Token Text="END_IF" UId="367" />
+  <Token Text=";" UId="368" />
+  <NewLine Num="2" UId="369" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="370">
+    <Text UId="371">Pistolet 1</Text>
+  </LineComment>
+  <NewLine Num="1" UId="372" />
+  <Token Text="IF" UId="373" />
+  <Blank Num="1" UId="374" />
+  <Token Text="(" UId="375" />
+  <Access Scope="LocalVariable" UId="376">
+    <Symbol UId="377">
+      <Component Name="device" UId="378" />
+      <Token Text="." UId="379" />
+      <Component Name="sts" UId="380" />
+      <Token Text="." UId="381" />
+      <Component Name="AnalogSignals" UId="382" />
+      <Token Text="." UId="383" />
+      <Component Name="Limits" UId="384" />
+      <Token Text="." UId="385" />
+      <Component Name="Versa1_OL_Temp_HoseDistrib_1" UId="386" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="387" />
+  <Token Text="&lt;" UId="388" />
+  <Blank Num="1" UId="389" />
+  <Access Scope="LocalVariable" UId="390">
+    <Symbol UId="391">
+      <Component Name="device" UId="392" />
+      <Token Text="." UId="393" />
+      <Component Name="sts" UId="394" />
+      <Token Text="." UId="395" />
+      <Component Name="AnalogSignals" UId="396" />
+      <Token Text="." UId="397" />
+      <Component Name="Temperature" UId="398" />
+      <Token Text="." UId="399" />
+      <Component Name="Read" UId="400" />
+      <Token Text="." UId="401" />
+      <Component Name="Versa_ActTemp_HoseDistrib_1" UId="402" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="403" />
+  <Token Text="OR" UId="404" />
+  <NewLine Num="1" UId="405" />
+  <Blank Num="4" UId="406" />
+  <Access Scope="LocalVariable" UId="407">
+    <Symbol UId="408">
+      <Component Name="device" UId="409" />
+      <Token Text="." UId="410" />
+      <Component Name="sts" UId="411" />
+      <Token Text="." UId="412" />
+      <Component Name="AnalogSignals" UId="413" />
+      <Token Text="." UId="414" />
+      <Component Name="Limits" UId="415" />
+      <Token Text="." UId="416" />
+      <Component Name="Versa1_UL_Temp_HoseDistrib_1" UId="417" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="418" />
+  <Token Text="&gt;" UId="419" />
+  <Blank Num="1" UId="420" />
+  <Access Scope="LocalVariable" UId="421">
+    <Symbol UId="422">
+      <Component Name="device" UId="423" />
+      <Token Text="." UId="424" />
+      <Component Name="sts" UId="425" />
+      <Token Text="." UId="426" />
+      <Component Name="AnalogSignals" UId="427" />
+      <Token Text="." UId="428" />
+      <Component Name="Temperature" UId="429" />
+      <Token Text="." UId="430" />
+      <Component Name="Read" UId="431" />
+      <Token Text="." UId="432" />
+      <Component Name="Versa_ActTemp_HoseDistrib_1" UId="433" />
+    </Symbol>
+  </Access>
+  <Token Text=")" UId="434" />
+  <Blank Num="1" UId="435" />
+  <Token Text="AND" UId="436" />
+  <NewLine Num="1" UId="437" />
+  <Blank Num="4" UId="438" />
+  <Token Text="NOT" UId="439" />
+  <Blank Num="1" UId="440" />
+  <Access Scope="LocalVariable" UId="441">
+    <Symbol UId="442">
+      <Component Name="dataReceiveError" UId="443" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="444" />
+  <Token Text="AND" UId="445" />
+  <Blank Num="1" UId="446" />
+  <Token Text="NOT" UId="447" />
+  <Blank Num="1" UId="448" />
+  <Access Scope="LocalVariable" UId="449">
+    <Symbol UId="450">
+      <Component Name="device" UId="451" />
+      <Token Text="." UId="452" />
+      <Component Name="sts" UId="453" />
+      <Token Text="." UId="454" />
+      <Component Name="maskAlm" UId="455" />
+      <Token Text="." UId="456" />
+      <Token Text="%X9" UId="457" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="458" />
+  <Token Text="THEN" UId="459" />
+  <NewLine Num="1" UId="460" />
+  <Blank Num="4" UId="461" />
+  <NewLine Num="1" UId="462" />
+  <Blank Num="4" UId="463" />
+  <Access Scope="LocalVariable" UId="464">
+    <Symbol UId="465">
+      <Component Name="device" UId="466" />
+      <Token Text="." UId="467" />
+      <Component Name="sts" UId="468" />
+      <Token Text="." UId="469" />
+      <Component Name="alm" UId="470" />
+      <Token Text="." UId="471" />
+      <Token Text="%X9" UId="472" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="473" />
+  <Token Text=":=" UId="474" />
+  <Blank Num="1" UId="475" />
+  <Access Scope="LiteralConstant" UId="476">
+    <Constant UId="477">
+      <ConstantValue UId="479">TRUE</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="480" />
+  <NewLine Num="1" UId="481" />
+  <Token Text="END_IF" UId="482" />
+  <Token Text=";" UId="483" />
+  <NewLine Num="2" UId="484" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="485">
+    <Text UId="486">Wąż 2</Text>
+  </LineComment>
+  <NewLine Num="1" UId="487" />
+  <Token Text="IF" UId="488" />
+  <Blank Num="1" UId="489" />
+  <Token Text="(" UId="490" />
+  <Access Scope="LocalVariable" UId="491">
+    <Symbol UId="492">
+      <Component Name="device" UId="493" />
+      <Token Text="." UId="494" />
+      <Component Name="sts" UId="495" />
+      <Token Text="." UId="496" />
+      <Component Name="AnalogSignals" UId="497" />
+      <Token Text="." UId="498" />
+      <Component Name="Limits" UId="499" />
+      <Token Text="." UId="500" />
+      <Component Name="Versa1_OL_Temp_Hose_2" UId="501" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="502" />
+  <Token Text="&lt;" UId="503" />
+  <Blank Num="1" UId="504" />
+  <Access Scope="LocalVariable" UId="505">
+    <Symbol UId="506">
+      <Component Name="device" UId="507" />
+      <Token Text="." UId="508" />
+      <Component Name="sts" UId="509" />
+      <Token Text="." UId="510" />
+      <Component Name="AnalogSignals" UId="511" />
+      <Token Text="." UId="512" />
+      <Component Name="Temperature" UId="513" />
+      <Token Text="." UId="514" />
+      <Component Name="Read" UId="515" />
+      <Token Text="." UId="516" />
+      <Component Name="Versa_ActTemp_Hose_2" UId="517" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="518" />
+  <Token Text="OR" UId="519" />
+  <NewLine Num="1" UId="520" />
+  <Blank Num="4" UId="521" />
+  <Access Scope="LocalVariable" UId="522">
+    <Symbol UId="523">
+      <Component Name="device" UId="524" />
+      <Token Text="." UId="525" />
+      <Component Name="sts" UId="526" />
+      <Token Text="." UId="527" />
+      <Component Name="AnalogSignals" UId="528" />
+      <Token Text="." UId="529" />
+      <Component Name="Limits" UId="530" />
+      <Token Text="." UId="531" />
+      <Component Name="Versa1_UL_Temp_Hose_2" UId="532" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="533" />
+  <Token Text="&gt;" UId="534" />
+  <Blank Num="1" UId="535" />
+  <Access Scope="LocalVariable" UId="536">
+    <Symbol UId="537">
+      <Component Name="device" UId="538" />
+      <Token Text="." UId="539" />
+      <Component Name="sts" UId="540" />
+      <Token Text="." UId="541" />
+      <Component Name="AnalogSignals" UId="542" />
+      <Token Text="." UId="543" />
+      <Component Name="Temperature" UId="544" />
+      <Token Text="." UId="545" />
+      <Component Name="Read" UId="546" />
+      <Token Text="." UId="547" />
+      <Component Name="Versa_ActTemp_Hose_2" UId="548" />
+    </Symbol>
+  </Access>
+  <Token Text=")" UId="549" />
+  <Blank Num="1" UId="550" />
+  <Token Text="AND" UId="551" />
+  <NewLine Num="1" UId="552" />
+  <Blank Num="4" UId="553" />
+  <Token Text="NOT" UId="554" />
+  <Blank Num="1" UId="555" />
+  <Access Scope="LocalVariable" UId="556">
+    <Symbol UId="557">
+      <Component Name="dataReceiveError" UId="558" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="559" />
+  <Token Text="AND" UId="560" />
+  <Blank Num="1" UId="561" />
+  <Token Text="NOT" UId="562" />
+  <Blank Num="1" UId="563" />
+  <Access Scope="LocalVariable" UId="564">
+    <Symbol UId="565">
+      <Component Name="device" UId="566" />
+      <Token Text="." UId="567" />
+      <Component Name="sts" UId="568" />
+      <Token Text="." UId="569" />
+      <Component Name="maskAlm" UId="570" />
+      <Token Text="." UId="571" />
+      <Token Text="%X10" UId="572" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="573" />
+  <Token Text="THEN" UId="574" />
+  <NewLine Num="1" UId="575" />
+  <Blank Num="4" UId="576" />
+  <NewLine Num="1" UId="577" />
+  <Blank Num="4" UId="578" />
+  <Access Scope="LocalVariable" UId="579">
+    <Symbol UId="580">
+      <Component Name="device" UId="581" />
+      <Token Text="." UId="582" />
+      <Component Name="sts" UId="583" />
+      <Token Text="." UId="584" />
+      <Component Name="alm" UId="585" />
+      <Token Text="." UId="586" />
+      <Token Text="%X10" UId="587" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="588" />
+  <Token Text=":=" UId="589" />
+  <Blank Num="1" UId="590" />
+  <Access Scope="LiteralConstant" UId="591">
+    <Constant UId="592">
+      <ConstantValue UId="594">TRUE</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="595" />
+  <NewLine Num="1" UId="596" />
+  <Token Text="END_IF" UId="597" />
+  <Token Text=";" UId="598" />
+  <NewLine Num="2" UId="599" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="600">
+    <Text UId="601">Pistolet 2</Text>
+  </LineComment>
+  <NewLine Num="1" UId="602" />
+  <Token Text="IF" UId="603" />
+  <Blank Num="1" UId="604" />
+  <Token Text="(" UId="605" />
+  <Access Scope="LocalVariable" UId="606">
+    <Symbol UId="607">
+      <Component Name="device" UId="608" />
+      <Token Text="." UId="609" />
+      <Component Name="sts" UId="610" />
+      <Token Text="." UId="611" />
+      <Component Name="AnalogSignals" UId="612" />
+      <Token Text="." UId="613" />
+      <Component Name="Limits" UId="614" />
+      <Token Text="." UId="615" />
+      <Component Name="Versa1_OL_Temp_HoseDistrib_2" UId="616" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="617" />
+  <Token Text="&lt;" UId="618" />
+  <Blank Num="1" UId="619" />
+  <Access Scope="LocalVariable" UId="620">
+    <Symbol UId="621">
+      <Component Name="device" UId="622" />
+      <Token Text="." UId="623" />
+      <Component Name="sts" UId="624" />
+      <Token Text="." UId="625" />
+      <Component Name="AnalogSignals" UId="626" />
+      <Token Text="." UId="627" />
+      <Component Name="Temperature" UId="628" />
+      <Token Text="." UId="629" />
+      <Component Name="Read" UId="630" />
+      <Token Text="." UId="631" />
+      <Component Name="Versa_ActTemp_HoseDistrib_2" UId="632" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="633" />
+  <Token Text="OR" UId="634" />
+  <NewLine Num="1" UId="635" />
+  <Blank Num="4" UId="636" />
+  <Access Scope="LocalVariable" UId="637">
+    <Symbol UId="638">
+      <Component Name="device" UId="639" />
+      <Token Text="." UId="640" />
+      <Component Name="sts" UId="641" />
+      <Token Text="." UId="642" />
+      <Component Name="AnalogSignals" UId="643" />
+      <Token Text="." UId="644" />
+      <Component Name="Limits" UId="645" />
+      <Token Text="." UId="646" />
+      <Component Name="Versa1_UL_Temp_HoseDistrib_2" UId="647" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="648" />
+  <Token Text="&gt;" UId="649" />
+  <Blank Num="1" UId="650" />
+  <Access Scope="LocalVariable" UId="651">
+    <Symbol UId="652">
+      <Component Name="device" UId="653" />
+      <Token Text="." UId="654" />
+      <Component Name="sts" UId="655" />
+      <Token Text="." UId="656" />
+      <Component Name="AnalogSignals" UId="657" />
+      <Token Text="." UId="658" />
+      <Component Name="Temperature" UId="659" />
+      <Token Text="." UId="660" />
+      <Component Name="Read" UId="661" />
+      <Token Text="." UId="662" />
+      <Component Name="Versa_ActTemp_HoseDistrib_2" UId="663" />
+    </Symbol>
+  </Access>
+  <Token Text=")" UId="664" />
+  <Blank Num="1" UId="665" />
+  <Token Text="AND" UId="666" />
+  <NewLine Num="1" UId="667" />
+  <Blank Num="4" UId="668" />
+  <Token Text="NOT" UId="669" />
+  <Blank Num="1" UId="670" />
+  <Access Scope="LocalVariable" UId="671">
+    <Symbol UId="672">
+      <Component Name="dataReceiveError" UId="673" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="674" />
+  <Token Text="AND" UId="675" />
+  <Blank Num="1" UId="676" />
+  <Token Text="NOT" UId="677" />
+  <Blank Num="1" UId="678" />
+  <Access Scope="LocalVariable" UId="679">
+    <Symbol UId="680">
+      <Component Name="device" UId="681" />
+      <Token Text="." UId="682" />
+      <Component Name="sts" UId="683" />
+      <Token Text="." UId="684" />
+      <Component Name="maskAlm" UId="685" />
+      <Token Text="." UId="686" />
+      <Token Text="%X11" UId="687" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="688" />
+  <Token Text="THEN" UId="689" />
+  <NewLine Num="1" UId="690" />
+  <Blank Num="4" UId="691" />
+  <NewLine Num="1" UId="692" />
+  <Blank Num="4" UId="693" />
+  <Access Scope="LocalVariable" UId="694">
+    <Symbol UId="695">
+      <Component Name="device" UId="696" />
+      <Token Text="." UId="697" />
+      <Component Name="sts" UId="698" />
+      <Token Text="." UId="699" />
+      <Component Name="alm" UId="700" />
+      <Token Text="." UId="701" />
+      <Token Text="%X11" UId="702" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="703" />
+  <Token Text=":=" UId="704" />
+  <Blank Num="1" UId="705" />
+  <Access Scope="LiteralConstant" UId="706">
+    <Constant UId="707">
+      <ConstantValue UId="709">TRUE</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="710" />
+  <NewLine Num="1" UId="711" />
+  <Token Text="END_IF" UId="712" />
+  <Token Text=";" UId="713" />
+  <NewLine Num="2" UId="714" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="715">
+    <Text UId="716">Wąż 3</Text>
+  </LineComment>
+  <NewLine Num="1" UId="717" />
+  <Token Text="IF" UId="718" />
+  <Blank Num="1" UId="719" />
+  <Token Text="(" UId="720" />
+  <Access Scope="LocalVariable" UId="721">
+    <Symbol UId="722">
+      <Component Name="device" UId="723" />
+      <Token Text="." UId="724" />
+      <Component Name="sts" UId="725" />
+      <Token Text="." UId="726" />
+      <Component Name="AnalogSignals" UId="727" />
+      <Token Text="." UId="728" />
+      <Component Name="Limits" UId="729" />
+      <Token Text="." UId="730" />
+      <Component Name="Versa1_OL_Temp_Zone7" UId="731" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="732" />
+  <Token Text="&lt;" UId="733" />
+  <Blank Num="1" UId="734" />
+  <Access Scope="LocalVariable" UId="735">
+    <Symbol UId="736">
+      <Component Name="device" UId="737" />
+      <Token Text="." UId="738" />
+      <Component Name="sts" UId="739" />
+      <Token Text="." UId="740" />
+      <Component Name="AnalogSignals" UId="741" />
+      <Token Text="." UId="742" />
+      <Component Name="Temperature" UId="743" />
+      <Token Text="." UId="744" />
+      <Component Name="Read" UId="745" />
+      <Token Text="." UId="746" />
+      <Component Name="Versa_ActTemp_Zone7" UId="747" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="748" />
+  <Token Text="OR" UId="749" />
+  <NewLine Num="1" UId="750" />
+  <Blank Num="4" UId="751" />
+  <Access Scope="LocalVariable" UId="752">
+    <Symbol UId="753">
+      <Component Name="device" UId="754" />
+      <Token Text="." UId="755" />
+      <Component Name="sts" UId="756" />
+      <Token Text="." UId="757" />
+      <Component Name="AnalogSignals" UId="758" />
+      <Token Text="." UId="759" />
+      <Component Name="Limits" UId="760" />
+      <Token Text="." UId="761" />
+      <Component Name="Versa1_UL_Temp_Zone7" UId="762" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="763" />
+  <Token Text="&gt;" UId="764" />
+  <Blank Num="1" UId="765" />
+  <Access Scope="LocalVariable" UId="766">
+    <Symbol UId="767">
+      <Component Name="device" UId="768" />
+      <Token Text="." UId="769" />
+      <Component Name="sts" UId="770" />
+      <Token Text="." UId="771" />
+      <Component Name="AnalogSignals" UId="772" />
+      <Token Text="." UId="773" />
+      <Component Name="Temperature" UId="774" />
+      <Token Text="." UId="775" />
+      <Component Name="Read" UId="776" />
+      <Token Text="." UId="777" />
+      <Component Name="Versa_ActTemp_Zone7" UId="778" />
+    </Symbol>
+  </Access>
+  <Token Text=")" UId="779" />
+  <Blank Num="1" UId="780" />
+  <Token Text="AND" UId="781" />
+  <NewLine Num="1" UId="782" />
+  <Blank Num="4" UId="783" />
+  <Token Text="NOT" UId="784" />
+  <Blank Num="1" UId="785" />
+  <Access Scope="LocalVariable" UId="786">
+    <Symbol UId="787">
+      <Component Name="dataReceiveError" UId="788" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="789" />
+  <Token Text="AND" UId="790" />
+  <Blank Num="1" UId="791" />
+  <Token Text="NOT" UId="792" />
+  <Blank Num="1" UId="793" />
+  <Access Scope="LocalVariable" UId="794">
+    <Symbol UId="795">
+      <Component Name="device" UId="796" />
+      <Token Text="." UId="797" />
+      <Component Name="sts" UId="798" />
+      <Token Text="." UId="799" />
+      <Component Name="maskAlm" UId="800" />
+      <Token Text="." UId="801" />
+      <Token Text="%X12" UId="802" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="803" />
+  <Token Text="THEN" UId="804" />
+  <NewLine Num="1" UId="805" />
+  <Blank Num="4" UId="806" />
+  <NewLine Num="1" UId="807" />
+  <Blank Num="4" UId="808" />
+  <Access Scope="LocalVariable" UId="809">
+    <Symbol UId="810">
+      <Component Name="device" UId="811" />
+      <Token Text="." UId="812" />
+      <Component Name="sts" UId="813" />
+      <Token Text="." UId="814" />
+      <Component Name="alm" UId="815" />
+      <Token Text="." UId="816" />
+      <Token Text="%X12" UId="817" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="818" />
+  <Token Text=":=" UId="819" />
+  <Blank Num="1" UId="820" />
+  <Access Scope="LiteralConstant" UId="821">
+    <Constant UId="822">
+      <ConstantValue UId="824">TRUE</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="825" />
+  <NewLine Num="1" UId="826" />
+  <Token Text="END_IF" UId="827" />
+  <Token Text=";" UId="828" />
+  <NewLine Num="2" UId="829" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="830">
+    <Text UId="831">Pistolet 3</Text>
+  </LineComment>
+  <NewLine Num="1" UId="832" />
+  <Token Text="IF" UId="833" />
+  <Blank Num="1" UId="834" />
+  <Token Text="(" UId="835" />
+  <Access Scope="LocalVariable" UId="836">
+    <Symbol UId="837">
+      <Component Name="device" UId="838" />
+      <Token Text="." UId="839" />
+      <Component Name="sts" UId="840" />
+      <Token Text="." UId="841" />
+      <Component Name="AnalogSignals" UId="842" />
+      <Token Text="." UId="843" />
+      <Component Name="Limits" UId="844" />
+      <Token Text="." UId="845" />
+      <Component Name="Versa1_OL_Temp_Zone8" UId="846" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="847" />
+  <Token Text="&lt;" UId="848" />
+  <Blank Num="1" UId="849" />
+  <Access Scope="LocalVariable" UId="850">
+    <Symbol UId="851">
+      <Component Name="device" UId="852" />
+      <Token Text="." UId="853" />
+      <Component Name="sts" UId="854" />
+      <Token Text="." UId="855" />
+      <Component Name="AnalogSignals" UId="856" />
+      <Token Text="." UId="857" />
+      <Component Name="Temperature" UId="858" />
+      <Token Text="." UId="859" />
+      <Component Name="Read" UId="860" />
+      <Token Text="." UId="861" />
+      <Component Name="Versa_ActTemp_Zone8" UId="862" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="863" />
+  <Token Text="OR" UId="864" />
+  <NewLine Num="1" UId="865" />
+  <Blank Num="4" UId="866" />
+  <Access Scope="LocalVariable" UId="867">
+    <Symbol UId="868">
+      <Component Name="device" UId="869" />
+      <Token Text="." UId="870" />
+      <Component Name="sts" UId="871" />
+      <Token Text="." UId="872" />
+      <Component Name="AnalogSignals" UId="873" />
+      <Token Text="." UId="874" />
+      <Component Name="Limits" UId="875" />
+      <Token Text="." UId="876" />
+      <Component Name="Versa1_UL_Temp_Zone8" UId="877" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="878" />
+  <Token Text="&gt;" UId="879" />
+  <Blank Num="1" UId="880" />
+  <Access Scope="LocalVariable" UId="881">
+    <Symbol UId="882">
+      <Component Name="device" UId="883" />
+      <Token Text="." UId="884" />
+      <Component Name="sts" UId="885" />
+      <Token Text="." UId="886" />
+      <Component Name="AnalogSignals" UId="887" />
+      <Token Text="." UId="888" />
+      <Component Name="Temperature" UId="889" />
+      <Token Text="." UId="890" />
+      <Component Name="Read" UId="891" />
+      <Token Text="." UId="892" />
+      <Component Name="Versa_ActTemp_Zone8" UId="893" />
+    </Symbol>
+  </Access>
+  <Token Text=")" UId="894" />
+  <Blank Num="1" UId="895" />
+  <Token Text="AND" UId="896" />
+  <NewLine Num="1" UId="897" />
+  <Blank Num="4" UId="898" />
+  <Token Text="NOT" UId="899" />
+  <Blank Num="1" UId="900" />
+  <Access Scope="LocalVariable" UId="901">
+    <Symbol UId="902">
+      <Component Name="dataReceiveError" UId="903" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="904" />
+  <Token Text="AND" UId="905" />
+  <Blank Num="1" UId="906" />
+  <Token Text="NOT" UId="907" />
+  <Blank Num="1" UId="908" />
+  <Access Scope="LocalVariable" UId="909">
+    <Symbol UId="910">
+      <Component Name="device" UId="911" />
+      <Token Text="." UId="912" />
+      <Component Name="sts" UId="913" />
+      <Token Text="." UId="914" />
+      <Component Name="maskAlm" UId="915" />
+      <Token Text="." UId="916" />
+      <Token Text="%X13" UId="917" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="918" />
+  <Token Text="THEN" UId="919" />
+  <NewLine Num="1" UId="920" />
+  <Blank Num="4" UId="921" />
+  <NewLine Num="1" UId="922" />
+  <Blank Num="4" UId="923" />
+  <Access Scope="LocalVariable" UId="924">
+    <Symbol UId="925">
+      <Component Name="device" UId="926" />
+      <Token Text="." UId="927" />
+      <Component Name="sts" UId="928" />
+      <Token Text="." UId="929" />
+      <Component Name="alm" UId="930" />
+      <Token Text="." UId="931" />
+      <Token Text="%X13" UId="932" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="933" />
+  <Token Text=":=" UId="934" />
+  <Blank Num="1" UId="935" />
+  <Access Scope="LiteralConstant" UId="936">
+    <Constant UId="937">
+      <ConstantValue UId="939">TRUE</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="940" />
+  <NewLine Num="1" UId="941" />
+  <Token Text="END_IF" UId="942" />
+  <Token Text=";" UId="943" />
+  <NewLine Num="2" UId="944" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="945">
+    <Text UId="946">Wąż 4</Text>
+  </LineComment>
+  <NewLine Num="1" UId="947" />
+  <Token Text="IF" UId="948" />
+  <Blank Num="1" UId="949" />
+  <Token Text="(" UId="950" />
+  <Access Scope="LocalVariable" UId="951">
+    <Symbol UId="952">
+      <Component Name="device" UId="953" />
+      <Token Text="." UId="954" />
+      <Component Name="sts" UId="955" />
+      <Token Text="." UId="956" />
+      <Component Name="AnalogSignals" UId="957" />
+      <Token Text="." UId="958" />
+      <Component Name="Limits" UId="959" />
+      <Token Text="." UId="960" />
+      <Component Name="Versa1_OL_Temp_Zone9" UId="961" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="962" />
+  <Token Text="&lt;" UId="963" />
+  <Blank Num="1" UId="964" />
+  <Access Scope="LocalVariable" UId="965">
+    <Symbol UId="966">
+      <Component Name="device" UId="967" />
+      <Token Text="." UId="968" />
+      <Component Name="sts" UId="969" />
+      <Token Text="." UId="970" />
+      <Component Name="AnalogSignals" UId="971" />
+      <Token Text="." UId="972" />
+      <Component Name="Temperature" UId="973" />
+      <Token Text="." UId="974" />
+      <Component Name="Read" UId="975" />
+      <Token Text="." UId="976" />
+      <Component Name="Versa_ActTemp_Zone9" UId="977" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="978" />
+  <Token Text="OR" UId="979" />
+  <NewLine Num="1" UId="980" />
+  <Blank Num="4" UId="981" />
+  <Access Scope="LocalVariable" UId="982">
+    <Symbol UId="983">
+      <Component Name="device" UId="984" />
+      <Token Text="." UId="985" />
+      <Component Name="sts" UId="986" />
+      <Token Text="." UId="987" />
+      <Component Name="AnalogSignals" UId="988" />
+      <Token Text="." UId="989" />
+      <Component Name="Limits" UId="990" />
+      <Token Text="." UId="991" />
+      <Component Name="Versa1_UL_Temp_Zone9" UId="992" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="993" />
+  <Token Text="&gt;" UId="994" />
+  <Blank Num="1" UId="995" />
+  <Access Scope="LocalVariable" UId="996">
+    <Symbol UId="997">
+      <Component Name="device" UId="998" />
+      <Token Text="." UId="999" />
+      <Component Name="sts" UId="1000" />
+      <Token Text="." UId="1001" />
+      <Component Name="AnalogSignals" UId="1002" />
+      <Token Text="." UId="1003" />
+      <Component Name="Temperature" UId="1004" />
+      <Token Text="." UId="1005" />
+      <Component Name="Read" UId="1006" />
+      <Token Text="." UId="1007" />
+      <Component Name="Versa_ActTemp_Zone9" UId="1008" />
+    </Symbol>
+  </Access>
+  <Token Text=")" UId="1009" />
+  <Blank Num="1" UId="1010" />
+  <Token Text="AND" UId="1011" />
+  <NewLine Num="1" UId="1012" />
+  <Blank Num="4" UId="1013" />
+  <Token Text="NOT" UId="1014" />
+  <Blank Num="1" UId="1015" />
+  <Access Scope="LocalVariable" UId="1016">
+    <Symbol UId="1017">
+      <Component Name="dataReceiveError" UId="1018" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="1019" />
+  <Token Text="AND" UId="1020" />
+  <Blank Num="1" UId="1021" />
+  <Token Text="NOT" UId="1022" />
+  <Blank Num="1" UId="1023" />
+  <Access Scope="LocalVariable" UId="1024">
+    <Symbol UId="1025">
+      <Component Name="device" UId="1026" />
+      <Token Text="." UId="1027" />
+      <Component Name="sts" UId="1028" />
+      <Token Text="." UId="1029" />
+      <Component Name="maskAlm" UId="1030" />
+      <Token Text="." UId="1031" />
+      <Token Text="%X14" UId="1032" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="1033" />
+  <Token Text="THEN" UId="1034" />
+  <NewLine Num="1" UId="1035" />
+  <Blank Num="4" UId="1036" />
+  <NewLine Num="1" UId="1037" />
+  <Blank Num="4" UId="1038" />
+  <Access Scope="LocalVariable" UId="1039">
+    <Symbol UId="1040">
+      <Component Name="device" UId="1041" />
+      <Token Text="." UId="1042" />
+      <Component Name="sts" UId="1043" />
+      <Token Text="." UId="1044" />
+      <Component Name="alm" UId="1045" />
+      <Token Text="." UId="1046" />
+      <Token Text="%X14" UId="1047" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="1048" />
+  <Token Text=":=" UId="1049" />
+  <Blank Num="1" UId="1050" />
+  <Access Scope="LiteralConstant" UId="1051">
+    <Constant UId="1052">
+      <ConstantValue UId="1054">TRUE</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="1055" />
+  <NewLine Num="1" UId="1056" />
+  <Token Text="END_IF" UId="1057" />
+  <Token Text=";" UId="1058" />
+  <NewLine Num="2" UId="1059" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="1060">
+    <Text UId="1061">Pistolet 4</Text>
+  </LineComment>
+  <NewLine Num="1" UId="1062" />
+  <Token Text="IF" UId="1063" />
+  <Blank Num="1" UId="1064" />
+  <Token Text="(" UId="1065" />
+  <Access Scope="LocalVariable" UId="1066">
+    <Symbol UId="1067">
+      <Component Name="device" UId="1068" />
+      <Token Text="." UId="1069" />
+      <Component Name="sts" UId="1070" />
+      <Token Text="." UId="1071" />
+      <Component Name="AnalogSignals" UId="1072" />
+      <Token Text="." UId="1073" />
+      <Component Name="Limits" UId="1074" />
+      <Token Text="." UId="1075" />
+      <Component Name="Versa1_OL_Temp_Zone10" UId="1076" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="1077" />
+  <Token Text="&lt;" UId="1078" />
+  <Blank Num="1" UId="1079" />
+  <Access Scope="LocalVariable" UId="1080">
+    <Symbol UId="1081">
+      <Component Name="device" UId="1082" />
+      <Token Text="." UId="1083" />
+      <Component Name="sts" UId="1084" />
+      <Token Text="." UId="1085" />
+      <Component Name="AnalogSignals" UId="1086" />
+      <Token Text="." UId="1087" />
+      <Component Name="Temperature" UId="1088" />
+      <Token Text="." UId="1089" />
+      <Component Name="Read" UId="1090" />
+      <Token Text="." UId="1091" />
+      <Component Name="Versa_ActTemp_Zone10" UId="1092" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="1093" />
+  <Token Text="OR" UId="1094" />
+  <NewLine Num="1" UId="1095" />
+  <Blank Num="4" UId="1096" />
+  <Access Scope="LocalVariable" UId="1097">
+    <Symbol UId="1098">
+      <Component Name="device" UId="1099" />
+      <Token Text="." UId="1100" />
+      <Component Name="sts" UId="1101" />
+      <Token Text="." UId="1102" />
+      <Component Name="AnalogSignals" UId="1103" />
+      <Token Text="." UId="1104" />
+      <Component Name="Limits" UId="1105" />
+      <Token Text="." UId="1106" />
+      <Component Name="Versa1_UL_Temp_Zone10" UId="1107" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="1108" />
+  <Token Text="&gt;" UId="1109" />
+  <Blank Num="1" UId="1110" />
+  <Access Scope="LocalVariable" UId="1111">
+    <Symbol UId="1112">
+      <Component Name="device" UId="1113" />
+      <Token Text="." UId="1114" />
+      <Component Name="sts" UId="1115" />
+      <Token Text="." UId="1116" />
+      <Component Name="AnalogSignals" UId="1117" />
+      <Token Text="." UId="1118" />
+      <Component Name="Temperature" UId="1119" />
+      <Token Text="." UId="1120" />
+      <Component Name="Read" UId="1121" />
+      <Token Text="." UId="1122" />
+      <Component Name="Versa_ActTemp_Zone10" UId="1123" />
+    </Symbol>
+  </Access>
+  <Token Text=")" UId="1124" />
+  <Blank Num="1" UId="1125" />
+  <Token Text="AND" UId="1126" />
+  <NewLine Num="1" UId="1127" />
+  <Blank Num="4" UId="1128" />
+  <Token Text="NOT" UId="1129" />
+  <Blank Num="1" UId="1130" />
+  <Access Scope="LocalVariable" UId="1131">
+    <Symbol UId="1132">
+      <Component Name="dataReceiveError" UId="1133" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="1134" />
+  <Token Text="AND" UId="1135" />
+  <Blank Num="1" UId="1136" />
+  <Token Text="NOT" UId="1137" />
+  <Blank Num="1" UId="1138" />
+  <Access Scope="LocalVariable" UId="1139">
+    <Symbol UId="1140">
+      <Component Name="device" UId="1141" />
+      <Token Text="." UId="1142" />
+      <Component Name="sts" UId="1143" />
+      <Token Text="." UId="1144" />
+      <Component Name="maskAlm" UId="1145" />
+      <Token Text="." UId="1146" />
+      <Token Text="%X15" UId="1147" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="1148" />
+  <Token Text="THEN" UId="1149" />
+  <NewLine Num="1" UId="1150" />
+  <Blank Num="4" UId="1151" />
+  <NewLine Num="1" UId="1152" />
+  <Blank Num="4" UId="1153" />
+  <Access Scope="LocalVariable" UId="1154">
+    <Symbol UId="1155">
+      <Component Name="device" UId="1156" />
+      <Token Text="." UId="1157" />
+      <Component Name="sts" UId="1158" />
+      <Token Text="." UId="1159" />
+      <Component Name="alm" UId="1160" />
+      <Token Text="." UId="1161" />
+      <Token Text="%X15" UId="1162" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="1163" />
+  <Token Text=":=" UId="1164" />
+  <Blank Num="1" UId="1165" />
+  <Access Scope="LiteralConstant" UId="1166">
+    <Constant UId="1167">
+      <ConstantValue UId="1169">TRUE</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="1170" />
+  <NewLine Num="1" UId="1171" />
+  <Token Text="END_IF" UId="1172" />
+  <Token Text=";" UId="1173" />
+  <NewLine Num="1" UId="1174" />
+</StructuredText></NetworkSource>
+          <ProgrammingLanguage>SCL</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="8A" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="8B" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="8C" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="8D" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="8E" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="8F" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Alarmy dla temperatur</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="90" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v3">
+  <Access Scope="LocalVariable" UId="21">
+    <Symbol UId="22">
+      <Component Name="device" UId="23" />
+      <Token Text="." UId="24" />
+      <Component Name="sts" UId="25" />
+      <Token Text="." UId="26" />
+      <Component Name="alm" UId="27" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="28" />
+  <Token Text=":=" UId="29" />
+  <Blank Num="1" UId="30" />
+  <Access Scope="LocalVariable" UId="31">
+    <Symbol UId="32">
+      <Component Name="device" UId="33" />
+      <Token Text="." UId="34" />
+      <Component Name="sts" UId="35" />
+      <Token Text="." UId="36" />
+      <Component Name="alm" UId="37" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="38" />
+  <Token Text="AND" UId="39" />
+  <Blank Num="1" UId="40" />
+  <Token Text="NOT" UId="41" />
+  <Blank Num="1" UId="42" />
+  <Access Scope="LocalVariable" UId="43">
+    <Symbol UId="44">
+      <Component Name="device" UId="45" />
+      <Token Text="." UId="46" />
+      <Component Name="rq" UId="47" />
+      <Token Text="." UId="48" />
+      <Component Name="almAck" UId="49" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="50" />
+</StructuredText></NetworkSource>
+          <ProgrammingLanguage>SCL</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="91" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="92" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="93" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="94" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="95" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+              <MultilingualTextItem ID="96" CompositionName="Items">
+                <AttributeList>
+                  <Culture>pl-PL</Culture>
+                  <Text>Reset alarmów</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <MultilingualText ID="97" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="98" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-US</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="99" CompositionName="Items">
+            <AttributeList>
+              <Culture>pl-PL</Culture>
+              <Text>Blok do komunikacji z Versa</Text>
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.FB>
+</Document>

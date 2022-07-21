@@ -1,0 +1,34 @@
+﻿FUNCTION "fcCopyData" : Void
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_VAR_Data : Variant;
+   END_VAR
+
+   VAR_OUTPUT 
+      o_VAR_Data : Variant;
+   END_VAR
+
+   VAR_TEMP 
+      temp_Buffer : Array[1..512] of Byte;
+      temp_PosBuffer : DInt;
+      temp_Internal_error : Int;
+   END_VAR
+
+
+BEGIN
+	
+	//wyczyszczenie struktury danych
+	//przerzucenie z struktury na tablice
+	
+	#temp_PosBuffer := 0;
+	#temp_Internal_error := Serialize(SRC_VARIABLE := #i_VAR_Data, DEST_ARRAY => #temp_Buffer, POS := #temp_PosBuffer);
+	
+	//przerzucenie spowrotem z tablicy do struktury
+	#temp_PosBuffer := 0;
+	#temp_Internal_error := Deserialize(SRC_ARRAY := #temp_Buffer, DEST_VARIABLE => #o_VAR_Data, POS := #temp_PosBuffer);
+	
+	
+	
+END_FUNCTION
+
